@@ -24,6 +24,7 @@ class GPTService:
 
         # Get the generated text
         generated_text = self.response['choices'][0]['message']['content']
+        
         try:
             data = json.loads(generated_text)
             print(data)
