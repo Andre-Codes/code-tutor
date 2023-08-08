@@ -1,0 +1,64 @@
+```json
+{
+  "description": "The sklearn OrdinalEncoder is used to encode categorical features into ordinal integers.",
+  "parameters": [
+    {
+      "name": "categories",
+      "type": "array-like",
+      "default": "auto",
+      "description": "The categories of each feature. It can be 'auto' to automatically infer categories from the training data, or a list of arrays specifying the categories of each feature."
+    },
+    {
+      "name": "dtype",
+      "type": "dtype, default=np.float64",
+      "description": "The desired dtype of the output."
+    }
+  ],
+  "attributes": [
+    {
+      "name": "categories_",
+      "type": "list of arrays",
+      "description": "The categories of each feature."
+    },
+    {
+      "name": "dtype_",
+      "type": "dtype",
+      "description": "The dtype of the output."
+    }
+  ],
+  "examples": [
+    {
+      "code": "from sklearn.preprocessing import OrdinalEncoder\n\nX = [['Male', 'Apple'], ['Female', 'Orange'], ['Female', 'Banana']]\n\nencoder = OrdinalEncoder()\nX_encoded = encoder.fit_transform(X)\n\nprint(X_encoded)"
+    }
+  ]
+}
+```
+
+### Description
+The sklearn OrdinalEncoder is used to encode categorical features into ordinal integers.
+
+### Parameters
+- `categories` (array-like, default='auto'): The categories of each feature. It can be 'auto' to automatically infer categories from the training data, or a list of arrays specifying the categories of each feature.
+- `dtype` (dtype, default=np.float64): The desired dtype of the output.
+
+### Attributes
+- `categories_` (list of arrays): The categories of each feature.
+- `dtype_` (dtype): The dtype of the output.
+
+### Examples
+```python
+from sklearn.preprocessing import OrdinalEncoder
+
+X = [['Male', 'Apple'], ['Female', 'Orange'], ['Female', 'Banana']]
+
+encoder = OrdinalEncoder()
+X_encoded = encoder.fit_transform(X)
+
+print(X_encoded)
+```
+Output:
+```
+[[1. 0.]
+ [0. 2.]
+ [0. 1.]]
+```
