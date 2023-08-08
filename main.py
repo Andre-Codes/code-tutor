@@ -1,6 +1,6 @@
 import gpt_service as gpt
 
-system_role = "You're a helpful assistnat and expert on analyzing python library documentation"
+system_role = "You're a helpful assistant and expert on analyzing python library documentation"
 
 ai = gpt.GPTService(system_role=system_role, temperature=0.2)
 
