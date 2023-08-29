@@ -10,44 +10,50 @@ class GPTService:
         api_key (str): The API key for OpenAI. Sourced from environment variables.
         user_prompt (str): The prompt that the user provides for the model.
         response (str): The generated response from the GPT model.
-        context (str): The context in which the GPT model operates.
+        role_context (str): The context in which the GPT model operates.
         temperature (float): The randomness of the GPT model's output.
-        md_code_instruct (str): Markdown instructions for code.
-        api_explain_context (str): Instructions for API explanation.
-        md_table_instruct (str): Markdown instructions for tables.
+        md_code_format (str): Markdown instructions for code.
+        md_table_format (str): Markdown instructions for tables.
         
     """
     
-    def __init__(self, context='basic', temperature=0):
-        """Initializes the GPTService class with the given parameters.
+    def __init__(self, role_context='basic', prompt_context=True, md_table_format_type='pipes', temperature=0):
+        """
+        Initializes the GPTService class with the given parameters.
         
-        Args:
-            context (str, optional): The context in which the GPT model operates. Defaults to 'basic'.
+        Parameters:
+            role_context (str, optional): The context in which the GPT model instance operates. Defaults to 'basic'.
                 Options:
                     - 'basic': General-purpose context for general questions.
                     - 'api_explain': Context for explaining API documentation.
                     - 'code_help': Context for answering coding-related questions.
             temperature (float, optional): The randomness of the GPT model's output. Defaults to 0.
+            prompt_context (bool, optional): Whether or not context (e.g. API documentation) is provided for the prompt. Defaults to True.
         """
         
+
         self.api_key = os.environ['OPENAI_API_KEY']
         self.user_prompt = ''
         self.response = ''
-        self.context = context
+        self.role_context = role_context
+        self.prompt_context = prompt_context
         self.temperature = temperature
         openai.api_key = self.api_key
         
-        self.md_code_instruct = "Surround any python code with a single backtick"
-        
-        self.api_explain_context = "Using the following documentation, summarize \
-            with fields, if available, for description, parameters, attributes, 'returns', code examples \
-                Provide a minimum of 3 examples, increasing in complexity, using various parameters."
-            
-        self.md_table_instruct = "Format the parameters as a markdown table using \
-            the following instructions: To add a table, use three or \
-                more hyphens (---) to create each column header, and use pipes (|) \
-                    to separate each column. For compatibility, you should also add \
-                        a pipe on either end of the row."
+        self.md_code_format = "Surround any python code with a single backtick"
+           
+        self.md_table_format_type = md_table_format_type
+    
+        if self.md_table_format_type == 'bullets':
+            self.md_table_format = "Format the parameters as a markdown list using bullets (e.g., * or -)."
+        elif self.md_table_format_type == 'pipes':
+            self.md_table_format = "Format the parameters only as a markdown table using \
+                the following instructions: To add a table, use three or \
+                    more hyphens (---) to create each column header, and use pipes (|) \
+                        to separate each column. For compatibility, you should also add \
+                            a pipe on either end of the row."
+        else:
+            raise ValueError("Invalid md_table_format_type. Use 'bullets' or 'pipes'.")
                         
         self.context_handlers = {
             'basic': self._handle_basic,
@@ -71,9 +77,9 @@ class GPTService:
                 - 'code_help': Provides help for coding-related questions.
         """
         
-        handler = self.context_handlers.get(self.context)
+        handler = self.context_handlers.get(self.role_context)
         if handler is None:
-            raise ValueError(f"Invalid context: {self.context}")
+            raise ValueError(f"Invalid context: {self.role_context}")
         
         system_role, user_content = handler(user_prompt)
         
@@ -104,14 +110,22 @@ class GPTService:
         return system_role, user_content
 
     def _handle_api_explain(self, user_prompt):
+        if self.prompt_context:
+            prompt_preface = "For the following documentation, summarize if provided"
+        else:
+            prompt_preface = "For the following, provide me"
+            
+        api_explain_message = f"{prompt_preface} the description, parameters, attributes, 'returns', code examples \
+        Provide a minimum of 3 examples, increasing in complexity, using various parameters."
+        
+        instructions = f"{api_explain_message}; {self.md_code_format}"
+        user_content = f"{instructions}: {user_prompt}; {self.md_table_format}"
         system_role = "You're a helpful assistant and expert on analyzing python library documentation."
-        instructions = f"{self.api_explain_context}; {self.md_code_instruct}"
-        user_content = f"{instructions}: {user_prompt}; {self.md_table_instruct}"
         return system_role, user_content
 
     def _handle_code_help(self, user_prompt):
         system_role = "You're a helpful assistant who answers coding language questions."
-        user_content = f"{user_prompt}; {self.md_code_instruct}"
+        user_content = f"{user_prompt}; {self.md_code_format}"
         return system_role, user_content
 
     def prompt(self, user_prompt=None):
