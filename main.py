@@ -10,11 +10,3 @@ answer = api_helper.get_response(api_helper.prompt)
 
 print(answer)
 
-answer['description']
-answer['parameters']
-answer['examples']
-
-
-import numpy as np
-
-np.linspace()

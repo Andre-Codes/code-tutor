@@ -17,7 +17,7 @@ class GPTService:
         
     """
     
-    def __init__(self, role_context='basic', prompt_context=True, md_table_format_type='pipes', temperature=0):
+    def __init__(self, role_context='basic', prompt_context=True, md_table_format_style='pipes', temperature=0):
         """
         Initializes the GPTService class with the given parameters.
         
@@ -28,38 +28,45 @@ class GPTService:
                     - 'api_explain': Context for explaining API documentation.
                     - 'code_help': Context for answering coding-related questions.
             temperature (float, optional): The randomness of the GPT model's output. Defaults to 0.
-            prompt_context (bool, optional): Whether or not context (e.g. API documentation) is provided for the prompt. Defaults to True.
+            prompt_context (bool, optional): Whether or not context (e.g. API documentation) is provided \
+                for the prompt. Defaults to True.
+            md_table_format_style (str, optional): The format in which to create a table. \
+                Depending on the rendering application, some require a nest bullet list \
+                    others require the pipe '|' character.  Defaults to 'pipes'.
         """
         
-
+        # Initialization of attributes
         self.api_key = os.environ['OPENAI_API_KEY']
         self.user_prompt = ''
         self.response = ''
         self.role_context = role_context
         self.prompt_context = prompt_context
         self.temperature = temperature
+        self.md_code_format = "Surround any python code with a single backtick"
+        self.md_table_format_style = md_table_format_style
+        self.md_table_format = self._set_md_table_format()
+        
         openai.api_key = self.api_key
         
-        self.md_code_format = "Surround any python code with a single backtick"
-           
-        self.md_table_format_type = md_table_format_type
-    
-        if self.md_table_format_type == 'bullets':
-            self.md_table_format = "Format the parameters as a markdown list using bullets (e.g., * or -)."
-        elif self.md_table_format_type == 'pipes':
-            self.md_table_format = "Format the parameters only as a markdown table using \
-                the following instructions: To add a table, use three or \
-                    more hyphens (---) to create each column header, and use pipes (|) \
-                        to separate each column. For compatibility, you should also add \
-                            a pipe on either end of the row."
-        else:
-            raise ValueError("Invalid md_table_format_type. Use 'bullets' or 'pipes'.")
-                        
         self.context_handlers = {
             'basic': self._handle_basic,
             'api_explain': self._handle_api_explain,
             'code_help': self._handle_code_help,
         }
+        
+    def _set_md_table_format(self):
+        """
+        Sets the markdown table format based on the type.
+        """
+        if self.md_table_format_style == 'bullets':
+            return "Format the parameters as a markdown list using bullets. The param description will \
+        be an indented bullet on a new line."
+        elif self.md_table_format_style == 'pipes':
+            return """Format the parameters only as a markdown table using the following instructions:
+            To add a table, use three or more hyphens (---) to create each column header, and use pipes (|)
+            to separate each column. For compatibility, you should also add a pipe on either end of the row."""
+        else:
+            raise ValueError("Invalid md_table_format_style. Use 'bullets' or 'pipes'.")
 
     def get_response(self, user_prompt):
         """Fetches the generated response from the GPT model based on the user prompt and context.
@@ -133,7 +140,8 @@ class GPTService:
         Prompts the user for input and fetches the generated response from the GPT model.
         
         Parameters:
-            user_prompt (str, optional): The prompt that the user may provide. If None, user will be prompted for input.
+            user_prompt (str, optional): The prompt that the user may provide. \
+                If None, user will be prompted for input.
         
         Returns:
             str: The generated text from the GPT model.
