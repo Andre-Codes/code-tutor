@@ -40,13 +40,20 @@ class GPTService:
         self.md_code_instruct = "Surround any python code with a single backtick"
         
         self.api_explain_context = "Using the following documentation, summarize \
-            with fields for description, parameters, attributes, code examples"
+            with fields, if available, for description, parameters, attributes, 'returns', code examples \
+                Provide a minimum of 3 examples, increasing in complexity, using various parameters."
             
-        self.md_table_instruct = "Format the parameters and examples as a markdown \
-            table using the following instructions: To add a table, use three or \
+        self.md_table_instruct = "Format the parameters as a markdown table using \
+            the following instructions: To add a table, use three or \
                 more hyphens (---) to create each column header, and use pipes (|) \
                     to separate each column. For compatibility, you should also add \
                         a pipe on either end of the row."
+                        
+        self.context_handlers = {
+            'basic': self._handle_basic,
+            'api_explain': self._handle_api_explain,
+            'code_help': self._handle_code_help,
+        }
 
     def get_response(self, user_prompt):
         """Fetches the generated response from the GPT model based on the user prompt and context.
@@ -64,28 +71,11 @@ class GPTService:
                 - 'code_help': Provides help for coding-related questions.
         """
         
-        if self.context != 'basic':
-            
-            if self.context == 'api_explain':
-                
-                instructions = f"{self.api_explain_context}; {self.md_code_instruct}"
-                documentation = user_prompt
-                formatting =  self.md_table_instruct
-                
-                system_role = "You're a helpful assistant and expert on analyzing \
-                    python library documentation"
-
-                user_content = f"{instructions}: {documentation}; {formatting}"
-                    
-            elif self.context == 'code_help':
-                formatting =  self.md_code_instruct
-                system_role = "You're a helpful assistant who answers coding language questions."
-                f"{user_prompt}; {formatting}"
-                    
-                    
-        else:
-            
-            system_role = "You're a helpful assistant that answers my questions."
+        handler = self.context_handlers.get(self.context)
+        if handler is None:
+            raise ValueError(f"Invalid context: {self.context}")
+        
+        system_role, user_content = handler(user_prompt)
         
         model = "gpt-3.5-turbo"
         self.response = openai.ChatCompletion.create(
@@ -107,6 +97,22 @@ class GPTService:
         except json.JSONDecodeError:
             print(generated_text)
             return generated_text
+        
+    def _handle_basic(self, user_prompt):
+        system_role = "You're a helpful assistant that answers my questions."
+        user_content = user_prompt
+        return system_role, user_content
+
+    def _handle_api_explain(self, user_prompt):
+        system_role = "You're a helpful assistant and expert on analyzing python library documentation."
+        instructions = f"{self.api_explain_context}; {self.md_code_instruct}"
+        user_content = f"{instructions}: {user_prompt}; {self.md_table_instruct}"
+        return system_role, user_content
+
+    def _handle_code_help(self, user_prompt):
+        system_role = "You're a helpful assistant who answers coding language questions."
+        user_content = f"{user_prompt}; {self.md_code_instruct}"
+        return system_role, user_content
 
     def prompt(self, user_prompt=None):
         """
