@@ -2,6 +2,7 @@ import os
 import openai
 import json
 
+
 class GPTService:
     def __init__(self, system_role="You are a helpful assistant who responds to my questions.", temperature=0):
         self.api_key = os.environ['OPENAI_API_KEY']
