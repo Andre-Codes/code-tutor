@@ -2,6 +2,12 @@ import os
 import openai
 import json
 
+
+# Load instructions from JSON file
+with open("instructions.json", "r") as f:
+    INSTRUCTIONS = json.load(f)
+    
+
 class GPTService:
     """
     A service class for interacting with the GPT-3.5-turbo model via OpenAI API.
@@ -42,10 +48,8 @@ class GPTService:
         self.role_context = role_context
         self.prompt_context = prompt_context
         self.temperature = temperature
-        self.md_code_format = "Surround single line python code with single backticks, and multiple \
-            lines of code with: ```python SAMPLE_CODE ```"
-        self.md_format_instruct = "Respond using markdown style formatting. Use the # character for headers, \
-            with at least one space in between the header and the next text."
+        self.md_code_format = INSTRUCTIONS["code_formatting"]["md_code_format"]
+        self.md_format_instruct = INSTRUCTIONS["general"]["md_format_instruct"]
         self.md_table_format_style = md_table_format_style
         self.md_table_format = self._set_md_table_format()
         
@@ -62,15 +66,11 @@ class GPTService:
         Sets the markdown table format based on the type.
         """
         if self.md_table_format_style == 'bullets':
-            return """Format the parameters and their descriptions as a table.
-        The table will be in the form of a bulleted list. The description for
-        each param will be an indented bullet on a new line."""
+            return INSTRUCTIONS["table_formatting"]["bullets"]
         elif self.md_table_format_style == 'pipes':
-            return """Format the parameters only as a markdown table using the following instructions:
-            To add a table, use three or more hyphens (---) to create each column header, and use pipes (|)
-            to separate each column. For compatibility, you should also add a pipe on either end of the row."""
+            return INSTRUCTIONS["table_formatting"]["pipes"]
         else:
-            raise ValueError("Invalid md_table_format_style. Use 'bullets' or 'pipes'.")
+            raise ValueError(f"Invalid md_table_format_style. Available styles: {list(INSTRUCTIONS['table_formatting'].keys())}.")
 
     def get_response(self, user_prompt):
         """Fetches the generated response from the GPT model based on the user prompt and context.

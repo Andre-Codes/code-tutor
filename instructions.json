@@ -1,0 +1,12 @@
+{
+    "table_formatting": {
+        "bullets": "Format the parameters and their descriptions as a table.The table will be in the form of a bulleted list. The description for each param will be an indented bullet on a new line.",
+        "pipes": "Format the parameters only as a markdown table using the following instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row."
+    },
+    "code_formatting": {
+        "md_code_format": "Surround single line python code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE ```"
+    },
+    "general": {
+        "md_format_instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text."
+    }
+}
