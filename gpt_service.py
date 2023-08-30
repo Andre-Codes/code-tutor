@@ -55,11 +55,7 @@ class GPTService:
         
         openai.api_key = self.api_key
         
-        self.context_handlers = {
-            'basic': self._handle_basic,
-            'api_explain': self._handle_api_explain,
-            'code_help': self._handle_code_help,
-        }
+        self.context_handlers = {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('contexts', {})}
         
     def _set_md_table_format(self):
         """
@@ -122,12 +118,11 @@ class GPTService:
 
     def _handle_api_explain(self, user_prompt):
         if self.prompt_context:
-            prompt_preface = "For the following documentation, summarize if provided"
+            prompt_preface = {INSTRUCTIONS['contexts']['api_explain']['prompt_preface_true']}
         else:
-            prompt_preface = "For the following, provide me"
+            prompt_preface = {INSTRUCTIONS['contexts']['api_explain']['prompt_preface_false']}
             
-        api_explain_message = f"{prompt_preface} the description, parameters, attributes, 'returns', code examples \
-        Provide a minimum of 3 examples, increasing in complexity, using various parameters."
+        api_explain_message = f"{prompt_preface} {INSTRUCTIONS['contexts']['api_explain']['instruct']}"
         
         instructions = f"{api_explain_message}; {self.md_format_instruct}; {self.md_code_format}"
         user_content = f"{instructions}: {user_prompt}; {self.md_table_format}"

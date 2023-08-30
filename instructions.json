@@ -8,5 +8,13 @@
     },
     "general": {
         "md_format_instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text."
+    },
+    "contexts": {
+        "api_explain": {
+            "instruct":"the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples, increasing in complexity, using various parameters.",
+            "prompt_preface_true":"For the following documentation, summarize if provided",
+            "prompt_preface_false": "For the following, provide me"
+        }
     }
+
 }
