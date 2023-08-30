@@ -23,7 +23,7 @@ class GPTService:
         
     """
     
-    def __init__(self, role_context='basic', prompt_context=True, md_table_format_style='pipes', temperature=0):
+    def __init__(self, role_context=None, prompt_context=None, md_table_format_style=None, temperature=None):
         """
         Initializes the GPTService class with parameters that control the prompt context and response output.
         
@@ -43,19 +43,25 @@ class GPTService:
         
         # Initialization of attributes
         self.api_key = os.environ['OPENAI_API_KEY']
+        openai.api_key = self.api_key
         self.user_prompt = ''
         self.response = ''
-        self.role_context = role_context
-        self.prompt_context = prompt_context
-        self.temperature = temperature
+        # Validate role_context against available contexts in JSON
+        available_contexts = INSTRUCTIONS.get('contexts', {}).keys()
+        self.role_context = role_context if role_context in available_contexts else 'basic'
+
+        self.prompt_context = prompt_context if prompt_context is not None else True  # Default to True
+        self.md_table_format_style = md_table_format_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
+        self.temperature = temperature or 0  # Default to 0
+
+        # Load remaining settings from JSON
         self.md_code_format = INSTRUCTIONS["code_formatting"]["md_code_format"]
         self.md_format_instruct = INSTRUCTIONS["general"]["md_format_instruct"]
-        self.md_table_format_style = md_table_format_style
         self.md_table_format = self._set_md_table_format()
         
-        openai.api_key = self.api_key
-        
-        self.context_handlers = {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('contexts', {})}
+        self.context_handlers = (
+            {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('contexts', {})}
+        )
         
     def _set_md_table_format(self):
         """
@@ -118,11 +124,11 @@ class GPTService:
 
     def _handle_api_explain(self, user_prompt):
         if self.prompt_context:
-            prompt_preface = {INSTRUCTIONS['contexts']['api_explain']['prompt_preface_true']}
+            prompt_preface = {INSTRUCTIONS['contexts'][self.role_context]['prompt_preface_true']}
         else:
-            prompt_preface = {INSTRUCTIONS['contexts']['api_explain']['prompt_preface_false']}
+            prompt_preface = {INSTRUCTIONS['contexts'][self.role_context]['prompt_preface_false']}
             
-        api_explain_message = f"{prompt_preface} {INSTRUCTIONS['contexts']['api_explain']['instruct']}"
+        api_explain_message = f"{prompt_preface} {INSTRUCTIONS['contexts'][self.role_context]['instruct']}"
         
         instructions = f"{api_explain_message}; {self.md_format_instruct}; {self.md_code_format}"
         user_content = f"{instructions}: {user_prompt}; {self.md_table_format}"
@@ -131,7 +137,7 @@ class GPTService:
 
     def _handle_code_help(self, user_prompt):
         system_role = "You're a helpful assistant who answers coding language questions."
-        user_content = f"{user_prompt}; {self.md_code_format}"
+        user_content = f"{user_prompt}; {INSTRUCTIONS['contexts'][self.role_context]['instruct']}; {self.md_code_format}"
         return system_role, user_content
 
     def prompt(self, user_prompt=None):
