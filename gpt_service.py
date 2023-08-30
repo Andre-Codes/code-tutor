@@ -19,7 +19,7 @@ class GPTService:
     
     def __init__(self, role_context='basic', prompt_context=True, md_table_format_style='pipes', temperature=0):
         """
-        Initializes the GPTService class with the given parameters.
+        Initializes the GPTService class with parameters that control the prompt context and response output.
         
         Parameters:
             role_context (str, optional): The context in which the GPT model instance operates. Defaults to 'basic'.
@@ -31,7 +31,7 @@ class GPTService:
             prompt_context (bool, optional): Whether or not context (e.g. API documentation) is provided \
                 for the prompt. Defaults to True.
             md_table_format_style (str, optional): The format in which to create a table. \
-                Depending on the rendering application, some require a nest bullet list \
+                Depending on the rendering application, some require a nested bulleted list, \
                     others require the pipe '|' character.  Defaults to 'pipes'.
         """
         
@@ -42,7 +42,8 @@ class GPTService:
         self.role_context = role_context
         self.prompt_context = prompt_context
         self.temperature = temperature
-        self.md_code_format = "Surround any python code with a single backtick"
+        self.md_code_format = "Surround single line python code with single backticks, and multiple \
+            lines of code with: ```python PUT CODE HERE ```"
         self.md_table_format_style = md_table_format_style
         self.md_table_format = self._set_md_table_format()
         
