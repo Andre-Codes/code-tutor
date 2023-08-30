@@ -43,7 +43,9 @@ class GPTService:
         self.prompt_context = prompt_context
         self.temperature = temperature
         self.md_code_format = "Surround single line python code with single backticks, and multiple \
-            lines of code with: ```python PUT CODE HERE ```"
+            lines of code with: ```python SAMPLE_CODE ```"
+        self.md_format_instruct = "Respond using markdown style formatting. Use the # character for headers, \
+            with at least one space in between the header and the next text."
         self.md_table_format_style = md_table_format_style
         self.md_table_format = self._set_md_table_format()
         
@@ -60,8 +62,9 @@ class GPTService:
         Sets the markdown table format based on the type.
         """
         if self.md_table_format_style == 'bullets':
-            return "Format the parameters as a markdown list using bullets. The param description will \
-        be an indented bullet on a new line."
+            return """Format the parameters and their descriptions as a table.
+        The table will be in the form of a bulleted list. The description for
+        each param will be an indented bullet on a new line."""
         elif self.md_table_format_style == 'pipes':
             return """Format the parameters only as a markdown table using the following instructions:
             To add a table, use three or more hyphens (---) to create each column header, and use pipes (|)
@@ -126,7 +129,7 @@ class GPTService:
         api_explain_message = f"{prompt_preface} the description, parameters, attributes, 'returns', code examples \
         Provide a minimum of 3 examples, increasing in complexity, using various parameters."
         
-        instructions = f"{api_explain_message}; {self.md_code_format}"
+        instructions = f"{api_explain_message}; {self.md_format_instruct}; {self.md_code_format}"
         user_content = f"{instructions}: {user_prompt}; {self.md_table_format}"
         system_role = "You're a helpful assistant and expert on analyzing python library documentation."
         return system_role, user_content
