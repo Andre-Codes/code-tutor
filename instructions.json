@@ -1,10 +1,10 @@
 {
     "response_formats": {
         "markdown": {
-            "main": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Surround single line code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE```",
+            "main": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text; For parameters only, format them as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row; Surround single line code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE```",
             "table_format": {
                 "bullets": "Format the parameters and their descriptions as a table. The table will be in the form of a tabbed rows. The description for each param will be on a new line and indented",
-                "pipes": "Format the parameters only as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row"
+                "pipes": "For parameters only, format them as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row"
             }
         }
     },

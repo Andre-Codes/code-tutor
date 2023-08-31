@@ -52,37 +52,43 @@ class GPTService:
             - "Basic", "Moderate", "Detailed", "Verbose", "Exhaustive", "Pedagogical"
     """
     
-    def __init__(self, role_context=None, prompt_context=None, comment_level=None, explain_level=None, temperature=None):
+    def __init__(
+        self, 
+        role_context=None, 
+        prompt_context=None, 
+        comment_level=None, 
+        explain_level=None, 
+        temperature=None):
         """
         Initializes the GPTService class with various settings.
 
         # Parameters
         ----------
-            role_context : (str, optional): 
-                Defines the operational context of the GPT model.
-                Defaults to 'basic'.
+        role_context : (str, optional): 
+            Defines the operational context of the GPT model.
+            Defaults to 'basic'.
+            
+            Options include:
+                - 'basic': General-purpose context for answering questions.
+                - 'api_explain': For summarizing and explaining API documentation. If the `prompt_context` parameter is set to `True`,
+                    this will enable the passing of entire API documentation as the prompt, ensuring up-to-date information in the response.
+                - 'code_help': For coding-related help.
                 
-                Options include:
-                    - 'basic': General-purpose context for answering questions.
-                    - 'api_explain': For summarizing and explaining API documentation. If the `prompt_context` parameter is set to `True`,
-                        this will enable the passing of entire API documentation as the prompt, ensuring up-to-date information in the response.
-                    - 'code_help': For coding-related help.
-                    
-            prompt_context : (bool, optional): 
-                Indicates if additional context (i.e. API documentation) will be provided for the prompt. Defaults to False.
+        prompt_context : (bool, optional): 
+            Indicates if additional context (i.e. API documentation) will be provided for the prompt. Defaults to False.
+            
+        md_table_style (str, optional): 
+            Specifies the Markdown table format. Defaults to 'pipes'.
+            Options:
+                - 'bullets': Use nested bulleted lists for tables.
+                - 'pipes': Use pipe characters to separate table cells.
                 
-            md_table_style (str, optional): 
-                Specifies the Markdown table format. Defaults to 'pipes'.
-                Options:
-                    - 'bullets': Use nested bulleted lists for tables.
-                    - 'pipes': Use pipe characters to separate table cells.
-                    
-            comment_level : (str, optional):
-                Specifies the level of commenting for either 'api_explain' or 'code_help' role_contexts.
-                Available options are based on the value of role_context. Defaults to 'Basic' for 'api_explain' and 'code_help'.
-                
-            temperature : (float, optional):
-                Controls the randomness of the GPT model's output. Lower values make the output more deterministic. Defaults to 0.
+        comment_level : (str, optional):
+            Specifies the level of commenting for either 'api_explain' or 'code_help' role_contexts.
+            Available options are based on the value of role_context. Defaults to 'Basic' for 'api_explain' and 'code_help'.
+            
+        temperature : (float, optional):
+            Controls the randomness of the GPT model's output. Lower values make the output more deterministic. Defaults to 0.
         """
         
         # Initialization of attributes
@@ -111,17 +117,6 @@ class GPTService:
             {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('role_contexts', {})}
         )
         
-    def _set_md_table_format(self):
-        """
-        Sets the markdown table format based on the type.
-        """
-        if self.md_table_style == 'bullets':
-            return INSTRUCTIONS["table_formatting"]["bullets"]
-        elif self.md_table_style == 'pipes':
-            return INSTRUCTIONS["table_formatting"]["pipes"]
-        else:
-            raise ValueError(f"Invalid md_table_style. Available styles: \
-                {list(INSTRUCTIONS['table_formatting'].keys())}.")
             
     def get_response_formats(self):
         available_formats = list(INSTRUCTIONS['response_formats'].keys())
