@@ -1,11 +1,14 @@
 {
     "response_formats": {
         "markdown": {
-            "main": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text; For parameters only, format them as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row; Surround single line code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE```",
-            "table_format": {
+            "main": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Surround single line code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE```",
+            "table_styles": {
                 "bullets": "Format the parameters and their descriptions as a table. The table will be in the form of a tabbed rows. The description for each param will be on a new line and indented",
                 "pipes": "For parameters only, format them as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row"
             }
+        },
+        "html": {
+            "main": "Respond in HTML format. Create a button at top linked to the API site for the related function or class. Make an HTML table with borders for the parameters. Put any code inside a <code> tag. Use the following CSS for styling: <style>\n\tcode {\n\t\tfont-family: Consolas,'courier new';\n\t\tcolor: crimson;\n\t\tbackground-color: #f1f1f1;\n\t\tpadding: 2px;\n\t\tfont-size: 105%;\n\t}\n</style>"
         }
     },
     "role_contexts": {

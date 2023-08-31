@@ -6,7 +6,6 @@ import json
 # Load instructions from JSON file
 with open("instructions.json", "r") as f:
     INSTRUCTIONS = json.load(f)
-    
 
 class GPTService:
     """
@@ -116,13 +115,18 @@ class GPTService:
         self.context_handlers = (
             {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('role_contexts', {})}
         )
-        
+    
+    def set_md_table_style(self, style):
+        available_table_styles = INSTRUCTIONS['response_formats']['markdown']['table_styles'].keys()
+        if style not in available_table_styles:
+            raise ValueError(f"Invalid md_table_style. Available styles: {list(INSTRUCTIONS['table_formatting'].keys())}.")
+        self.md_table_style = INSTRUCTIONS['response_formats']['markdown']['table_styles'][style]
             
     def get_response_formats(self):
         available_formats = list(INSTRUCTIONS['response_formats'].keys())
         print("Available response formats:", available_formats)
 
-    def get_response(self, user_prompt, response_format='markdown'):
+    def get_response(self, user_prompt, format_style='markdown'):
         """Fetches the generated response from the GPT model based on the user prompt and context.
         
         Args:
@@ -144,15 +148,21 @@ class GPTService:
         
         system_role, user_content = handler(user_prompt)
         
-        response_format = INSTRUCTIONS['response_formats'][response_format]['main']
-        print(f"{user_content}; {response_format}")
+        # Get instructions for selected format
+        response_format = INSTRUCTIONS['response_formats'][format_style]['main']
+        
+        # If selected format is 'markdown' and table style is set, append to respons instructions
+        if hasattr(self, 'md_table_style') and response_format == 'markdown':
+            response_format = response_format + self.md_table_style
+            
+        # print(f"{response_format}; {user_content}")
         
         model = "gpt-3.5-turbo"
         self.response = openai.ChatCompletion.create(
             model=model,
             messages=[
                 {"role": "system", "content": system_role},
-                {"role": "user", "content": f"{user_content}; {response_format}"},
+                {"role": "user", "content": f"{response_format}; {user_content}"},
             ],
             temperature=self.temperature,
         )
@@ -179,7 +189,7 @@ class GPTService:
         else:
             prompt_preface = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_preface_false']
             
-        extras = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process & module/class/function."
+        extras = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process."
             
         instructions = f"{prompt_preface} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
         user_content = f"{instructions}: {user_prompt}; {extras}"
@@ -212,5 +222,5 @@ class GPTService:
             self.user_prompt = input("Please provide a prompt: ")
         else:
             self.user_prompt = user_prompt
-        return self.get_response(self.user_prompt)
+        # return self.get_response(self.user_prompt)
 
