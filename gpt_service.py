@@ -10,35 +10,79 @@ with open("instructions.json", "r") as f:
 
 class GPTService:
     """
-    A service class for interacting with the GPT-3.5-turbo model via OpenAI API.
+    A service class for interacting with the GPT-3.5-turbo model via the OpenAI API.
     
     Attributes:
-        api_key (str): The API key for OpenAI. Sourced from environment variables.
+        api_key (str): The API key for OpenAI, sourced from environment variables.
         user_prompt (str): The prompt that the user provides for the model.
         response (str): The generated response from the GPT model.
-        role_context (str): The context in which the GPT model operates.
+        role_context (str): The context in which the GPT model operates. 
+                            Valid options are sourced from INSTRUCTIONS.json.
         temperature (float): The randomness of the GPT model's output.
-        md_code_format (str): Markdown instructions for code.
+        md_code_format (str): Markdown instructions for code formatting.
         md_table_format (str): Markdown instructions for tables.
         
+    Methods:
+        __init__(role_context, prompt_context, md_table_style, comment_level, temperature):
+            Initializes the class attributes based on provided parameters.
+            
+        _set_md_table_format():
+            Sets the Markdown table format based on the type.
+        
+        get_response(user_prompt):
+            Fetches a response from the GPT model based on the user's prompt and context.
+            
+        _handle_basic(user_prompt):
+            Context handler for 'basic' role_context.
+            
+        _handle_api_explain(user_prompt):
+            Context handler for 'api_explain' role_context.
+            
+        _handle_code_help(user_prompt):
+            Context handler for 'code_help' role_context.
+            
+        prompt(user_prompt):
+            Prompts the user for input and fetches the GPT model's response.
+            
+    Comment Levels:
+        For role_context='api_explain':
+            - "Basic", "Thorough", "Comprehensive", "Advanced", "Pedagogical", "Technical"
+        
+        For role_context='code_help':
+            - "Basic", "Moderate", "Detailed", "Verbose", "Exhaustive", "Pedagogical"
     """
     
     def __init__(self, role_context=None, prompt_context=None, md_table_style=None, comment_level=None, temperature=None):
         """
-        Initializes the GPTService class with parameters that control the prompt context and response output.
-        
-        Parameters:
-            `role_context` (str, optional): The context in which the GPT model instance operates. Defaults to 'basic'.
+        Initializes the GPTService class with various settings.
+
+        # Parameters
+        ----------
+            role_context : (str, optional): 
+                Defines the operational context of the GPT model.
+                Defaults to 'basic'.
+                
+                Options include:
+                    - 'basic': General-purpose context for answering questions.
+                    - 'api_explain': For summarizing and explaining API documentation. If the `prompt_context` parameter is set to `True`,
+                        this will enable the passing of entire API documentation as the prompt, ensuring up-to-date information in the response.
+                    - 'code_help': For coding-related help.
+                    
+            prompt_context : (bool, optional): 
+                Indicates if additional context (like API documentation) should be provided for the prompt. Defaults to True.
+                
+            md_table_style (str, optional): 
+                Specifies the Markdown table format. Defaults to 'pipes'.
                 Options:
-                    - 'basic': General-purpose context for general questions.
-                    - 'api_explain': Context for explaining API documentation.
-                    - 'code_help': Context for answering coding-related questions.
-            temperature (float, optional): The randomness of the GPT model's output. Defaults to 0.
-            prompt_context (bool, optional): Whether or not context (e.g. API documentation) is 
-                provided for the prompt. Defaults to True.
-            md_table_style (str, optional): The format in which to create a table.
-                Depending on the rendering application, some require a nested bulleted list,
-                    others require the pipe '|' character.  Defaults to 'pipes'.
+                    - 'bullets': Use nested bulleted lists for tables.
+                    - 'pipes': Use pipe characters to separate table cells.
+                    
+            comment_level : (str, optional):
+                Specifies the level of commenting for either 'api_explain' or 'code_help' role_contexts.
+                Available options are based on the value of role_context. Defaults to 'Basic' for 'api_explain' and 'code_help'.
+                
+            temperature : (float, optional):
+                Controls the randomness of the GPT model's output. Lower values make the output more deterministic. Defaults to 0.
         """
         
         # Initialization of attributes
