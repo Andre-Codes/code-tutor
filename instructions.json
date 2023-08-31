@@ -1,25 +1,40 @@
 {
-    "table_formatting": {
-        "bullets": "Format the parameters and their descriptions as a table. The table will be in the form of a tabbed rows. The description for each param will be on a new line and indented",
-        "pipes": "Format the parameters only as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row"
+    "response_formats": {
+        "markdown": {
+            "general_format": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text",
+            "table_format": {
+                "bullets": "Format the parameters and their descriptions as a table. The table will be in the form of a tabbed rows. The description for each param will be on a new line and indented",
+                "pipes": "Format the parameters only as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row"
+            },
+            "code_formatting": "Surround single line python code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE```"
+        }
     },
-    "code_formatting": {
-        "md_code_format": "Surround single line python code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE```"
-    },
-    "general": {
-        "md_format_instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text"
-    },
-    "contexts": {
+    "role_contexts": {
         "api_explain": {
-            "instruct":"the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples, increasing in complexity, using various parameters",
-            "prompt_preface_true":"For the following documentation, summarize if provided",
-            "prompt_preface_false": "For the following, provide me",
-            "comment_levels": ["Basic", "Thorough","Comprehensive", "Advanced", "Pedagogical", "Technical"]
+            "instruct": "the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples, increasing in complexity, using various parameters",
+            "prompt_preface_true": "For the following documentation, summarize when available",
+            "prompt_preface_false": "For the following, provide me"
         },
         "code_help": {
-            "instruct":"Provide at least 2 examples, and provide one coding joke",
-            "comment_levels": ["Basic", "Moderate", "Detailed", "Verbose", "Exhaustive", "Pedagogical"]
+            "instruct": "Provide at least 2 examples, and provide one coding joke"
         }
-    }
-
+    },
+    "explain_levels": [
+        "normal",
+        "comprehensive",
+        "advanced",
+        "dumbed-down",
+        "technical",
+        "pedagogical",
+        "professional",
+        "child-level"
+    ],
+    "comment_levels": [
+        "normal",
+        "concise",
+        "detailed",
+        "verbose",
+        "exhaustive",
+        "pedagogical"
+    ]
 }

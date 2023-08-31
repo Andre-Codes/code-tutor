@@ -52,7 +52,7 @@ class GPTService:
             - "Basic", "Moderate", "Detailed", "Verbose", "Exhaustive", "Pedagogical"
     """
     
-    def __init__(self, role_context=None, prompt_context=None, md_table_style=None, comment_level=None, temperature=None):
+    def __init__(self, role_context=None, prompt_context=None, comment_level=None, explain_level=None, temperature=None):
         """
         Initializes the GPTService class with various settings.
 
@@ -69,7 +69,7 @@ class GPTService:
                     - 'code_help': For coding-related help.
                     
             prompt_context : (bool, optional): 
-                Indicates if additional context (like API documentation) should be provided for the prompt. Defaults to True.
+                Indicates if additional context (i.e. API documentation) will be provided for the prompt. Defaults to False.
                 
             md_table_style (str, optional): 
                 Specifies the Markdown table format. Defaults to 'pipes'.
@@ -91,20 +91,23 @@ class GPTService:
         self.user_prompt = ''
         self.response = ''
         # Validate role_context against available contexts in JSON
-        available_contexts = INSTRUCTIONS.get('contexts', {}).keys()
-        self.role_context = role_context if role_context in available_contexts else 'basic'
+        available_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
+        self.role_context = role_context if role_context in available_contexts else 'normal'
 
-        self.prompt_context = prompt_context if prompt_context is not None else True  # Default to True
-        self.md_table_style = md_table_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
-        comment_levels = INSTRUCTIONS['contexts'][self.role_context]['comment_levels']
-        self.comment_level = comment_level if comment_level in comment_levels else 'basic'
-
+        self.prompt_context = prompt_context if prompt_context is not None else False  # Default to False
+        # self.md_table_style = md_table_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
+        # Get available comment and explain levels or set default to 'normal'
+        comment_levels = INSTRUCTIONS['comment_levels']
+        self.comment_level = comment_level if comment_level in comment_levels else 'normal'
+        explain_levels = INSTRUCTIONS['explain_levels']
+        self.explain_level = explain_level if explain_level in explain_levels else 'normal'
+        
         self.temperature = temperature or 0  # Default to 0
 
         # Load remaining settings from JSON
-        self.md_code_format = INSTRUCTIONS["code_formatting"]["md_code_format"]
+        self.md_code_format = INSTRUCTIONS["response_formats"]["markdown"]["code_formatting"]
         self.md_format_instruct = INSTRUCTIONS["general"]["md_format_instruct"]
-        self.md_table_format = self._set_md_table_format()
+        # self.md_table_format = self._set_md_table_format()
         
         self.context_handlers = (
             {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('contexts', {})}
@@ -176,7 +179,7 @@ class GPTService:
         else:
             prompt_preface = {INSTRUCTIONS['contexts'][self.role_context]['prompt_preface_false']}
             
-        comment_level = f"Provide {self.comment_level} level of code commenting and API explanation."
+        comment_level = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process."
             
         api_explain_message = f"{prompt_preface} {INSTRUCTIONS['contexts'][self.role_context]['instruct']}"
         instructions = f"{api_explain_message}; {self.md_format_instruct}; {self.md_code_format}; \
