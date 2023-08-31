@@ -100,17 +100,15 @@ class GPTService:
         comment_levels = INSTRUCTIONS['comment_levels']
         self.comment_level = comment_level if comment_level in comment_levels else 'normal'
         explain_levels = INSTRUCTIONS['explain_levels']
-        self.explain_level = explain_level if explain_level in explain_levels else 'normal'
+        self.explain_level = explain_level if explain_level in explain_levels else 'concise'
         
         self.temperature = temperature or 0  # Default to 0
 
         # Load remaining settings from JSON
-        self.md_code_format = INSTRUCTIONS["response_formats"]["markdown"]["code_formatting"]
-        self.md_format_instruct = INSTRUCTIONS["general"]["md_format_instruct"]
         # self.md_table_format = self._set_md_table_format()
         
         self.context_handlers = (
-            {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('contexts', {})}
+            {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('role_contexts', {})}
         )
         
     def _set_md_table_format(self):
@@ -124,8 +122,12 @@ class GPTService:
         else:
             raise ValueError(f"Invalid md_table_style. Available styles: \
                 {list(INSTRUCTIONS['table_formatting'].keys())}.")
+            
+    def get_response_formats(self):
+        available_formats = list(INSTRUCTIONS['response_formats'].keys())
+        print("Available response formats:", available_formats)
 
-    def get_response(self, user_prompt):
+    def get_response(self, user_prompt, response_format='markdown'):
         """Fetches the generated response from the GPT model based on the user prompt and context.
         
         Args:
@@ -147,12 +149,15 @@ class GPTService:
         
         system_role, user_content = handler(user_prompt)
         
+        response_format = INSTRUCTIONS['response_formats'][response_format]['main']
+        print(f"{user_content}; {response_format}")
+        
         model = "gpt-3.5-turbo"
         self.response = openai.ChatCompletion.create(
             model=model,
             messages=[
                 {"role": "system", "content": system_role},
-                {"role": "user", "content": user_content},
+                {"role": "user", "content": f"{user_content}; {response_format}"},
             ],
             temperature=self.temperature,
         )
@@ -175,27 +180,23 @@ class GPTService:
 
     def _handle_api_explain(self, user_prompt):
         if self.prompt_context:
-            prompt_preface = {INSTRUCTIONS['contexts'][self.role_context]['prompt_preface_true']}
+            prompt_preface = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_preface_true']
         else:
-            prompt_preface = {INSTRUCTIONS['contexts'][self.role_context]['prompt_preface_false']}
+            prompt_preface = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_preface_false']
             
-        comment_level = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process."
+        extras = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process & module/class/function."
             
-        api_explain_message = f"{prompt_preface} {INSTRUCTIONS['contexts'][self.role_context]['instruct']}"
-        instructions = f"{api_explain_message}; {self.md_format_instruct}; {self.md_code_format}; \
-            {self.md_table_format}; {comment_level}"
-        user_content = f"{instructions}: {user_prompt}"
+        instructions = f"{prompt_preface} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
+        user_content = f"{instructions}: {user_prompt}; {extras}"
         system_role = "You're a helpful expert on analyzing python library documentation."
         return system_role, user_content
 
     def _handle_code_help(self, user_prompt):
         
-        # Insert user selected word for commenting level
-        comment_level = f"Provide {self.comment_level} level of commenting and code explanation."
-
-        instructions = f"{INSTRUCTIONS['contexts'][self.role_context]['instruct']}; {self.md_code_format}; \
-            {comment_level}"
-        user_content = f"{user_prompt} {instructions}"
+        extras = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process."
+        
+        instructions = f"{INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
+        user_content = f"{instructions}; {user_prompt}; {extras}"
         system_role = "You're a helpful assistant who answers coding language questions."
         return system_role, user_content
 

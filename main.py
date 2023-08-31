@@ -1,22 +1,26 @@
 import gpt_service as gpt
 
-pandas_api = gpt.GPTService(role_context='api_explain',
+numpy_api = gpt.GPTService(role_context='api_explain',
                             temperature=0, 
-                            prompt_context=False, 
-                            md_table_style='pipes',
-                            comment_level='Basic')
+                            prompt_context=False,
+                            comment_level='detailed',
+                            explain_level='child-level')
 
-pandas_api.prompt = "pandas .resample function"
+numpy_api.prompt = "pandas .join function"
 
-pandas_api.get_response(pandas_api.prompt)
+numpy_api.get_response(numpy_api.prompt)
 
-pandas_api.md_table_style
+numpy_api.md_table_style
 
 
 
 code_help = gpt.GPTService(role_context='code_help',
-                            temperature=0.2, comment_level='Pedagogical')
+                            temperature=0.2, comment_level='Exhaustive')
 
-code_help.prompt = "i need to reverse a string and then select the middle character, If odd number of characters, select middle two"
+code_help.prompt = "how do i generate a plot that puts an arrow at the vertex"
 
 code_help.get_response(code_help.prompt)
+
+import numpy as np
+
+np.eye
