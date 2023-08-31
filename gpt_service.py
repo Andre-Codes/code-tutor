@@ -23,21 +23,21 @@ class GPTService:
         
     """
     
-    def __init__(self, role_context=None, prompt_context=None, md_table_format_style=None, temperature=None):
+    def __init__(self, role_context=None, prompt_context=None, md_table_style=None, comment_level=None, temperature=None):
         """
         Initializes the GPTService class with parameters that control the prompt context and response output.
         
         Parameters:
-            role_context (str, optional): The context in which the GPT model instance operates. Defaults to 'basic'.
+            `role_context` (str, optional): The context in which the GPT model instance operates. Defaults to 'basic'.
                 Options:
                     - 'basic': General-purpose context for general questions.
                     - 'api_explain': Context for explaining API documentation.
                     - 'code_help': Context for answering coding-related questions.
             temperature (float, optional): The randomness of the GPT model's output. Defaults to 0.
-            prompt_context (bool, optional): Whether or not context (e.g. API documentation) is provided \
-                for the prompt. Defaults to True.
-            md_table_format_style (str, optional): The format in which to create a table. \
-                Depending on the rendering application, some require a nested bulleted list, \
+            prompt_context (bool, optional): Whether or not context (e.g. API documentation) is 
+                provided for the prompt. Defaults to True.
+            md_table_style (str, optional): The format in which to create a table.
+                Depending on the rendering application, some require a nested bulleted list,
                     others require the pipe '|' character.  Defaults to 'pipes'.
         """
         
@@ -51,7 +51,10 @@ class GPTService:
         self.role_context = role_context if role_context in available_contexts else 'basic'
 
         self.prompt_context = prompt_context if prompt_context is not None else True  # Default to True
-        self.md_table_format_style = md_table_format_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
+        self.md_table_style = md_table_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
+        comment_levels = INSTRUCTIONS['contexts'][self.role_context]['comment_levels']
+        self.comment_level = comment_level if comment_level in comment_levels else 'basic'
+
         self.temperature = temperature or 0  # Default to 0
 
         # Load remaining settings from JSON
@@ -67,12 +70,13 @@ class GPTService:
         """
         Sets the markdown table format based on the type.
         """
-        if self.md_table_format_style == 'bullets':
+        if self.md_table_style == 'bullets':
             return INSTRUCTIONS["table_formatting"]["bullets"]
-        elif self.md_table_format_style == 'pipes':
+        elif self.md_table_style == 'pipes':
             return INSTRUCTIONS["table_formatting"]["pipes"]
         else:
-            raise ValueError(f"Invalid md_table_format_style. Available styles: {list(INSTRUCTIONS['table_formatting'].keys())}.")
+            raise ValueError(f"Invalid md_table_style. Available styles: \
+                {list(INSTRUCTIONS['table_formatting'].keys())}.")
 
     def get_response(self, user_prompt):
         """Fetches the generated response from the GPT model based on the user prompt and context.
@@ -128,16 +132,24 @@ class GPTService:
         else:
             prompt_preface = {INSTRUCTIONS['contexts'][self.role_context]['prompt_preface_false']}
             
+        comment_level = f"Provide {self.comment_level} level of code commenting and API explanation."
+            
         api_explain_message = f"{prompt_preface} {INSTRUCTIONS['contexts'][self.role_context]['instruct']}"
-        
-        instructions = f"{api_explain_message}; {self.md_format_instruct}; {self.md_code_format}"
-        user_content = f"{instructions}: {user_prompt}; {self.md_table_format}"
-        system_role = "You're a helpful assistant and expert on analyzing python library documentation."
+        instructions = f"{api_explain_message}; {self.md_format_instruct}; {self.md_code_format}; \
+            {self.md_table_format}; {comment_level}"
+        user_content = f"{instructions}: {user_prompt}"
+        system_role = "You're a helpful expert on analyzing python library documentation."
         return system_role, user_content
 
     def _handle_code_help(self, user_prompt):
+        
+        # Insert user selected word for commenting level
+        comment_level = f"Provide {self.comment_level} level of commenting and code explanation."
+
+        instructions = f"{INSTRUCTIONS['contexts'][self.role_context]['instruct']}; {self.md_code_format}; \
+            {comment_level}"
+        user_content = f"{user_prompt} {instructions}"
         system_role = "You're a helpful assistant who answers coding language questions."
-        user_content = f"{user_prompt}; {INSTRUCTIONS['contexts'][self.role_context]['instruct']}; {self.md_code_format}"
         return system_role, user_content
 
     def prompt(self, user_prompt=None):
