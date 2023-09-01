@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        code {
+            font-family: Consolas, 'courier new';
+            color: crimson;
+            background-color: #f1f1f1;
+            padding: 2px;
+            font-size: 105%;
+        }
+
+        pre {
+            white-space: pre;
+            font-family: Consolas, 'courier new';
+            background-color: #f3f3f3;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="window.location.href='https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.transform.html'">API Documentation</button>
+    <h2>transform vs apply method in pandas</h2>
+    <p>
+        The <code>transform</code> and <code>apply</code> methods in pandas are used to perform operations on DataFrame columns or rows. The main difference between them is that <code>transform</code> returns a DataFrame with the same shape as the original, while <code>apply</code> can return a Series or a DataFrame with a different shape.
+    </p>
+    <h3>Parameters</h3>
+    <table style="border-collapse: collapse; border: 1px solid black;">
+        <tr>
+            <th style="border: 1px solid black; padding: 5px;">Parameter</th>
+            <th style="border: 1px solid black; padding: 5px;">Description</th>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; padding: 5px;"><code>func</code></td>
+            <td style="border: 1px solid black; padding: 5px;">The function to apply to each column or row.</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black; padding: 5px;"><code>axis</code></td>
+            <td style="border: 1px solid black; padding: 5px;">The axis along which the function is applied. 0 for columns, 1 for rows.</td>
+        </tr>
+    </table>
+    <h3>Examples</h3>
+    <h4>Example 1:</h4>
+    <pre><code>
+import pandas as pd
+
+df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+
+# Using transform
+df_transformed = df.transform(lambda x: x * 2)
+print(df_transformed)
+    </code></pre>
+    <h4>Example 2:</h4>
+    <pre><code>
+import pandas as pd
+
+df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+
+# Using apply
+df_applied = df.apply(lambda x: x * 2)
+print(df_applied)
+    </code></pre>
+    <h4>Example 3:</h4>
+    <pre><code>
+import pandas as pd
+
+df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+
+# Using transform with axis=1
+df_transformed_rows = df.transform(lambda x: x * 2, axis=1)
+print(df_transformed_rows)
+    </code></pre>
+    <h3>Sources</h3>
+    <ul>
+        <li><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.transform.html">Pandas Documentation - transform</a></li>
+        <li><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.apply.html">Pandas Documentation - apply</a></li>
+        <li><a href="https://www.geeksforgeeks.org/difference-between-apply-and-transform-in-pandas/">GeeksforGeeks - Difference between apply and transform in pandas</a></li>
+    </ul>
+</body>
+</html>
