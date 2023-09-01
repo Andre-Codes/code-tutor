@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stratified Sampling for Linear Regression with scikit-learn</title>
+    <style>
+        code {
+            font-family: Consolas, 'courier new';
+            color: crimson;
+            background-color: #f1f1f1;
+            padding: 2px;
+            font-size: 105%;
+        }
+        pre {
+            white-space: pre;
+            font-family: Consolas, 'courier new';
+            background-color: #f3f3f3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stratified Sampling for Linear Regression with scikit-learn</h1>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedShuffleSplit.html">API Documentation</a>
+
+    <h2>Parameters</h2>
+    <table style="border-collapse: collapse; border: 1px solid black;">
+        <tr>
+            <th>Parameter</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>n_splits</code></td>
+            <td>Number of re-shuffling & splitting iterations.</td>
+        </tr>
+        <tr>
+            <td><code>test_size</code></td>
+            <td>Float or int value representing the proportion or absolute number of test samples.</td>
+        </tr>
+        <tr>
+            <td><code>train_size</code></td>
+            <td>Float or int value representing the proportion or absolute number of train samples.</td>
+        </tr>
+        <tr>
+            <td><code>random_state</code></td>
+            <td>Seed used by the random number generator.</td>
+        </tr>
+    </table>
+
+    <h2>Code Example</h2>
+    <pre><code>
+import numpy as np
+from sklearn.model_selection import StratifiedShuffleSplit
+
+# Generate some dummy data
+X = np.random.rand(100, 5)
+y = np.random.randint(0, 2, 100)
+
+# Create the StratifiedShuffleSplit object
+stratified_split = StratifiedShuffleSplit(n_splits=3, test_size=0.2, random_state=42)
+
+# Perform stratified sampling
+for train_index, test_index in stratified_split.split(X, y):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+
+# Train and evaluate your linear regression model using the sampled data
+# ...
+
+# Continue with your analysis
+# ...
+    </code></pre>
+
+    <h2>Sources</h2>
+    <ul>
+        <li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.StratifiedShuffleSplit.html">scikit-learn documentation</a></li>
+        <li><a href="https://en.wikipedia.org/wiki/Stratified_sampling">Wikipedia - Stratified Sampling</a></li>
+        <li><a href="https://www.analyticsvidhya.com/blog/2020/03/stratified-sampling-machine-learning/">Analytics Vidhya - Stratified Sampling in Machine Learning</a></li>
+    </ul>
+</body>
+</html>

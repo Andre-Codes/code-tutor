@@ -18,7 +18,7 @@
             "prompt_preface_false": "For the following, provide me"
         },
         "code_help": {
-            "instruct": "Provide up tp 3 examples, using various parameters. If possible, provide several web links from various sources for related material under a 'Sources' section."
+            "instruct": "Provide up to 3 examples, using various parameters. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a brief summary of question at top of response."
         }
     },
     "explain_levels": [

@@ -96,7 +96,7 @@ class GPTService:
         self.user_prompt = ''
         self.response = ''
         # Validate role_context against available contexts in JSON
-        available_contexts = INSTRUCTIONS.get('response_formats', {}).keys()
+        available_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
         self.role_context = role_context if role_context in available_contexts else 'markdown'
 
         self.prompt_context = prompt_context if prompt_context is not None else False  # Default to False
@@ -164,7 +164,7 @@ class GPTService:
         
         self.completed_prompt = f"{response_instruct}; {user_content}"
         
-        response_file = f"{self.role_context}_{timestamp}.{self.file_exts[format_style]}"
+        self.response_file = f"{self.role_context}_{timestamp}.{self.file_exts[format_style]}"
         
         model = "gpt-3.5-turbo"
         self.response = openai.ChatCompletion.create(
@@ -182,10 +182,11 @@ class GPTService:
         try:
             data = json.loads(generated_text)
             print(data)
-            with open(response_file, 'w') as f:
-                f.write(generated_text)
             return data
+                    
         except json.JSONDecodeError:
+            with open(self.response_file, 'w') as f:
+                f.write(generated_text)
             print(generated_text)
             return generated_text
         

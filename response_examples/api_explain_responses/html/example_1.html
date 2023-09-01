@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    code {
+        font-family: Consolas, 'courier new';
+        color: crimson;
+        background-color: #f1f1f1;
+        padding: 2px;
+        font-size: 105%;
+    }
+    pre {
+        white-space: pre;
+        font-family: Consolas, 'courier new';
+        background-color: #f3f3f3;
+    }
+    table {
+        border-collapse: collapse;
+        border: 1px solid black;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 5px;
+    }
+</style>
+</head>
+<body>
+<a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.agg.html" target="_blank">
+    <button>Go to pandas.DataFrame.agg API</button>
+</a>
+
+<h2>pandas.DataFrame.agg</h2>
+
+<p>The <code>pandas.DataFrame.agg</code> function is used to aggregate using one or more operations over the specified axis.</p>
+
+<h3>Parameters</h3>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td>func</td>
+        <td>A function, string, or list of functions to use for aggregation.</td>
+    </tr>
+    <tr>
+        <td>axis</td>
+        <td>The axis to apply the aggregation on. Default is 0 (index).</td>
+    </tr>
+    <tr>
+        <td>*args</td>
+        <td>Additional positional arguments to pass to the aggregation functions.</td>
+    </tr>
+    <tr>
+        <td>**kwargs</td>
+        <td>Additional keyword arguments to pass to the aggregation functions.</td>
+    </tr>
+</table>
+
+<h3>Returns</h3>
+<p>Returns a new DataFrame with the aggregated results.</p>
+
+<h3>Code Examples</h3>
+
+<h4>Example 1:</h4>
+<pre><code>
+import pandas as pd
+
+# Create a sample DataFrame
+data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+df = pd.DataFrame(data)
+
+# Aggregate using sum function
+result = df.agg('sum')
+
+print(result)
+</code></pre>
+<p>Output:</p>
+<pre><code>
+A    6
+B    15
+dtype: int64
+</code></pre>
+
+<h4>Example 2:</h4>
+<pre><code>
+import pandas as pd
+
+# Create a sample DataFrame
+data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+df = pd.DataFrame(data)
+
+# Aggregate using multiple functions
+result = df.agg(['sum', 'mean'])
+
+print(result)
+</code></pre>
+<p>Output:</p>
+<pre><code>
+     A    B
+sum  6   15
+mean 2.0 5.0
+</code></pre>
+
+<h4>Example 3:</h4>
+<pre><code>
+import pandas as pd
+
+# Create a sample DataFrame
+data = {'A': [1, 2, 3], 'B': [4, 5, 6]}
+df = pd.DataFrame(data)
+
+# Aggregate using a custom function
+def custom_agg(x):
+    return x.max() - x.min()
+
+result = df.agg(custom_agg)
+
+print(result)
+</code></pre>
+<p>Output:</p>
+<pre><code>
+A    2
+B    2
+dtype: int64
+</code></pre>
+
+</body>
+</html>
