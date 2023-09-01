@@ -1,7 +1,7 @@
 import os
 import openai
 import json
-
+import datetime
 
 # Load instructions from JSON file
 with open("instructions.json", "r") as f:
@@ -96,8 +96,8 @@ class GPTService:
         self.user_prompt = ''
         self.response = ''
         # Validate role_context against available contexts in JSON
-        available_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
-        self.role_context = role_context if role_context in available_contexts else 'normal'
+        available_contexts = INSTRUCTIONS.get('response_formats', {}).keys()
+        self.role_context = role_context if role_context in available_contexts else 'markdown'
 
         self.prompt_context = prompt_context if prompt_context is not None else False  # Default to False
         # self.md_table_style = md_table_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
@@ -115,6 +115,12 @@ class GPTService:
         self.context_handlers = (
             {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('role_contexts', {})}
         )
+        
+        # Set file extensions based on response format
+        self.file_exts = {
+            "markdown": "md",
+            "html": "html"
+        }
     
     def set_md_table_style(self, style):
         available_table_styles = INSTRUCTIONS['response_formats']['markdown']['table_styles'].keys()
@@ -141,6 +147,7 @@ class GPTService:
                 - 'api_explain': Provides explanations for API documentation.
                 - 'code_help': Provides help for coding-related questions.
         """
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
         handler = self.context_handlers.get(self.role_context)
         if handler is None:
@@ -156,6 +163,8 @@ class GPTService:
             response_instruct = response_instruct + self.md_table_style
         
         self.completed_prompt = f"{response_instruct}; {user_content}"
+        
+        response_file = f"{self.role_context}_{timestamp}.{self.file_exts[format_style]}"
         
         model = "gpt-3.5-turbo"
         self.response = openai.ChatCompletion.create(
@@ -173,6 +182,8 @@ class GPTService:
         try:
             data = json.loads(generated_text)
             print(data)
+            with open(response_file, 'w') as f:
+                f.write(generated_text)
             return data
         except json.JSONDecodeError:
             print(generated_text)
@@ -223,4 +234,3 @@ class GPTService:
         else:
             self.user_prompt = user_prompt
         # return self.get_response(self.user_prompt)
-
