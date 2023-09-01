@@ -8,7 +8,7 @@
             }
         },
         "html": {
-            "main": "Respond in HTML format. Create a button at top linked to the API site for the related function or class. Make an HTML table with borders for the parameters. Put any code inside a <code> tag. Use the following CSS for styling: <style>\n\tcode {\n\t\tfont-family: Consolas,'courier new';\n\t\tcolor: crimson;\n\t\tbackground-color: #f1f1f1;\n\t\tpadding: 2px;\n\t\tfont-size: 105%;\n\t}\n</style>"
+            "main": "Respond in HTML format. Create a button at top linked to the API site for the related function or class. Make an HTML table with borders for the parameters. Put any code inside <pre><code> tag, using the following CSS for styling: <style> code { font-family: Consolas,'courier new'; color: crimson; background-color: #f1f1f1; padding: 2px; font-size: 105%; } pre { white-space: pre; font-family: Consolas,'courier new'; background-color: #f3f3f3; } </style>"
         }
     },
     "role_contexts": {
