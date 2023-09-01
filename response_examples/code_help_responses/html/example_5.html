@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pandas Styler - Highlight Values Above Average</title>
+    <style>
+        code {
+            font-family: Consolas, 'courier new';
+            color: crimson;
+            background-color: #f1f1f1;
+            padding: 2px;
+            font-size: 105%;
+        }
+        pre {
+            white-space: pre;
+            font-family: Consolas, 'courier new';
+            background-color: #f3f3f3;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pandas Styler - Highlight Values Above Average</h1>
+    <p>
+        This code demonstrates how to create a function using the pandas styler to color the values above the average for a column in a dataframe.
+    </p>
+    <h2>Code</h2>
+    <pre><code>
+import pandas as pd
+
+def highlight_above_average(df):
+    """
+    Function to highlight values above the average for each column in a dataframe.
+    """
+    # Calculate the average for each column
+    avg = df.mean()
+
+    # Create a styler object for the dataframe
+    styler = df.style
+
+    # Iterate over each column
+    for col in df.columns:
+        # Highlight values above the average for the column
+        styler = styler.apply(lambda x: ['background-color: yellow' if val > avg[col] else '' for val in x], subset=col)
+
+    return styler
+
+# Example usage
+data = {'A': [1, 2, 3, 4, 5],
+        'B': [6, 7, 8, 9, 10],
+        'C': [11, 12, 13, 14, 15]}
+df = pd.DataFrame(data)
+
+highlighted_df = highlight_above_average(df)
+highlighted_df
+    </code></pre>
+    <h2>Examples</h2>
+    <h3>Example 1</h3>
+    <p>
+        <strong>Parameters:</strong>
+    </p>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>df</td>
+            <td>The input dataframe</td>
+        </tr>
+    </table>
+    <pre><code>
+data = {'A': [1, 2, 3, 4, 5],
+        'B': [6, 7, 8, 9, 10],
+        'C': [11, 12, 13, 14, 15]}
+df = pd.DataFrame(data)
+
+highlighted_df = highlight_above_average(df)
+highlighted_df
+    </code></pre>
+    <h3>Example 2</h3>
+    <p>
+        <strong>Parameters:</strong>
+    </p>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>df</td>
+            <td>The input dataframe</td>
+        </tr>
+    </table>
+    <pre><code>
+data = {'A': [10, 20, 30, 40, 50],
+        'B': [60, 70, 80, 90, 100],
+        'C': [110, 120, 130, 140, 150]}
+df = pd.DataFrame(data)
+
+highlighted_df = highlight_above_average(df)
+highlighted_df
+    </code></pre>
+    <h3>Example 3</h3>
+    <p>
+        <strong>Parameters:</strong>
+    </p>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>df</td>
+            <td>The input dataframe</td>
+        </tr>
+    </table>
+    <pre><code>
+data = {'A': [5, 10, 15, 20, 25],
+        'B': [30, 35, 40, 45, 50],
+        'C': [55, 60, 65, 70, 75]}
+df = pd.DataFrame(data)
+
+highlighted_df = highlight_above_average(df)
+highlighted_df
+    </code></pre>
+    <h2>Sources</h2>
+    <ul>
+        <li><a href="https://pandas.pydata.org/pandas-docs/stable/user_guide/style.html">Pandas Documentation - Styling</a></li>
+        <li><a href="https://www.geeksforgeeks.org/styling-pandas-dataframe/">GeeksforGeeks - Styling Pandas DataFrame</a></li>
+        <li><a href="https://towardsdatascience.com/style-pandas-dataframe-like-a-master-6b02bf6468b0">Towards Data Science - Style Pandas DataFrame Like a Master</a></li>
+    </ul>
+</body>
+</html>

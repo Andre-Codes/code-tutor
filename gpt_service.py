@@ -132,7 +132,7 @@ class GPTService:
         available_formats = list(INSTRUCTIONS['response_formats'].keys())
         print("Available response formats:", available_formats)
 
-    def get_response(self, user_prompt, format_style='markdown'):
+    def get_response(self, user_prompt, format_style='markdown', save_output=True):
         """Fetches the generated response from the GPT model based on the user prompt and context.
         
         Args:
@@ -185,8 +185,9 @@ class GPTService:
             return data
                     
         except json.JSONDecodeError:
-            with open(self.response_file, 'w') as f:
-                f.write(generated_text)
+            if save_output:
+                with open(self.response_file, 'w') as f:
+                    f.write(generated_text)
             print(generated_text)
             return generated_text
         
