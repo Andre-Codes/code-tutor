@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    code {
+        font-family: Consolas, 'courier new';
+        color: crimson;
+        background-color: #f1f1f1;
+        padding: 2px;
+        font-size: 105%;
+    }
+    pre {
+        white-space: pre;
+        font-family: Consolas, 'courier new';
+        background-color: #f3f3f3;
+    }
+</style>
+</head>
+<body>
+<button onclick="window.location.href='https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.to_numeric.html'">Go to pandas.to_numeric API</button>
+<br><br>
+
+<h2>pandas to_numeric function</h2>
+<p>The <code>to_numeric</code> function in pandas is used to convert the values in a given Series or DataFrame to numeric type.</p>
+
+<h3>Parameters:</h3>
+<table style="border-collapse: collapse; border: 1px solid black;">
+    <tr>
+        <th style="border: 1px solid black;">Parameter</th>
+        <th style="border: 1px solid black;">Description</th>
+    </tr>
+    <tr>
+        <td style="border: 1px solid black;">arg</td>
+        <td style="border: 1px solid black;">The object to convert to a numeric type.</td>
+    </tr>
+    <tr>
+        <td style="border: 1px solid black;">errors</td>
+        <td style="border: 1px solid black;">Specifies how to handle errors during the conversion. Possible values are 'raise', 'coerce', and 'ignore'.</td>
+    </tr>
+    <tr>
+        <td style="border: 1px solid black;">downcast</td>
+        <td style="border: 1px solid black;">Specifies a dict of item->dtype of what to downcast if possible.</td>
+    </tr>
+</table>
+
+<h3>Returns:</h3>
+<p>Returns a numeric type (int, float, or complex) or a Series or DataFrame with the numeric type.</p>
+
+<h3>Code Examples:</h3>
+<p><strong>Example 1:</strong> Convert a Series of strings to numeric type:</p>
+<pre><code>
+import pandas as pd
+
+# Create a Series with strings
+s = pd.Series(['1', '2', '3', '4', '5'])
+
+# Convert the Series to numeric type
+s_numeric = pd.to_numeric(s)
+
+print(s_numeric)
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>
+0    1
+1    2
+2    3
+3    4
+4    5
+dtype: int64
+</code></pre>
+
+<p><strong>Example 2:</strong> Convert a DataFrame column to numeric type, ignoring errors:</p>
+<pre><code>
+import pandas as pd
+
+# Create a DataFrame
+df = pd.DataFrame({'A': ['1', '2', '3', '4', '5'],
+                   'B': ['6', '7', '8', '9', '10']})
+
+# Convert column 'A' to numeric type, ignoring errors
+df['A'] = pd.to_numeric(df['A'], errors='ignore')
+
+print(df)
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>
+   A   B
+0  1   6
+1  2   7
+2  3   8
+3  4   9
+4  5  10
+</code></pre>
+
+<p><strong>Example 3:</strong> Convert a DataFrame column to numeric type, raising errors:</p>
+<pre><code>
+import pandas as pd
+
+# Create a DataFrame
+df = pd.DataFrame({'A': ['1', '2', '3', '4', '5'],
+                   'B': ['6', '7', '8', '9', '10']})
+
+# Convert column 'A' to numeric type, raising errors
+df['A'] = pd.to_numeric(df['A'], errors='raise')
+
+print(df)
+</code></pre>
+<p><strong>Output:</strong></p>
+<pre><code>
+   A   B
+0  1   6
+1  2   7
+2  3   8
+3  4   9
+4  5  10
+</code></pre>
+
+<p>In the first example, we create a Series with strings and use the <code>to_numeric</code> function to convert it to a numeric type. The resulting Series contains integers.</p>
+<p>In the second example, we create a DataFrame with two columns and convert column 'A' to numeric type, ignoring errors. The resulting DataFrame remains the same.</p>
+<p>In the third example, we create a DataFrame with two columns and convert column 'A' to numeric type, raising errors. Since the values in column 'A' are valid numbers, the resulting DataFrame remains the same.</p>
+
+</body>
+</html>
