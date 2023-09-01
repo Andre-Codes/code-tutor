@@ -14,4 +14,7 @@ test.get_response(test.prompt, format_style='html')
 
 
 # Example using the 'code_help' context
-code_help = gpt.GPTService(role_context='code_help', comment_level='exhaustive')
+code_help = gpt.GPTService(role_context='code_help', comment_level='normal')
+
+code_help.get_response("how delete every other row in a dataframe")
+

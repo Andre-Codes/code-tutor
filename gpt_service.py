@@ -201,7 +201,7 @@ class GPTService:
         extras = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process."
         
         instructions = f"{INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
-        user_content = f"{instructions}; {user_prompt}; {extras}"
+        user_content = f"{instructions}: {user_prompt}; {extras}"
         system_role = "You're a helpful assistant who answers coding language questions."
         return system_role, user_content
 
