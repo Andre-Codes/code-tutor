@@ -122,7 +122,7 @@ class GPTService:
             raise ValueError(f"Invalid md_table_style. Available styles: {list(INSTRUCTIONS['table_formatting'].keys())}.")
         self.md_table_style = INSTRUCTIONS['response_formats']['markdown']['table_styles'][style]
             
-    def get_response_formats(self):
+    def get_format_styles(self):
         available_formats = list(INSTRUCTIONS['response_formats'].keys())
         print("Available response formats:", available_formats)
 
@@ -149,20 +149,20 @@ class GPTService:
         system_role, user_content = handler(user_prompt)
         
         # Get instructions for selected format
-        response_format = INSTRUCTIONS['response_formats'][format_style]['main']
+        response_instruct = INSTRUCTIONS['response_formats'][format_style]['main']
         
-        # If selected format is 'markdown' and table style is set, append to respons instructions
-        if hasattr(self, 'md_table_style') and response_format == 'markdown':
-            response_format = response_format + self.md_table_style
-            
-        # print(f"{response_format}; {user_content}")
+        # If selected format is 'markdown' and table style is set, append to response instructions
+        if hasattr(self, 'md_table_style') and format_style == 'markdown':
+            response_instruct = response_instruct + self.md_table_style
+        
+        self.completed_prompt = f"{response_instruct}; {user_content}"
         
         model = "gpt-3.5-turbo"
         self.response = openai.ChatCompletion.create(
             model=model,
             messages=[
                 {"role": "system", "content": system_role},
-                {"role": "user", "content": f"{response_format}; {user_content}"},
+                {"role": "user", "content": self.completed_prompt},
             ],
             temperature=self.temperature,
         )

@@ -13,7 +13,7 @@
     },
     "role_contexts": {
         "api_explain": {
-            "instruct": "the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples, increasing in complexity, using various parameters",
+            "instruct": "the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters",
             "prompt_preface_true": "For the following documentation, summarize when available",
             "prompt_preface_false": "For the following, provide me"
         },

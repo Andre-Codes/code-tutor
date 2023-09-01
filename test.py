@@ -8,7 +8,7 @@ test = gpt.GPTService(role_context='api_explain',
                             comment_level='detailed',
                             explain_level='comprehensive')
 
-test.prompt = "pandas to_numeric function"
+test.prompt = "pandas pivot function"
 
 test.get_response(test.prompt, format_style='html')
 
