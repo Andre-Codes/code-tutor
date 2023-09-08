@@ -36,21 +36,13 @@ api_explain = gpt.GPTService(role_context='api_explain',
                             prompt_context=True,
                             comment_level='verbose',
                             explain_level='comprehensive')
-api_explain.prompt = "https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html"
-api_explain.get_response(api_explain.prompt, format_style='html')
 ```
 
-```python
-code_help = gpt.GPTService(role_context='code_help',
-                            comment_level='normal',
-                            explain_level='comprehensive')
-code_help.prompt = "using pandas compare two dataframes, and create a new one with the differences"
-code_help.get_response(code_help.prompt, format_style='markdown')
-```
 
-## Methods Description
 
-### `__init__(role_context, prompt_context, md_table_style, comment_level, temperature)`
+### Methods Description
+
+#### `__init__(role_context, prompt_context, md_table_style, comment_level, temperature)`
 
 Initializes the GPTService class with various settings.
 
@@ -59,19 +51,21 @@ Initializes the GPTService class with various settings.
 - `prompt_context` (bool, optional): Indicates if additional context will be provided for the prompt.
 - ... (continue for each method and parameter)
 
-## Examples
+### Examples
 
-### Basic Usage
 ```python
-gpt = GPTService(role_context="basic")
-response = gpt.get_response("")
-print(response)
+code_help = gpt.GPTService(role_context='code_help',
+                            comment_level='normal',
+                            explain_level='comprehensive')
+code_help.prompt = "using pandas compare two dataframes, and create a new one with the differences"
+code_help.get_response(code_help.prompt, format_style='markdown')
 ```
-### ======= Example Result =======
+#### ======= Example Result =======
 
-The below example is as is, no changes made to the API response.
+The below example is the unaltered result with a
+response pre-formatted in markdown; no changes made to the API response.
 
-### =========================
+#### =========================
 
 # Comparing and Creating a New DataFrame with Differences using Pandas
 
