@@ -188,6 +188,9 @@ class GPTService:
         if self.format_style == 'markdown':
             response_instruct = response_instruct +  \
                 INSTRUCTIONS['response_formats']['markdown']['table_styles'][self.MD_TABLE_STYLE]
+        elif self.format_style == 'html':
+            response_instruct = response_instruct +  \
+                INSTRUCTIONS['response_formats']['html']['css']
         
         self.complete_prompt = f"{response_instruct}; {user_content}"
         
