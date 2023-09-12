@@ -66,7 +66,8 @@ class GPTService:
         prompt_context=None, 
         comment_level=None, 
         explain_level=None, 
-        temperature=None):
+        temperature=None,
+        model="gpt-3.5-turbo"):
         """
         Initializes the GPTService class with various settings.
 
@@ -104,6 +105,7 @@ class GPTService:
         openai.api_key = self.api_key
         self.user_prompt = ''
         self.response = ''
+        self.model=model
         # Validate role_context against available contexts in JSON
         available_role_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
         self.role_context = role_context if role_context in available_role_contexts else 'basic'
@@ -191,9 +193,8 @@ class GPTService:
         
         self.response_file = f"{self.role_context}_{timestamp}.{self.file_exts[self.format_style]}"
         
-        model = "gpt-4"
         self.response = openai.ChatCompletion.create(
-            model=model,
+            model=self.model,
             messages=[
                 {"role": "system", "content": system_role},
                 {"role": "user", "content": self.complete_prompt},
