@@ -16,7 +16,7 @@
             "system_role": "You're a helpful expert on analyzing python library documentation.",
             "prompt_context_true": "Using the provided documentation, summarize when available",
             "prompt_context_false": "For the following, provide me",
-            "instruct": "the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualzie each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section."
+            "instruct": "the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualzie each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section."
         },
         "code_help": {
             "system_role": "You're a helpful assistant who answers coding language questions.",
