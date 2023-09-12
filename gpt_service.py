@@ -149,11 +149,11 @@ class GPTService:
         available_role_contexts = list(INSTRUCTIONS['role_contexts'].keys())
         print("Available role contexts:", available_role_contexts)
 
-    def get_response(self, user_prompt, format_style='markdown', save_output=False, print_response=False):
+    def get_response(self, prompt=None, format_style='markdown', save_output=False, print_response=False):
         """Fetches the generated response from the GPT model based on the user prompt and context.
         
         Args:
-            user_prompt (str): The prompt that the user provides for the model.
+            prompt (str): The prompt that the user provides for the model.
         
         Returns:
             str: The generated text from the GPT model.
@@ -164,6 +164,10 @@ class GPTService:
                 - 'api_explain': Provides explanations for API documentation.
                 - 'code_help': Provides help for coding-related questions.
         """
+        if prompt is None:
+            raise ValueError("Prompt can't be None.")
+        else:
+            self.prompt = prompt
         
         self.format_style = format_style.lower()
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S") # for output file name
@@ -172,7 +176,7 @@ class GPTService:
         # if handler is None:
         #     raise ValueError(f"Invalid context: {self.role_context}")
         
-        system_role, user_content = self._handle_role_instructions(user_prompt) # change to handler(user_prompt) for context handler process
+        system_role, user_content = self._handle_role_instructions(prompt) # change to handler(prompt) for context handler process
         
         # Get instructions for selected format
         response_instruct = INSTRUCTIONS['response_formats'][self.format_style]['instruct']
@@ -284,25 +288,6 @@ class GPTService:
             user_content = user_prompt
 
         return system_role, user_content
-
-    def prompt(self, user_prompt=None):
-        """
-        Prompts the user for input and fetches the generated response from the GPT model.
-        
-        Parameters:
-            user_prompt (str, optional): The prompt that the user may provide. \
-                If None, user will be prompted for input.
-        
-        Returns:
-            str: The generated text from the GPT model.
-        
-        """
-        
-        if user_prompt is None:
-            self.user_prompt = input("Please provide a prompt: ")
-        else:
-            self.user_prompt = user_prompt
-        # return self.get_response(self.user_prompt)
         
     def show(self):
         if not self.response_content:
