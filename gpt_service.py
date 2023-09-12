@@ -191,7 +191,7 @@ class GPTService:
         
         self.response_file = f"{self.role_context}_{timestamp}.{self.file_exts[self.format_style]}"
         
-        model = "gpt-3.5-turbo"
+        model = "gpt-4"
         self.response = openai.ChatCompletion.create(
             model=model,
             messages=[
