@@ -2,6 +2,7 @@ import os
 import openai
 import json
 import datetime
+from IPython.display import display, HTML, Markdown
 
 # Load instructions from JSON file
 with open("instructions.json", "r") as f:
@@ -51,6 +52,14 @@ class GPTService:
             - "Basic", "Moderate", "Detailed", "Verbose", "Exhaustive", "Pedagogical"
     """
     
+    # Class variables
+    DISPLAY_MAPPING = { # mappings for IPython.display function names
+        'html': HTML,
+        'markdown': Markdown
+    }
+    
+    MD_TABLE_STYLE = "pipes" # default format for markdown tables
+    
     def __init__(
         self, 
         role_context=None, 
@@ -96,25 +105,27 @@ class GPTService:
         self.user_prompt = ''
         self.response = ''
         # Validate role_context against available contexts in JSON
-        available_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
-        self.role_context = role_context if role_context in available_contexts else 'markdown'
+        available_role_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
+        self.role_context = role_context if role_context in available_role_contexts else 'basic'
 
         self.prompt_context = prompt_context if prompt_context is not None else False  # Default to False
         # self.md_table_style = md_table_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
         # Get available comment and explain levels or set default to 'normal'
         comment_levels = INSTRUCTIONS['comment_levels']
-        self.comment_level = comment_level if comment_level in comment_levels else 'normal'
+        self.comment_level = comment_level if comment_level in comment_levels \
+            or comment_level is None  else 'normal'
         explain_levels = INSTRUCTIONS['explain_levels']
-        self.explain_level = explain_level if explain_level in explain_levels else 'concise'
+        self.explain_level = explain_level if explain_level in explain_levels \
+            or explain_level is None  else 'concise'
         
         self.temperature = temperature or 0  # Default to 0
 
         # Load remaining settings from JSON
         # self.md_table_format = self._set_md_table_format()
         
-        self.context_handlers = (
-            {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('role_contexts', {})}
-        )
+        # self.context_handlers = (
+        #     {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('role_contexts', {})}
+        # )
         
         # Set file extensions based on response format
         self.file_exts = {
@@ -125,14 +136,20 @@ class GPTService:
     def set_md_table_style(self, style):
         available_table_styles = INSTRUCTIONS['response_formats']['markdown']['table_styles'].keys()
         if style not in available_table_styles:
-            raise ValueError(f"Invalid md_table_style. Available styles: {list(INSTRUCTIONS['table_formatting'].keys())}.")
-        self.md_table_style = INSTRUCTIONS['response_formats']['markdown']['table_styles'][style]
-            
-    def get_format_styles(self):
+            raise ValueError(f"Invalid MD_TABLE_STYLE. Available styles: {list(INSTRUCTIONS['table_formatting'].keys())}.")
+        self.MD_TABLE_STYLE = INSTRUCTIONS['response_formats']['markdown']['table_styles'][style]
+    
+    @staticmethod      
+    def get_format_styles():
         available_formats = list(INSTRUCTIONS['response_formats'].keys())
         print("Available response formats:", available_formats)
+    
+    @staticmethod      
+    def get_role_contexts():
+        available_role_contexts = list(INSTRUCTIONS['role_contexts'].keys())
+        print("Available role contexts:", available_role_contexts)
 
-    def get_response(self, user_prompt, format_style='markdown', save_output=True):
+    def get_response(self, user_prompt, format_style='markdown', save_output=False, print_response=False):
         """Fetches the generated response from the GPT model based on the user prompt and context.
         
         Args:
@@ -147,49 +164,52 @@ class GPTService:
                 - 'api_explain': Provides explanations for API documentation.
                 - 'code_help': Provides help for coding-related questions.
         """
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         
-        handler = self.context_handlers.get(self.role_context)
-        if handler is None:
-            raise ValueError(f"Invalid context: {self.role_context}")
+        self.format_style = format_style.lower()
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S") # for output file name
         
-        system_role, user_content = handler(user_prompt)
+        # handler = self.context_handlers.get(self.role_context)
+        # if handler is None:
+        #     raise ValueError(f"Invalid context: {self.role_context}")
+        
+        system_role, user_content = self._handle_role_instructions(user_prompt) # change to handler(user_prompt) for context handler process
         
         # Get instructions for selected format
-        response_instruct = INSTRUCTIONS['response_formats'][format_style]['main']
+        response_instruct = INSTRUCTIONS['response_formats'][self.format_style]['instruct']
         
         # If selected format is 'markdown' and table style is set, append to response instructions
-        if hasattr(self, 'md_table_style') and format_style == 'markdown':
-            response_instruct = response_instruct + self.md_table_style
+        # removed: hasattr(self, 'md_table_style') and 
+        if self.format_style == 'markdown':
+            response_instruct = response_instruct +  \
+                INSTRUCTIONS['response_formats']['markdown']['table_styles'][self.MD_TABLE_STYLE]
         
-        self.completed_prompt = f"{response_instruct}; {user_content}"
+        self.complete_prompt = f"{response_instruct}; {user_content}"
         
-        self.response_file = f"{self.role_context}_{timestamp}.{self.file_exts[format_style]}"
+        self.response_file = f"{self.role_context}_{timestamp}.{self.file_exts[self.format_style]}"
         
         model = "gpt-3.5-turbo"
         self.response = openai.ChatCompletion.create(
             model=model,
             messages=[
                 {"role": "system", "content": system_role},
-                {"role": "user", "content": self.completed_prompt},
+                {"role": "user", "content": self.complete_prompt},
             ],
             temperature=self.temperature,
         )
 
         # Get the generated text
-        generated_text = self.response['choices'][0]['message']['content']
+        self.response_content = self.response['choices'][0]['message']['content']
         
-        try:
-            data = json.loads(generated_text)
-            print(data)
-            return data
-                    
-        except json.JSONDecodeError:
+        if self.response_content:
             if save_output:
                 with open(self.response_file, 'w') as f:
-                    f.write(generated_text)
-            print(generated_text)
-            return generated_text
+                    f.write(self.response_content)
+            if print_response:
+                print(self.response_content)
+            return self.response_content
+        else:
+            print("No response content.")
+            return None
         
     def _handle_basic(self, user_prompt):
         system_role = "You're a helpful assistant that answers my questions."
@@ -198,24 +218,71 @@ class GPTService:
 
     def _handle_api_explain(self, user_prompt):
         if self.prompt_context:
-            prompt_preface = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_preface_true']
+            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_true']
         else:
-            prompt_preface = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_preface_false']
+            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_false']
+        
+        if self.comment_level is not None:
+            comment_level = f"Provide {self.comment_level}"
+        else:
+            comment_level = "Do not add any"
             
-        extras = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process."
+        if self.comment_level is not None:
+            explain_level = f"Provide {self.explain_level}"
+        else:
+            explain_level = "Do not give any"
             
-        instructions = f"{prompt_preface} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
-        user_content = f"{instructions}: {user_prompt}; {extras}"
+        documentation = f"{comment_level} code comments and {explain_level} explanation of the process."
+            
+        instructions = f"{prompt_context} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
+        user_content = f"{instructions}: {user_prompt}; {documentation}"
         system_role = "You're a helpful expert on analyzing python library documentation."
         return system_role, user_content
 
     def _handle_code_help(self, user_prompt):
+        if self.prompt_context:
+            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_true']
+        else:
+            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_false']
         
-        extras = f"Provide {self.comment_level} code comments and a {self.explain_level} explanation of the process."
+        documentation_instruct = f"Provide {self.comment_level} code comments and {self.explain_level} explanation of the process."
         
-        instructions = f"{INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
-        user_content = f"{instructions}: {user_prompt}; {extras}"
+        instructions = f"{prompt_context} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
+        user_content = f"{instructions}: {user_prompt}; {documentation_instruct}"
         system_role = "You're a helpful assistant who answers coding language questions."
+        return system_role, user_content
+    
+    def _handle_role_instructions(self, user_prompt):
+        if self.role_context != 'basic':
+            if self.prompt_context:
+                prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_true']
+            else:
+                prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_false']
+
+            comment_level = (
+                f"Provide {self.comment_level}" if self.comment_level is not None else "Do not add any"
+            )
+
+            explain_level = (
+                f"Provide {self.explain_level}" if self.explain_level is not None else "Do not give any"
+            )
+
+            default_documentation = f"{comment_level} code comments and {explain_level} explanation of the process."
+
+            documentation = (
+                INSTRUCTIONS.get('role_contexts', {})
+                            .get(self.role_context, {})
+                            .get('documentation', default_documentation)
+            )
+
+            instructions = f"{prompt_context} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
+            user_content = f"{instructions}: {user_prompt}; {documentation}"
+
+            system_role = INSTRUCTIONS['role_contexts'][self.role_context]['system_role']
+        else:
+            system_role = "You're a helpful assistant who answers my questions"
+            user_content = user_prompt
+
         return system_role, user_content
 
     def prompt(self, user_prompt=None):
@@ -236,3 +303,13 @@ class GPTService:
         else:
             self.user_prompt = user_prompt
         # return self.get_response(self.user_prompt)
+        
+    def show(self):
+        if not self.response_content:
+            print("No response to show.")
+            return
+        display_class = self.DISPLAY_MAPPING.get(self.format_style, None)
+        if display_class:
+            display(display_class(self.response_content))
+        else:
+            print("Unknown format.")

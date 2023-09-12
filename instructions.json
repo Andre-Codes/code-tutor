@@ -1,24 +1,35 @@
 {
     "response_formats": {
         "markdown": {
-            "main": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Surround single line code with single backticks, and multiple lines of code with: ```python SAMPLE_CODE```",
+            "instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. ",
             "table_styles": {
-                "bullets": "Format the parameters and their descriptions as a table. The table will be in the form of a tabbed rows. The description for each param will be on a new line and indented",
-                "pipes": "For parameters only, format them as a markdown table using the instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, you should also add a pipe on either end of the row"
+                "bullets": "Also, format any table in the form of a bullet outline. The description for each param will be on a new line and indented",
+                "pipes": "Also, format any table using these instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, add a pipe on either end of the row"
             }
         },
         "html": {
-            "main": "Respond in HTML format. Create a button at top linked to the API site for the related function or class. Make an HTML table with borders for the parameters. Put any code inside <pre><code> tag, using the following CSS for styling: <style> code { font-family: Consolas,'courier new'; color: crimson; background-color: #f1f1f1; padding: 2px; font-size: 105%; } pre { white-space: pre; font-family: Consolas,'courier new'; background-color: #f3f3f3; } </style>"
+            "instruct": "Respond in HTML format. Create a button (or multiple) at top linked to the API site, or embeded direct URLs for the related modules and/or functions used. Use HTML tables as requested and format them with borders. Use other HTML features to make the page visually appealing and engaging. When displaying any image, use related API documentation sources to find them. Put any code inside <pre><code> tag, using the following CSS for styling: <style> code { font-family: Consolas,'courier new'; color: crimson; background-color: #f1f1f1; padding: 2px; font-size: 105%; } pre { white-space: pre; font-family: Consolas,'courier new'; background-color: #f3f3f3; } </style> "
         }
     },
     "role_contexts": {
         "api_explain": {
-            "instruct": "the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters",
-            "prompt_preface_true": "For the following documentation, summarize when available",
-            "prompt_preface_false": "For the following, provide me"
+            "system_role": "You're a helpful expert on analyzing python library documentation.",
+            "prompt_context_true": "Using the provided documentation, summarize when available",
+            "prompt_context_false": "For the following, provide me",
+            "instruct": "the description, parameters, attributes, 'returns', code examples Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualzie each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section."
         },
         "code_help": {
-            "instruct": "Provide up to 3 examples, using various parameters. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a brief summary of question at top of response."
+            "system_role": "You're a helpful assistant who answers coding language questions.",
+            "prompt_context_true": "To answer the following question, use documentation from the following source, and",
+            "prompt_context_false": "Answer the following code related question, use any source documentation if provided, and",
+            "instruct": "provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response."
+        },
+        "code_convert": {
+            "system_role": "You're a helpful assistant who helps translate coding languages.",
+            "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
+            "prompt_context_false": "Answer the following code question, and",
+            "instruct": "translate the following code to the specified language. After the translation, make a table to help visualize the translation by comparing each line of code with the other language, and add a column for description",
+            "documentation": "After the translation, provide detailed comments for each language and then, if applicable, explain the equivalent libraries or packages used in each language"
         }
     },
     "explain_levels": [
