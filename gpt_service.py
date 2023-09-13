@@ -149,66 +149,38 @@ class GPTService:
         available_role_contexts = list(INSTRUCTIONS['role_contexts'].keys())
         print("Available role contexts:", available_role_contexts)
 
-    def get_response(self, prompt=None, format_style='markdown', save_output=False, print_raw=False):
-        """Fetches the generated response from the GPT model based on the user prompt and context.
-        
-        Args:
-            prompt (str): The prompt that the user provides for the model.
-        
-        Returns:
-            str: The generated text from the GPT model.
-        
-        Notes:
-            The behavior of this method changes based on the 'context' attribute:
-                - 'basic': Provides general answers to questions.
-                - 'api_explain': Provides explanations for API documentation.
-                - 'code_help': Provides help for coding-related questions.
-        """
+    def _validate_and_assign_params(self, prompt, format_style):
         if prompt is None:
             raise ValueError("Prompt can't be None.")
-        else:
-            self.prompt = prompt
-        
+        self.prompt = prompt
         self.format_style = format_style.lower()
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S") # for output file name
-        
-        # handler = self.context_handlers.get(self.role_context)
-        # if handler is None:
-        #     raise ValueError(f"Invalid context: {self.role_context}")
-        
-        system_role, user_content = self._handle_role_instructions(prompt) # change to handler(prompt) for context handler process
-        
-        # Get instructions for selected format
+
+    def _prepare_api_call(self):
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
+
+        self.system_role, user_content = self._handle_role_instructions(self.prompt)
+
         response_instruct = INSTRUCTIONS['response_formats'][self.format_style]['instruct']
-        
-        # If selected format is 'markdown' and table style is set, append to response instructions
-        # removed: hasattr(self, 'md_table_style') and 
         if self.format_style == 'markdown':
-            response_instruct = response_instruct +  \
-                INSTRUCTIONS['response_formats']['markdown']['table_styles'][self.MD_TABLE_STYLE]
+            response_instruct += INSTRUCTIONS['response_formats']['markdown']['table_styles'][self.MD_TABLE_STYLE]
         elif self.format_style == 'html':
-            response_instruct = response_instruct +  \
-                INSTRUCTIONS['response_formats']['html']['css']
-        
+            response_instruct += INSTRUCTIONS['response_formats']['html']['css']
+
         self.complete_prompt = f"{response_instruct}; {user_content}"
-        
         self.response_file = f"{self.role_context}_{timestamp}.{self.file_exts[self.format_style]}"
-        
+
+    def _make_openai_call(self):
         self.response = openai.ChatCompletion.create(
             model=self.model,
             messages=[
-                {"role": "system", "content": system_role},
+                {"role": "system", "content": self.system_role},
                 {"role": "user", "content": self.complete_prompt},
             ],
             temperature=self.temperature,
         )
-
-        # Get the generated text
         self.response_content = self.response['choices'][0]['message']['content']
-        
-        status_code = self.response["choices"][0]["finish_reason"]
-        assert status_code == "stop", f"The status code was {status_code}."
-        
+
+    def _handle_output(self, save_output, print_raw):
         if self.response_content:
             if save_output:
                 with open(self.response_file, 'w') as f:
@@ -216,10 +188,15 @@ class GPTService:
             if print_raw:
                 print(self.response_content)
             self.show()
-            print("*****************")
         else:
             print("No response content.")
-            return None
+
+    def get_response(self, prompt=None, format_style='markdown', save_output=False, print_raw=False):
+        self._validate_and_assign_params(prompt, format_style)
+        self._prepare_api_call()
+        self._make_openai_call()
+        self._handle_output(save_output, print_raw)
+
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
