@@ -151,7 +151,7 @@ class GPTService:
         available_role_contexts = list(INSTRUCTIONS['role_contexts'].keys())
         print("Available role contexts:", available_role_contexts)
 
-    def get_response(self, prompt=None, format_style='markdown', save_output=False, print_response=False):
+    def get_response(self, prompt=None, format_style='markdown', save_output=False, print_raw=False):
         """Fetches the generated response from the GPT model based on the user prompt and context.
         
         Args:
@@ -208,13 +208,17 @@ class GPTService:
         # Get the generated text
         self.response_content = self.response['choices'][0]['message']['content']
         
+        status_code = self.response["choices"][0]["finish_reason"]
+        assert status_code == "stop", f"The status code was {status_code}."
+        
         if self.response_content:
             if save_output:
                 with open(self.response_file, 'w') as f:
                     f.write(self.response_content)
-            if print_response:
+            if print_raw:
                 print(self.response_content)
-            return self.response_content
+            self.show()
+            print("*****************")
         else:
             print("No response content.")
             return None
