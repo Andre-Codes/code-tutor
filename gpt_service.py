@@ -72,39 +72,38 @@ class GPTService:
             model (str, optional): The GPT model name to use. Defaults to "gpt-3.5-turbo".
         """
         
-        # Initialization of attributes
+        # Set up API access
         self.api_key = os.environ['OPENAI_API_KEY']
         openai.api_key = self.api_key
-        self.model=model
-        # Validate role_context against available contexts in JSON
+        
+        # Set the GPT model
+        self.model = model
+        
+        # Validate and set role_context
         available_role_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
         self.role_context = role_context if role_context in available_role_contexts else 'basic'
-        # Store prompt_context
+        
+        # Validate and set prompt_context
         if not isinstance(prompt_context, bool):
             raise ValueError("prompt_context must be a boolean value: True or False")
-        else:
-            self.prompt_context = prompt_context
-        # self.md_table_style = md_table_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
-        # Get available comment and explain levels or set default to 'normal'
+        self.prompt_context = prompt_context
+        
+        # Validate and set comment_level
         comment_levels = INSTRUCTIONS['comment_levels']
         self.comment_level = comment_level if comment_level in comment_levels \
-            or comment_level is None  else 'normal'
+            or comment_level is None else 'normal'
+        
+        # Validate and set explain_level
         explain_levels = INSTRUCTIONS['explain_levels']
         self.explain_level = explain_level if explain_level in explain_levels \
-            or explain_level is None  else 'concise'
-        # Default temperature to 0 if not a valid temperature
+            or explain_level is None else 'concise'
+        
+        # Validate and set temperature
         if 0 <= temperature <= 1:
             self.temperature = temperature
         else:
             raise ValueError("temperature must be between 0 and 1")
-        # Load remaining settings from JSON
-        # self.md_table_format = self._set_md_table_format()
-        
-        # self.context_handlers = (
-        #     {context: getattr(self, f'_handle_{context}') for context in INSTRUCTIONS.get('role_contexts', {})}
-        # )
-        
-        # Set file extensions based on response format
+
     
     def set_md_table_style(self, style):
         available_table_styles = INSTRUCTIONS['response_formats']['markdown']['table_styles'].keys()
