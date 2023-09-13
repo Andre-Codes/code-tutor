@@ -14,7 +14,6 @@ class GPTService:
     
     Attributes:
         api_key (str): The OpenAI API key, sourced from environment variables.
-        user_prompt (str): The user-provided prompt for generating a response.
         model (str): The GPT model name to be used. Defaults to "gpt-3.5-turbo".
         role_context (str): Operational context for the GPT model, e.g., 'basic', 'api_explain'.
         prompt_context (bool): Whether additional context will be provided in the prompt. 
@@ -50,14 +49,14 @@ class GPTService:
     
     def __init__(
         self, 
-        role_context=None, 
-        prompt_context=None, 
-        comment_level=None, 
-        explain_level=None, 
-        temperature=None,
+        role_context=None,
+        prompt_context=False,
+        comment_level=None,
+        explain_level=None,
+        temperature=0,
         model="gpt-3.5-turbo"):
         """
-        Initializes the GPTService class with various settings.
+        Initializes the GPTService class with settings to control the prompt and response.
 
         # Parameters
         ----------
@@ -76,13 +75,15 @@ class GPTService:
         # Initialization of attributes
         self.api_key = os.environ['OPENAI_API_KEY']
         openai.api_key = self.api_key
-        self.user_prompt = ''
         self.model=model
         # Validate role_context against available contexts in JSON
         available_role_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
         self.role_context = role_context if role_context in available_role_contexts else 'basic'
-
-        self.prompt_context = prompt_context if prompt_context is not None else False  # Default to False
+        # Store prompt_context
+        if not isinstance(prompt_context, bool):
+            raise ValueError("prompt_context must be a boolean value: True or False")
+        else:
+            self.prompt_context = prompt_context
         # self.md_table_style = md_table_style or INSTRUCTIONS.get('table_formatting', {}).get('default', 'pipes')
         # Get available comment and explain levels or set default to 'normal'
         comment_levels = INSTRUCTIONS['comment_levels']
@@ -91,9 +92,11 @@ class GPTService:
         explain_levels = INSTRUCTIONS['explain_levels']
         self.explain_level = explain_level if explain_level in explain_levels \
             or explain_level is None  else 'concise'
-        
-        self.temperature = temperature or 0  # Default to 0
-
+        # Default temperature to 0 if not a valid temperature
+        if 0 <= temperature <= 1:
+            self.temperature = temperature
+        else:
+            raise ValueError("temperature must be between 0 and 1")
         # Load remaining settings from JSON
         # self.md_table_format = self._set_md_table_format()
         
