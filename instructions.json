@@ -29,7 +29,7 @@
             "system_role": "You're a helpful assistant who helps translate coding languages.",
             "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
             "prompt_context_false": "Answer the following code question, and",
-            "instruct": "translate the following code to the specified language. After the translation, make a table to help visualize the translation by comparing each line of code with the other language, and add a column for description",
+            "instruct": "translate the following code to the specified language. After showing the translation, make a table to help visualize the translation by comparing each indvididual line of code with the other language, and add a column for description",
             "documentation": "After the translation, provide detailed comments for each language and then, if applicable, explain the equivalent libraries or packages used in each language"
         }
     },

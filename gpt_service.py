@@ -10,46 +10,34 @@ with open("instructions.json", "r") as f:
 
 class GPTService:
     """
-    A service class for interacting with the GPT-3.5-turbo model via the OpenAI API.
+    A class for interacting with GPT models via the OpenAI API.
     
     Attributes:
-        api_key (str): The API key for OpenAI, sourced from environment variables.
-        user_prompt (str): The prompt that the user provides for the model.
-        response (str): The generated response from the GPT model.
-        role_context (str): The context in which the GPT model operates. 
-                            Valid options are sourced from INSTRUCTIONS.json.
-        temperature (float): The randomness of the GPT model's output.
-        md_code_format (str): Markdown instructions for code formatting.
-        md_table_format (str): Markdown instructions for tables.
+        api_key (str): The OpenAI API key, sourced from environment variables.
+        user_prompt (str): The user-provided prompt for generating a response.
+        model (str): The GPT model name to be used. Defaults to "gpt-3.5-turbo".
+        role_context (str): Operational context for the GPT model, e.g., 'basic', 'api_explain'.
+        prompt_context (bool): Whether additional context will be provided in the prompt. 
+        comment_level (str): Level of comment verbosity.
+        explain_level (str): Level of explanation verbosity.
+        temperature (float): Controls randomness in output. Lower is more deterministic.
+        
+    Class Variables:
+        DISPLAY_MAPPING (dict): Mappings for IPython.display function names.
+        MD_TABLE_STYLE (str): Default style for Markdown tables.
         
     Methods:
-        __init__(role_context, prompt_context, md_table_style, comment_level, temperature):
-            Initializes the class attributes based on provided parameters.
-            
-        _set_md_table_format():
-            Sets the Markdown table format based on the type.
-        
-        get_response(user_prompt):
-            Fetches a response from the GPT model based on the user's prompt and context.
-            
-        _handle_basic(user_prompt):
-            Context handler for 'basic' role_context.
-            
-        _handle_api_explain(user_prompt):
-            Context handler for 'api_explain' role_context.
-            
-        _handle_code_help(user_prompt):
-            Context handler for 'code_help' role_context.
-            
-        prompt(user_prompt):
-            Prompts the user for input and fetches the GPT model's response.
-            
-    Comment Levels:
-        For role_context='api_explain':
-            - "Basic", "Thorough", "Comprehensive", "Advanced", "Pedagogical", "Technical"
-        
-        For role_context='code_help':
-            - "Basic", "Moderate", "Detailed", "Verbose", "Exhaustive", "Pedagogical"
+        __init__(): Initializes class attributes.
+        set_md_table_style(): Sets Markdown table style.
+        get_format_styles(): Prints available response formats.
+        get_role_contexts(): Prints available role contexts.
+        _validate_and_assign_params(): Validates and assigns prompt and format_style.
+        _craft_prompt(): Constructs the complete prompt for OpenAI API call.
+        _make_openai_call(): Makes the API call and stores the response.
+        _handle_output(): Handles saving and displaying the response.
+        get_response(): Main function to get a response from the GPT model.
+        _handle_role_instructions(): Constructs role-specific instructions for the prompt.
+        show(): Displays the generated content.
     """
     
     # Class variables
@@ -73,38 +61,22 @@ class GPTService:
 
         # Parameters
         ----------
-        role_context : (str, optional): 
-            Defines the operational context of the GPT model.
-            Defaults to 'basic'.
-            
-            Options include:
-                - 'basic': General-purpose context for answering questions.
-                - 'api_explain': For summarizing and explaining API documentation. If the `prompt_context` parameter is set to `True`,
-                    this will enable the passing of entire API documentation as the prompt, ensuring up-to-date information in the response.
-                - 'code_help': For coding-related help.
-                
-        prompt_context : (bool, optional): 
-            Indicates if additional context (i.e. API documentation) will be provided for the prompt. Defaults to False.
-            
-        md_table_style (str, optional): 
-            Specifies the Markdown table format. Defaults to 'pipes'.
-            Options:
-                - 'bullets': Use nested bulleted lists for tables.
-                - 'pipes': Use pipe characters to separate table cells.
-                
-        comment_level : (str, optional):
-            Specifies the level of commenting for either 'api_explain' or 'code_help' role_contexts.
-            Available options are based on the value of role_context. Defaults to 'Basic' for 'api_explain' and 'code_help'.
-            
-        temperature : (float, optional):
-            Controls the randomness of the GPT model's output. Lower values make the output more deterministic. Defaults to 0.
+            role_context (str, optional): Operational context for GPT. This directly control \
+                what is sent to the GPT model in addition to the user inputted prompt. \
+                    Use the `get_role_contexts()` method to view the available roles. \
+                        Defaults to 'basic'.
+            prompt_context (bool, optional): Whether additional context will be provided; \
+                typically as API documentation or code. Defaults to False.
+            comment_level (str, optional): Level of comment verbosity. Defaults to 'normal'.
+            explain_level (str, optional): Level of explanation verbosity. Defaults to 'concise'.
+            temperature (float, optional): Controls randomness in output. Defaults to 0.
+            model (str, optional): The GPT model name to use. Defaults to "gpt-3.5-turbo".
         """
         
         # Initialization of attributes
         self.api_key = os.environ['OPENAI_API_KEY']
         openai.api_key = self.api_key
         self.user_prompt = ''
-        self.response = ''
         self.model=model
         # Validate role_context against available contexts in JSON
         available_role_contexts = INSTRUCTIONS.get('role_contexts', {}).keys()
@@ -130,10 +102,6 @@ class GPTService:
         # )
         
         # Set file extensions based on response format
-        self.file_exts = {
-            "markdown": "md",
-            "html": "html"
-        }
     
     def set_md_table_style(self, style):
         available_table_styles = INSTRUCTIONS['response_formats']['markdown']['table_styles'].keys()
@@ -155,9 +123,7 @@ class GPTService:
         self.prompt = prompt
         self.format_style = format_style.lower()
 
-    def _prepare_api_call(self):
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
-
+    def _craft_prompt(self):
         self.system_role, user_content = self._handle_role_instructions(self.prompt)
 
         response_instruct = INSTRUCTIONS['response_formats'][self.format_style]['instruct']
@@ -167,10 +133,9 @@ class GPTService:
             response_instruct += INSTRUCTIONS['response_formats']['html']['css']
 
         self.complete_prompt = f"{response_instruct}; {user_content}"
-        self.response_file = f"{self.role_context}_{timestamp}.{self.file_exts[self.format_style]}"
 
     def _make_openai_call(self):
-        self.response = openai.ChatCompletion.create(
+        response = openai.ChatCompletion.create(
             model=self.model,
             messages=[
                 {"role": "system", "content": self.system_role},
@@ -178,12 +143,19 @@ class GPTService:
             ],
             temperature=self.temperature,
         )
-        self.response_content = self.response['choices'][0]['message']['content']
+        self.response_content = response['choices'][0]['message']['content']
 
     def _handle_output(self, save_output, print_raw):
+        file_exts = {
+            "markdown": "md",
+            "html": "html"
+        }
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
+        response_file = f"{self.role_context}_{timestamp}.{file_exts[self.format_style]}"
+        
         if self.response_content:
             if save_output:
-                with open(self.response_file, 'w') as f:
+                with open(response_file, 'w') as f:
                     f.write(self.response_content)
             if print_raw:
                 print(self.response_content)
@@ -193,7 +165,7 @@ class GPTService:
 
     def get_response(self, prompt=None, format_style='markdown', save_output=False, print_raw=False):
         self._validate_and_assign_params(prompt, format_style)
-        self._prepare_api_call()
+        self._craft_prompt()
         self._make_openai_call()
         self._handle_output(save_output, print_raw)
 
