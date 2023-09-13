@@ -140,13 +140,11 @@ class GPTService:
         if style not in available_table_styles:
             raise ValueError(f"Invalid MD_TABLE_STYLE. Available styles: {list(INSTRUCTIONS['table_formatting'].keys())}.")
         self.MD_TABLE_STYLE = INSTRUCTIONS['response_formats']['markdown']['table_styles'][style]
-    
-    @staticmethod      
+        
     def get_format_styles():
         available_formats = list(INSTRUCTIONS['response_formats'].keys())
         print("Available response formats:", available_formats)
-    
-    @staticmethod      
+         
     def get_role_contexts():
         available_role_contexts = list(INSTRUCTIONS['role_contexts'].keys())
         print("Available role contexts:", available_role_contexts)
@@ -222,47 +220,6 @@ class GPTService:
         else:
             print("No response content.")
             return None
-        
-    def _handle_basic(self, user_prompt):
-        system_role = "You're a helpful assistant that answers my questions."
-        user_content = user_prompt
-        return system_role, user_content
-
-    def _handle_api_explain(self, user_prompt):
-        if self.prompt_context:
-            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_true']
-        else:
-            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_false']
-        
-        if self.comment_level is not None:
-            comment_level = f"Provide {self.comment_level}"
-        else:
-            comment_level = "Do not add any"
-            
-        if self.comment_level is not None:
-            explain_level = f"Provide {self.explain_level}"
-        else:
-            explain_level = "Do not give any"
-            
-        documentation = f"{comment_level} code comments and {explain_level} explanation of the process."
-            
-        instructions = f"{prompt_context} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
-        user_content = f"{instructions}: {user_prompt}; {documentation}"
-        system_role = "You're a helpful expert on analyzing python library documentation."
-        return system_role, user_content
-
-    def _handle_code_help(self, user_prompt):
-        if self.prompt_context:
-            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_true']
-        else:
-            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context]['prompt_context_false']
-        
-        documentation_instruct = f"Provide {self.comment_level} code comments and {self.explain_level} explanation of the process."
-        
-        instructions = f"{prompt_context} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
-        user_content = f"{instructions}: {user_prompt}; {documentation_instruct}"
-        system_role = "You're a helpful assistant who answers coding language questions."
-        return system_role, user_content
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
