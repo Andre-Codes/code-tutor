@@ -26,11 +26,18 @@
             "instruct": "provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response."
         },
         "code_convert": {
-            "system_role": "You're a helpful assistant who helps translate coding languages.",
+            "system_role": "You're computer language expert who helps translate on language to another.",
             "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
             "prompt_context_false": "Answer the following code question, and",
             "instruct": "translate the following code to the specified language. After showing the translation, make a table to help visualize the translation by comparing each indvididual line of code with the other language, and add a column for description",
             "documentation": "After the translation, provide detailed comments for each language and then, if applicable, explain the equivalent libraries or packages used in each language"
+        },
+        "pep8": {
+            "system_role": "You're an expert in the python coding language and assisting with python pep8 standards.",
+            "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
+            "prompt_context_false": "",
+            "instruct": "I need the following code refactored to be more 'pythonic' and conformed to the PEP8 standards. Be sure to use comprehensions (list, dictionary, etc.) when necessary, fix variable naming conventions, indenting, and overall structure, ensure line length under 79 characters for code, and 72 for comments and docstrings, replace code with built-in methods when possible, and any other standards/best practices that conform to PEP8 and make the code more readable, efficient, and pythonic.",
+            "documentation": "Make a table showing all the changes that were made, with an explanation for why you chose to do so. If the code does not need any changes, simply explain why it conforms to PEP8 and is 'pythonic'."
         }
     },
     "explain_levels": [
