@@ -31,7 +31,7 @@ class CodeTutor:
         get_format_styles(): Prints available response formats.
         get_role_contexts(): Prints available role contexts.
         _validate_and_assign_params(): Validates and assigns prompt and format_style.
-        _craft_prompt(): Constructs the complete prompt for OpenAI API call.
+        _build_prompt(): Constructs the complete prompt for OpenAI API call.
         _make_openai_call(): Makes the API call and stores the response.
         _handle_output(): Handles saving and displaying the response.
         get_response(): Main function to get a response from the GPT model.
@@ -125,7 +125,7 @@ class CodeTutor:
         self.prompt = prompt
         self.format_style = format_style.lower()
 
-    def _craft_prompt(self):
+    def _build_prompt(self):
         self.system_role, user_content = self._handle_role_instructions(self.prompt)
 
         response_instruct = INSTRUCTIONS['response_formats'][self.format_style]['instruct']
@@ -139,10 +139,7 @@ class CodeTutor:
     def _make_openai_call(self):
         response = openai.ChatCompletion.create(
             model=self.model,
-            messages=[
-                {"role": "system", "content": self.system_role},
-                {"role": "user", "content": self.complete_prompt},
-            ],
+            messages=self.__messages,
             temperature=self.temperature,
         )
         self.response_content = response['choices'][0]['message']['content']
@@ -164,13 +161,45 @@ class CodeTutor:
             self.show()
         else:
             print("No response content.")
+            
+    def _build_messages(self, prompt):
+        # Validate that all items in 'prompt' are strings
+        if not all(isinstance(item, str) for item in prompt):
+            raise ValueError("All elements in the list should be strings")
+        
+        # Initialize system message
+        system_msg = [{"role": "system", "content": self.system_role}]
+        
+        # Determine user and assistant messages based on the length of the 'prompt'
+        if len(prompt) > 1:
+            user_assistant_msgs = [
+                {
+                    "role": "assistant" if i % 2 == 0 else "user", 
+                    "content": prompt[i]
+                }
+                for i in range(len(prompt))
+            ]
+        else:
+            user_assistant_msgs = [{"role": "user", "content": self.complete_prompt}]
+        
+        # Combine system, user, and assistant messages
+        self.__messages = system_msg + user_assistant_msgs
 
-    def get_response(self, prompt=None, format_style='markdown', save_output=False, print_raw=False):
+    def get_response(
+            self,
+            prompt=None,
+            format_style='markdown',
+            save_output=False,
+            print_raw=False
+        ):
+        # _build_messages requires prompt to be a list
+        # convert prompt to a list if it is not already
+        prompt = [prompt] if not isinstance(prompt, list) else prompt
         self._validate_and_assign_params(prompt, format_style)
-        self._craft_prompt()
+        self._build_prompt()
+        self._build_messages(prompt)
         self._make_openai_call()
         self._handle_output(save_output, print_raw)
-
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
