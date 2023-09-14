@@ -8,7 +8,7 @@ from IPython.display import display, HTML, Markdown
 with open("instructions.json", "r") as f:
     INSTRUCTIONS = json.load(f)
 
-class GPTService:
+class CodeTutor:
     """
     A class for interacting with GPT models via the OpenAI API.
     
