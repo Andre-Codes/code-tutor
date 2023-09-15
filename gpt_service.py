@@ -234,12 +234,17 @@ class CodeTutor:
 
         return system_role, user_content
         
-    def show(self):
+    def show(self, content=None):
         if not self.response_content:
             print("No response to show.")
             return
+        
+        if not content:
+            content = self.response_content
+            
         display_class = self.DISPLAY_MAPPING.get(self.format_style, None)
+        
         if display_class:
-            display(display_class(self.response_content))
+            display(display_class(content))
         else:
             print("Unknown format.")
