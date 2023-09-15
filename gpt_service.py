@@ -2,6 +2,7 @@ import os
 import openai
 import json
 import datetime
+import re
 from IPython.display import display, HTML, Markdown
 
 # Load instructions from JSON file
@@ -144,7 +145,7 @@ class CodeTutor:
         )
         self.response_content = response['choices'][0]['message']['content']
 
-    def _handle_output(self, save_output, print_raw):
+    def _handle_output(self, save_output, print_raw, only_code):
         file_exts = {
             "markdown": "md",
             "html": "html"
@@ -158,7 +159,7 @@ class CodeTutor:
                     f.write(self.response_content)
             if print_raw:
                 print(self.response_content)
-            self.show()
+            self.show(content=self.response_content, only_code=only_code)
         else:
             print("No response content.")
             
@@ -190,7 +191,8 @@ class CodeTutor:
             prompt=None,
             format_style='markdown',
             save_output=False,
-            print_raw=False
+            print_raw=False,
+            only_code=False
         ):
         # _build_messages requires prompt to be a list
         # convert prompt to a list if it is not already
@@ -199,7 +201,7 @@ class CodeTutor:
         self._build_prompt()
         self._build_messages(prompt)
         self._make_openai_call()
-        self._handle_output(save_output, print_raw)
+        self._handle_output(save_output, print_raw, only_code)
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
@@ -234,16 +236,21 @@ class CodeTutor:
 
         return system_role, user_content
         
-    def show(self, content=None):
+    def show(self, content=None, only_code=False):
         if not self.response_content:
             print("No response to show.")
             return
-        
-        if not content:
-            content = self.response_content
             
         display_class = self.DISPLAY_MAPPING.get(self.format_style, None)
         
+        if not content:
+            content = self.response_content
+        
+        if only_code:
+            pattern = r'(```.*?```)'
+            matches = re.findall(pattern, content, re.DOTALL) 
+            content = '\n'.join(matches)
+            
         if display_class:
             display(display_class(content))
         else:
