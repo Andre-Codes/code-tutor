@@ -1,10 +1,10 @@
-# GPTService - A Python Wrapper for GPT-3.5-turbo
+# CodeTutor - A Python Wrapper for GPT-3.5-turbo
 
 ** THIS README IS A WORK IN PROGRESS **
 
 ## Introduction
 
-This Python class serves as an interface to the OpenAI GPT-3.5-turbo API. It allows for easy interaction with the model in various contexts such as basic Q&A, API explanation, and coding assistance.
+This Python class serves as an interface to the OpenAI GPT-3.5-turbo API. It allows for easy interaction with the model in various contexts such as basic Q&A, API explanation, coding assistance, and code refactoring.
 
 ## Table of Contents
 
@@ -22,16 +22,12 @@ This Python class serves as an interface to the OpenAI GPT-3.5-turbo API. It all
 
 ## Installation and Setup
 
-1. Clone this repository.
-2. Install the required packages.
-3. Add your OpenAI API key to the environment variables.
-
 ## Usage
 
-Initialize the `GPTService` class and then call its methods based on your use case. For example:
+Initialize the `CodeTutor` class and then call its methods based on your use case. For example:
 
 ```python
-api_explain = gpt.GPTService(role_context='api_explain',
+api_explain = gpt.CodeTutor(role_context='api_explain',
                             temperature=0, 
                             prompt_context=True,
                             comment_level='verbose',
@@ -53,123 +49,46 @@ Initializes the GPTService class with various settings.
 
 ### Examples
 
+## The 'code_help' role context
 ```python
-code_help = gpt.GPTService(role_context='code_help',
+code_help = gpt.CodeTutor(role_context='code_help',
                             comment_level='normal',
                             explain_level='comprehensive')
 code_help.prompt = "using pandas compare two dataframes, and create a new one with the differences"
 code_help.get_response(code_help.prompt, format_style='markdown')
 ```
-#### ======= Example Result =======
 
-The below example is the unaltered result with a
-response pre-formatted in markdown; no changes made to the API response.
-
-#### =========================
-
-# Comparing and Creating a New DataFrame with Differences using Pandas
-
-## Summary
-The question is about comparing two DataFrames using the pandas library in Python and creating a new DataFrame that contains the differences between the two original DataFrames.
-
-## Process Explanation
-To compare two DataFrames and create a new one with the differences, you can follow these steps:
-
-1. Import the necessary libraries:
+### The 'pep8' role context, with assistant messages
+(See this [notebook](https://github.com/Andre-Codes/code-tutor/blob/main/response_examples/chat_assistant_examples/chat_assistant.ipynb) for a full example with response output)
 ```python
-import pandas as pd
+# initiaite the class with the chosen role
+fix_code = gpt.CodeTutor(role_context="pep8")
+
+# create the prompt, save it to a unique variable
+prompt_1 = """
+counter=0
+Num = 0.5
+if 0 <= Num:
+    if Num <= 1:
+        for i in [0,2,4,6,8,10,12,14,16,18,20]:
+            counter = counter + 1
+            print(counter + ": " + i**2)
+"""
+# send the prompt and the response will be displayed in the output cell
+# the response is also accessible from the response_content attribute
+fix_code.get_response(prompt=prompt_1, format_style='markdown')
+
+# create a second prompt to follow up the previous response
+prompt2 = """
+can you check again and confirm all the possible changes to 
+the original code were made to conform to PEP8
+"""
+
+# save the first response to a variable
+prompt1_response = fix_code.response_content
+# create a list, alternate prompt and assistant message (response)
+messages = [prompt_1, prompt_response, prompt2]
+# send the messages and get another response
+fix_code.get_response(prompt=messages, format_style='markdown')
 ```
 
-2. Create two DataFrames to compare:
-```python
-df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-df2 = pd.DataFrame({'A': [1, 2, 4], 'B': [4, 5, 7]})
-```
-
-3. Use the `compare` method from pandas to compare the two DataFrames:
-```python
-comparison_result = df1.compare(df2)
-```
-
-4. The `comparison_result` will be a new DataFrame that contains the differences between the two original DataFrames. It will have three columns: `self`, `other`, and `diff`. The `self` column represents the values from the first DataFrame (`df1`), the `other` column represents the values from the second DataFrame (`df2`), and the `diff` column represents the differences between the two values.
-
-5. You can access the differences by filtering the `diff` column:
-```python
-differences = comparison_result['diff']
-```
-
-6. If you want to create a new DataFrame with only the differences, you can use the `dropna` method to remove rows with no differences:
-```python
-new_df = differences.dropna()
-```
-
-7. The `new_df` will be a DataFrame that contains only the rows with differences between the two original DataFrames.
-
-## Examples
-
-### Example 1:
-```python
-import pandas as pd
-
-df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-df2 = pd.DataFrame({'A': [1, 2, 4], 'B': [4, 5, 7]})
-
-comparison_result = df1.compare(df2)
-differences = comparison_result['diff']
-new_df = differences.dropna()
-
-print(new_df)
-```
-Output:
-```
-     A    B
-2  3.0  6.0
-```
-
-### Example 2:
-```python
-import pandas as pd
-
-df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-df2 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-
-comparison_result = df1.compare(df2)
-differences = comparison_result['diff']
-new_df = differences.dropna()
-
-print(new_df)
-```
-Output:
-```
-Empty DataFrame
-Columns: [A, B]
-Index: []
-```
-
-### Example 3:
-```python
-import pandas as pd
-
-df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-df2 = pd.DataFrame({'A': [4, 5, 6], 'B': [1, 2, 3]})
-
-comparison_result = df1.compare(df2)
-differences = comparison_result['diff']
-new_df = differences.dropna()
-
-print(new_df)
-```
-Output:
-```
-     A    B
-0  1.0  4.0
-1  2.0  5.0
-2  3.0  6.0
-```
-
-## Sources
-- [pandas documentation](https://pandas.pydata.org/docs/)
-- [GeeksforGeeks - Compare two Pandas DataFrames for differences](https://www.geeksforgeeks.org/compare-two-pandas-dataframes-for-differences/)
-- [Real Python - How to Compare Values in Two Pandas DataFrames](https://realpython.com/pandas-compare-rows/)
-
-#### ======= End of Example Result =======
