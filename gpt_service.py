@@ -145,7 +145,9 @@ class CodeTutor:
         )
         self.response_content = response['choices'][0]['message']['content']
 
-    def _handle_output(self, save_output, print_raw, only_code):
+    def _handle_output(self, save_output, print_raw, **kwargs):
+        only_code = kwargs.get('only_code', False)
+        
         file_exts = {
             "markdown": "md",
             "html": "html"
@@ -192,7 +194,7 @@ class CodeTutor:
             format_style='markdown',
             save_output=False,
             print_raw=False,
-            only_code=False
+            **kwargs
         ):
         # _build_messages requires prompt to be a list
         # convert prompt to a list if it is not already
@@ -201,7 +203,7 @@ class CodeTutor:
         self._build_prompt()
         self._build_messages(prompt)
         self._make_openai_call()
-        self._handle_output(save_output, print_raw, only_code)
+        self._handle_output(save_output, print_raw, **kwargs)
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
