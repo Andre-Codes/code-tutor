@@ -160,9 +160,10 @@ class CodeTutor:
                     f.write(self.response_content)
             if print_raw:
                 print(self.response_content)
-            self.show(content=self.response_content, only_code=only_code)
+            content = self.show(content=self.response_content, only_code=only_code)
+            return content
         else:
-            print("No response content.")
+            return "No response."
             
     def _build_messages(self, prompt):
         # Validate that all items in 'prompt' are strings
@@ -202,9 +203,9 @@ class CodeTutor:
         self._build_prompt()
         self._build_messages(prompt)
         self._make_openai_call()
-        self._handle_output(save_output, print_raw, **kwargs)
+        content = self._handle_output(save_output, print_raw, **kwargs)
         # Return finished response from OpenAI
-        return self.response_content
+        return content
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
