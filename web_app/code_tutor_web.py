@@ -20,11 +20,12 @@ def generate_response(prompt, only_code):
 
 def display_content(content, header=None):
     st.divider()
-    if header:
-        st.markdown(f"# {header}")
-    st.markdown(content)
+    with st.container():
+        if header:
+            st.markdown(f"# {header}")
+        st.markdown(content)
 
-def continue_lesson(user_prompt, role_context):
+def extra_lesson(user_prompt, role_context):
     with st.spinner('Continuing lesson...'):
         prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
         messages = [user_prompt, ct.response_content, prompt2]
@@ -61,7 +62,7 @@ if answer_button:
     display_content(content)
     
     if extra_lesson_toggle:
-        more_content = continue_lesson(user_prompt, ct.role_context)
+        more_content = extra_lesson(user_prompt, ct.role_context)
         display_content(more_content, header="Further Explanation")
             
             
