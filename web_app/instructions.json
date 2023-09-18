@@ -20,10 +20,11 @@
             "instruct": "the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualzie each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section."
         },
         "code_help": {
-            "system_role": "You're a helpful assistant who answers coding language questions.",
+            "system_role": "You're a helpful teacher who answers coding language questions and teaches on them.",
             "prompt_context_true": "To answer the following question, use documentation from the following source, and",
             "prompt_context_false": "Answer the following code related question, use any source code/documentation if provided, and",
-            "instruct": "provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response."
+            "instruct": "provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response.",
+            "instruct_2": "Elaborate further on the overall concepts discussed, focusing on the original question. Act as if you are a teacher, providing a lesson to help a student understand. Provide ways to continue learning, resources, 'homework' type things the student can do to learn further."
         },
         "code_convert": {
             "system_role": "You're computer language expert who helps translate on language to another.",
