@@ -3,16 +3,6 @@ import streamlit as st
 
 
 
-st.title("Code Tutor")
-
-
-
-# Sidebar with dropdown
-roles = gpt.CodeTutor.get_role_contexts()
-selected_fruit = st.sidebar.selectbox(
-    'Select an AI Role:', 
-    roles
-)
 
 # initalize the class with role context
 ct = gpt.CodeTutor(
@@ -20,6 +10,32 @@ ct = gpt.CodeTutor(
     explain_level='concise', 
     comment_level='normal'
 )
+
+# Sidebar with dropdown
+roles = gpt.CodeTutor.get_role_contexts()
+
+def generate_response(prompt, only_code):
+    with st.spinner('Generating a response...'):
+        return ct.get_response(prompt=prompt, only_code=only_code)
+
+def display_content(content, header=None):
+    st.divider()
+    if header:
+        st.markdown(f"# {header}")
+    st.markdown(content)
+
+def continue_lesson(user_prompt, role_context):
+    with st.spinner('Continuing lesson...'):
+        prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
+        messages = [user_prompt, ct.response_content, prompt2]
+        return ct.get_response(prompt=messages)
+
+selected_role = st.sidebar.selectbox(
+    'Select an AI Role:', 
+    roles
+)
+
+st.title("Code Tutor")
 
 prompt_box = st.empty()
 
@@ -39,19 +55,13 @@ user_prompt = prompt_box.text_area(
     key='prompt'
 )
 
+# 
 if answer_button:
-    with st.spinner('Generating a response...'):
-        content = ct.get_response(prompt=user_prompt, only_code=code_only_toggle)
-    # display the generated markdown content
-    st.divider()
-    st.markdown(content)
+    content = generate_response(user_prompt, code_only_toggle)
+    display_content(content)
+    
     if extra_lesson_toggle:
-        with st.spinner('Continuing lesson...'):
-            # create new prompt/assistant messages
-            prompt2 = gpt.INSTRUCTIONS['role_contexts'][ct.role_context]['instruct_2']
-            messages = [user_prompt, ct.response_content, prompt2]
-            more_content = ct.get_response(prompt=messages)
-            # display the generated markdown content
-            st.divider()
-            st.markdown("# Further Explanation")
-            st.markdown(more_content)
+        more_content = continue_lesson(user_prompt, ct.role_context)
+        display_content(more_content, header="Further Explanation")
+            
+            
