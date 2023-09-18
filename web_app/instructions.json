@@ -1,0 +1,61 @@
+{
+    "response_formats": {
+        "markdown": {
+            "instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. ",
+            "table_styles": {
+                "bullets": "Also, format any table in the form of a bullet outline. The description for each param will be on a new line and indented",
+                "pipes": "Also, format any table using these instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, add a pipe on either end of the row"
+            }
+        },
+        "html": {
+            "instruct": "Respond in HTML format. Create a button (or multiple) at top linked to the API site, or embeded direct URLs for the related modules and/or functions used. Use HTML tables as requested and format them with borders. Use other HTML features to make the page visually appealing and engaging. When displaying any image, use related API documentation sources to find them.",
+            "css": "Put any code inside <pre><code> tag, using the following CSS for styling: code { font-family: 'Fira Code', monospace; background-color: #282a36; color: #50fa7b; padding: 1px; border-radius: 3px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); } pre { overflow: auto; background-color: #282a30; color: #f8f8f2; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }"
+        }
+    },
+    "role_contexts": {
+        "api_explain": {
+            "system_role": "You're a helpful expert on analyzing python library documentation.",
+            "prompt_context_true": "Using the provided documentation, summarize when available",
+            "prompt_context_false": "For the following, provide me",
+            "instruct": "the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualzie each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section."
+        },
+        "code_help": {
+            "system_role": "You're a helpful assistant who answers coding language questions.",
+            "prompt_context_true": "To answer the following question, use documentation from the following source, and",
+            "prompt_context_false": "Answer the following code related question, use any source code/documentation if provided, and",
+            "instruct": "provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response."
+        },
+        "code_convert": {
+            "system_role": "You're computer language expert who helps translate on language to another.",
+            "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
+            "prompt_context_false": "Answer the following code question, and",
+            "instruct": "translate the following code to the specified language. After showing the translation, make a table to help visualize the translation by comparing each indvididual line of code with the other language, and add a column for description",
+            "documentation": "After the translation, provide detailed comments for each language and then, if applicable, explain the equivalent libraries or packages used in each language"
+        },
+        "pep8": {
+            "system_role": "You're an expert in the python coding language and assisting with python pep8 standards.",
+            "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
+            "prompt_context_false": "",
+            "instruct": "I need the following code refactored to be more efficient and 'pythonic' and conformed to the PEP8 standards. Be sure to use comprehensions (list, dictionary, etc.) when necessary, fix variable naming conventions, indenting, and overall structure, ensure line length under 79 characters for code, and 72 for comments and docstrings, use any built-in methods to simplify code when possible, and any other standards/best practices that conform to PEP8 and make the code more readable, efficient, and pythonic.",
+            "documentation": "Create a table with columns comparing all the changes that were made, with an explanation column for why you made the change. If the code does not need any changes, simply explain why it conforms to PEP8 and is 'pythonic'."
+        }
+    },
+    "explain_levels": [
+        "concise",
+        "comprehensive",
+        "advanced",
+        "dumbed-down",
+        "technical",
+        "pedagogical",
+        "professional",
+        "child-level"
+    ],
+    "comment_levels": [
+        "normal",
+        "concise",
+        "detailed",
+        "verbose",
+        "exhaustive",
+        "pedagogical"
+    ]
+}
