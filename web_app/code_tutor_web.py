@@ -3,6 +3,14 @@ import streamlit as st
 
 
 
+languages = [
+    'Python', 'JavaScript', 'Java', 'C', 'C++', 'C#', 'Ruby', 
+    'PHP', 'Swift', 'Kotlin', 'TypeScript', 'Go', 'Rust', 
+    'SQL', 'MATLAB', 'R', 'Bash/Shell scripting', 'Scala', 
+    'Dart', 'Objective-C', 'HTML', 'CSS'
+]
+
+
 
 # initalize the class with role context
 ct = gpt.CodeTutor(
@@ -14,16 +22,27 @@ ct = gpt.CodeTutor(
 # Sidebar with dropdown
 roles = gpt.CodeTutor.get_role_contexts()
 
+selected_role = st.sidebar.selectbox(
+    'Select an AI Role:', 
+    roles
+)
+
+ct.role_context = selected_role
+
 def generate_response(prompt, only_code):
     with st.spinner('Generating a response...'):
-        return ct.get_response(prompt=prompt, only_code=only_code)
+        return ct.get_response(prompt=prompt, only_code=only_code, format_style=format_style)
 
 def display_content(content, header=None):
+    # ct.complete_prompt
     st.divider()
     with st.container():
         if header:
             st.markdown(f"# {header}")
-        st.markdown(content)
+        if selected_role == 'code_convert' and not extra_lesson_toggle:
+            st.markdown(content)
+        else:
+            st.markdown(content)
 
 def extra_lesson(user_prompt, role_context):
     with st.spinner('Continuing lesson...'):
@@ -31,11 +50,13 @@ def extra_lesson(user_prompt, role_context):
         messages = [user_prompt, ct.response_content, prompt2]
         return ct.get_response(prompt=messages)
 
-selected_role = st.sidebar.selectbox(
-    'Select an AI Role:', 
-    roles
-)
 
+
+if selected_role == 'code_convert':
+    format_style = 'code_convert'
+else:
+    format_style = 'markdown'
+    
 st.title("Code Tutor")
 
 prompt_box = st.empty()
@@ -55,6 +76,7 @@ user_prompt = prompt_box.text_area(
     placeholder="How do I loop through a dictionary . . .", 
     key='prompt'
 )
+
 
 # 
 if answer_button:

@@ -151,11 +151,11 @@ class CodeTutor:
             "markdown": "md",
             "html": "html"
         }
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
-        response_file = f"{self.role_context}_{timestamp}.{file_exts[self.format_style]}"
         
         if self.response_content:
             if save_output:
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
+                response_file = f"{self.role_context}_{timestamp}.{file_exts[self.format_style]}"
                 with open(response_file, 'w') as f:
                     f.write(self.response_content)
             if print_raw:

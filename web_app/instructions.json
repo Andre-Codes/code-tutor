@@ -30,11 +30,12 @@
             "instruct_2": "Elaborate further on the overall concepts discussed, focusing on the original question. Act as if you are a teacher, providing a lesson to help a student understand. Provide ways to continue learning, resources, 'homework' type things the student can do to learn further."
         },
         "code_convert": {
-            "system_role": "You're computer language expert who helps translate on language to another.",
+            "system_role": "You're computer language expert who translates one language to another.",
             "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
-            "prompt_context_false": "Answer the following code question, and",
+            "prompt_context_false": "",
             "instruct": "translate the following code to the specified language. Respond only with the converted code by itself, and nothing else.",
-            "documentation": "After the translation, provide detailed comments for each language and then, if applicable, explain the equivalent libraries or packages used in each language"
+            "instruct_2": "For the previous code translation, make a table comparing each line of code and a description of what was translated, and then if applicable, explain the equivalent libraries or packages used in each language",
+            "documentation": "Do not provide any explanation in your response."
         },
         "pep8": {
             "system_role": "You're an expert in the python coding language and assisting with python pep8 standards.",
