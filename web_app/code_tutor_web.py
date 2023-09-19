@@ -29,7 +29,7 @@ def display_content(content, custom_header=None):
         st.markdown(content)
 
 def extra_lesson(user_prompt, role_context):
-    with st.spinner('Continuing lesson...'):
+    with st.spinner('Next lesson...'):
         prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
         messages = [user_prompt, ct.response_content, prompt2]
         return ct.get_response(prompt=messages)
