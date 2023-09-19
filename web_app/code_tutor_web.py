@@ -2,16 +2,6 @@ import gpt_service_web as gpt
 import streamlit as st
 
 
-
-languages = [
-    'Python', 'JavaScript', 'Java', 'C', 'C++', 'C#', 'Ruby', 
-    'PHP', 'Swift', 'Kotlin', 'TypeScript', 'Go', 'Rust', 
-    'SQL', 'MATLAB', 'R', 'Bash/Shell scripting', 'Scala', 
-    'Dart', 'Objective-C', 'HTML', 'CSS'
-]
-
-
-
 # initalize the class with role context
 ct = gpt.CodeTutor(
     role_context="code_help", 
@@ -19,8 +9,51 @@ ct = gpt.CodeTutor(
     comment_level='normal'
 )
 
+
+convert_languages = gpt.INSTRUCTIONS['role_contexts']['code_convert']['languages']
+convert_file_formats = gpt.INSTRUCTIONS['role_contexts']['code_convert']['file_formats']
+convert_options = convert_languages + convert_file_formats
+
+custom_header = None
+
+def generate_response(prompt, only_code):
+    with st.spinner('Generating a response...'):
+        return ct.get_response(prompt=prompt, only_code=only_code, format_style=format_style)
+
+def display_content(content, custom_header=None):
+    # ct.complete_prompt
+    st.divider()
+    with st.container():
+        if custom_header:
+            st.markdown(f"{custom_header}")
+        st.markdown(content)
+
+def extra_lesson(user_prompt, role_context):
+    with st.spinner('Continuing lesson...'):
+        prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
+        messages = [user_prompt, ct.response_content, prompt2]
+        return ct.get_response(prompt=messages)
+    
+def format_language(lang):
+    if lang in convert_languages:
+        return f":blue[{lang}]" 
+    else:
+        return f":green[{lang}]"
+
+def handle_code_convert(user_prompt):
+    language = st.sidebar.selectbox(
+        "Convert to:", convert_options, format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
+    )
+    format_style = 'code_convert'
+    header = f"# {language} Translation"
+    user_prompt = f"to {language}: {user_prompt}"
+    return format_style, header, user_prompt
+#     
+
 # Sidebar with dropdown
 roles = gpt.CodeTutor.get_role_contexts()
+
+
 
 selected_role = st.sidebar.selectbox(
     'Select an AI Role:', 
@@ -28,48 +61,20 @@ selected_role = st.sidebar.selectbox(
 )
 
 ct.role_context = selected_role
-
-def generate_response(prompt, only_code):
-    with st.spinner('Generating a response...'):
-        return ct.get_response(prompt=prompt, only_code=only_code, format_style=format_style)
-
-def display_content(content, header=None):
-    # ct.complete_prompt
-    st.divider()
-    with st.container():
-        if header:
-            st.markdown(f"# {header}")
-        if selected_role == 'code_convert' and not extra_lesson_toggle:
-            st.markdown(content)
-        else:
-            st.markdown(content)
-
-def extra_lesson(user_prompt, role_context):
-    with st.spinner('Continuing lesson...'):
-        prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
-        messages = [user_prompt, ct.response_content, prompt2]
-        return ct.get_response(prompt=messages)
-
-
-
-if selected_role == 'code_convert':
-    format_style = 'code_convert'
-else:
-    format_style = 'markdown'
     
 st.title("Code Tutor")
 
 prompt_box = st.empty()
 
 # Create two columns
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    answer_button = st.button("Teach")
+    answer_button = st.button(f":blue[{selected_role}]", help="Generate a response")
 with col2:
-    code_only_toggle = st.toggle("Just code")
+    just_code_toggle = st.toggle("Just code", help="The result will contain only code", key='just_code')
 with col3:
-    extra_lesson_toggle = st.toggle("Extra lesson")
+    extra_lesson_toggle = st.toggle("Extra lesson", help="Provide additional information to the related question. The selected AI role directly affects this.")
 
 user_prompt = prompt_box.text_area(
     label="Enter your prompt", 
@@ -77,14 +82,18 @@ user_prompt = prompt_box.text_area(
     key='prompt'
 )
 
+if selected_role == 'code_convert':
+    format_style, custom_header, user_prompt = handle_code_convert(user_prompt)
+else:
+    format_style = 'markdown'
 
 # 
 if answer_button:
-    content = generate_response(user_prompt, code_only_toggle)
-    display_content(content)
+    content = generate_response(user_prompt, just_code_toggle)
+    display_content(content, custom_header=custom_header)
     
     if extra_lesson_toggle:
         more_content = extra_lesson(user_prompt, ct.role_context)
-        display_content(more_content, header="Further Explanation")
+        display_content(more_content, custom_header="Further Explanation")
             
             
