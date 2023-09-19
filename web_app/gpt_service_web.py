@@ -53,7 +53,7 @@ class CodeTutor:
         prompt_context=False,
         comment_level=None,
         explain_level=None,
-        temperature=0,
+        temperature=None,
         model="gpt-3.5-turbo"):
         """
         Initializes the GPTService class with settings to control the prompt and response.
