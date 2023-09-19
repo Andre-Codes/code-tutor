@@ -20,9 +20,11 @@
             "system_role": "You're a helpful expert on analyzing python library documentation.",
             "prompt_context_true": "Using the provided documentation, summarize when available",
             "prompt_context_false": "For the following, provide me",
-            "instruct": "the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualzie each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section.",
+            "instruct": "the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualize each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section.",
             "display_name": "API Explanation",
-            "button_phrase": "Explain!"
+            "API Explanation": "api_explain",
+            "button_phrase": "Explain This",
+            "prompt_placeholder": "The pandas .agg method..."
         },
         "code_help": {
             "system_role": "You're a helpful teacher who answers coding language questions and teaches on them.",
@@ -30,20 +32,24 @@
             "prompt_context_false": "Answer the following code related question, use any source code/documentation if provided, and",
             "instruct": "provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response.",
             "instruct_2": "Elaborate further on the overall concepts discussed, focusing on the original question. Act as if you are a teacher, providing a lesson to help a student understand. Provide ways to continue learning, resources, 'homework' type things the student can do to learn further.",
-            "display_name": "Coding Assistance",
-            "button_phrase": "Help Me!"
+            "display_name": "Code Assistance",
+            "Code Assistance": "code_help",
+            "button_phrase": "Help Me!",
+            "prompt_placeholder": "I don't know how to use the lambda function correctly here:\n\nnumbers = [1, 2, 3, 4]\n\tsquared_numbers = map(lambda numbers: x * x, numbers)\n\tprint(squared_numbers) "
         },
         "code_convert": {
             "system_role": "You're computer language expert who translates one language to another.",
             "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
             "prompt_context_false": "",
             "instruct": "translate the following code to the specified language. Respond only with the converted code by itself, and nothing else.",
-            "instruct_2": "For the previous code translation, make a table comparing each line of code and a description of what was translated, and then if applicable, compare equivalent libraries or packages. Finally, go into detail on how the newly translated code works in relation to the original code.",
+            "instruct_2": "Make a markdown table comparing each line of code and a description of what was translated, and then if applicable, compare equivalent libraries or packages. Finally, go into detail on how the newly translated code works in relation to the original code.",
             "documentation": "Do not provide any explanation in your response.",
             "languages": ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash/Shell scripting", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"],
             "file_formats": [".TXT", ".CSV", ".JSON", ".YAML", ".XML", ".MD", ".INI"],
             "display_name": "Code Conversion",
-            "button_phrase": "Convert to!"
+            "Code Conversion": "code_convert",
+            "button_phrase": "Convert Code",
+            "prompt_placeholder": "Enter a single line or entire block of code..."
         },
         "pep8": {
             "system_role": "You're an expert in the python coding language and assisting with python pep8 standards.",
@@ -51,8 +57,10 @@
             "prompt_context_false": "",
             "instruct": "I need the following code refactored to be more efficient and 'pythonic' and conformed to the PEP8 standards. Be sure to use comprehensions (list, dictionary, etc.) when necessary, fix variable naming conventions, indenting, and overall structure, ensure line length under 79 characters for code, and 72 for comments and docstrings, use any built-in methods to simplify code when possible, and any other standards/best practices that conform to PEP8 and make the code more readable, efficient, and pythonic.",
             "documentation": "Create a table with columns comparing all the changes that were made, with an explanation column for why you made the change. If the code does not need any changes, simply explain why it conforms to PEP8 and is 'pythonic'.",
-            "display_name": "PEP8 Standardizer",
-            "button_phrase": "Fix My Code!"
+            "display_name": "PEP 8 Standardizer",
+            "PEP 8 Standardizer": "pep8",
+            "button_phrase": "Fix My Code",
+            "prompt_placeholder": "from math import *\n\ndef BADLY_Formatted_Func(A,B,C=3,D=4,E=5):\n global Z\n Z=10\n A=A+1;B=B+1\n resultlist=[]\n for i in range(0,A):\n  for j in range(0,B): resultlist.append(i+j+C);resultlist.append(D)\n  resultlist.append(E)\n return sum(resultlist), Z"
         }
     },
     "explain_levels": [
