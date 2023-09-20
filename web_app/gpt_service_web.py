@@ -5,7 +5,10 @@ import datetime
 import re
 
 # Load instructions from JSON file
-with open("instructions_web.json", "r") as f:
+path_web = "/mount/src/code-tutor/web_app/instructions_web.json"
+path_local = "instructions_web.json"
+f_path = path_web if os.path.exists(path_web) else path_local
+with open(f_path, "r") as f:
     INSTRUCTIONS = json.load(f)
 
 class CodeTutor:
