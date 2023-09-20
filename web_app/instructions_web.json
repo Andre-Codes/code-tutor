@@ -8,7 +8,7 @@
             }
         },
         "code_convert": {
-            "instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Surround code blocks and one-line code with three single quotes: ''' SAMPLE_CODE '''"
+            "instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Be sure to use markdown for code blocks, using the correct name of the language to ensure proper syntax highlighting."
         },
         "html": {
             "instruct": "Respond in HTML format. Create a button (or multiple) at top linked to the API site, or embeded direct URLs for the related modules and/or functions used. Use HTML tables as requested and format them with borders. Use other HTML features to make the page visually appealing and engaging. When displaying any image, use related API documentation sources to find them.",
@@ -43,9 +43,9 @@
             "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
             "prompt_context_false": "",
             "instruct": "translate the following code to the specified language. Respond only with the converted code by itself, and nothing else.",
-            "instruct_2": "Make a markdown table comparing each line of code and a description of what was translated, and then if applicable, compare equivalent libraries or packages. Finally, go into detail on how the newly translated code works in relation to the original code.",
+            "instruct_2": "Make a markdown table comparing each line of code and a description of what was translated, and then if applicable, compare equivalent libraries or packages. Finally, go into detail on how the newly translated code works in relation to the original code; explaining the difference between operators, commands, data structures, etc.",
             "documentation": "Do not provide any explanation in your response.",
-            "languages": ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash/Shell scripting", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"],
+            "languages": ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"],
             "file_formats": [".TXT", ".CSV", ".JSON", ".YAML", ".XML", ".MD", ".INI"],
             "display_name": "Code Conversion",
             "Code Conversion": "code_convert",

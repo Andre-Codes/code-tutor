@@ -20,6 +20,8 @@ def generate_response(prompt, only_code):
         )
 
 def display_content(content, custom_header=None):
+    # st.text(ct.response_content)
+    # st.text(ct.complete_prompt)
     st.divider()
     with st.container():
         if custom_header:
@@ -37,7 +39,7 @@ def extra_lesson(user_prompt, role_context):
 
 def handle_code_convert(user_prompt, language):
     format_style = 'code_convert'
-    header = f"# {language.title()} Translation"
+    header = f"# {language} Translation"
     user_prompt = f"to {language}: {user_prompt}"
     return format_style, header, user_prompt
 
@@ -119,7 +121,7 @@ if selected_json_role == 'code_convert':
     selected_language = st.sidebar.selectbox(
     "Convert to:", convert_options, format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
     )
-    convert_language = selected_language.lower().replace('-','')
+    convert_language = selected_language.lower().replace('-', '')
     format_style, custom_header, user_prompt = handle_code_convert(user_prompt, convert_language)
 else:
     format_style = 'markdown'
