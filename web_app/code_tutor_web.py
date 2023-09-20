@@ -12,7 +12,7 @@ ct = gpt.CodeTutor(
 )
 
 def generate_response(prompt, only_code):
-    with st.spinner('Forming an answer ...'):
+    with st.spinner('Forming an answer...:thought_balloon:'):
         return ct.get_response(
             prompt = prompt, 
             only_code = only_code, 
@@ -20,12 +20,14 @@ def generate_response(prompt, only_code):
         )
 
 def display_content(content, custom_header=None):
-    # ct.complete_prompt
     st.divider()
     with st.container():
         if custom_header:
             st.markdown(f"{custom_header}")
-        st.markdown(content)
+        if content[:3] == "***":
+            st.warning(content)
+        else:
+            st.markdown(content)
 
 def extra_lesson(user_prompt, role_context):
     with st.spinner('Next lesson...'):
@@ -35,7 +37,7 @@ def extra_lesson(user_prompt, role_context):
 
 def handle_code_convert(user_prompt, language):
     format_style = 'code_convert'
-    header = f"# {language} Translation"
+    header = f"# {language.title()} Translation"
     user_prompt = f"to {language}: {user_prompt}"
     return format_style, header, user_prompt
 
@@ -114,9 +116,10 @@ user_prompt = prompt_box.text_area(
 
 if selected_json_role == 'code_convert':
     # Display selection box for languages to convert to
-    convert_language = st.sidebar.selectbox(
+    selected_language = st.sidebar.selectbox(
     "Convert to:", convert_options, format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
     )
+    convert_language = selected_language.lower().replace('-','')
     format_style, custom_header, user_prompt = handle_code_convert(user_prompt, convert_language)
 else:
     format_style = 'markdown'

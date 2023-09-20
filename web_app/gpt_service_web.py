@@ -5,7 +5,7 @@ import datetime
 import re
 
 # Load instructions from JSON file
-with open("instructions.json", "r") as f:
+with open("instructions_web.json", "r") as f:
     INSTRUCTIONS = json.load(f)
 
 class CodeTutor:
@@ -54,7 +54,8 @@ class CodeTutor:
         comment_level=None,
         explain_level=None,
         temperature=None,
-        model="gpt-3.5-turbo"):
+        model="gpt-3.5-turbo",
+        api_key=os.environ['OPENAI_API_KEY']):
         """
         Initializes the GPTService class with settings to control the prompt and response.
 
@@ -73,9 +74,8 @@ class CodeTutor:
         """
         
         # Set up API access
-        self.api_key = os.environ['OPENAI_API_KEY']
-        openai.api_key = self.api_key
-        
+        self.api_key = api_key
+                
         # Set the GPT model
         self.model = model
         
@@ -134,12 +134,17 @@ class CodeTutor:
         self.complete_prompt = f"{response_instruct}; {user_content}"
 
     def _make_openai_call(self):
-        response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=self.__messages,
-            temperature=self.temperature,
-        )
-        self.response_content = response['choices'][0]['message']['content']
+        try:
+            openai.api_key = self.api_key
+            response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=self.__messages,
+                temperature=self.temperature,
+            )
+        except Exception as e:
+            return "Connection to API failed - Verify internet connection or API key"
+        if response:
+            self.response_content = response['choices'][0]['message']['content']
 
     def _handle_output(self, save_output, print_raw, **kwargs):
         only_code = kwargs.get('only_code', False)
@@ -149,18 +154,21 @@ class CodeTutor:
             "html": "html"
         }
         
-        if self.response_content:
-            if save_output:
-                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
-                response_file = f"{self.role_context}_{timestamp}.{file_exts[self.format_style]}"
-                with open(response_file, 'w') as f:
-                    f.write(self.response_content)
-            if print_raw:
-                print(self.response_content)
-            content = self.show(content=self.response_content, only_code=only_code)
-            return content
-        else:
-            return "No response."
+        try:
+            if self.response_content:
+                if save_output:
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
+                    response_file = f"{self.role_context}_{timestamp}.{file_exts[self.format_style]}"
+                    with open(response_file, 'w') as f:
+                        f.write(self.response_content)
+                if print_raw:
+                    print(self.response_content)
+                content = self.show(content=self.response_content, only_code=only_code)
+                return content
+            else:
+                return "No response."
+        except Exception as e:
+            return "***Your request could not be completed - Verify internet connection and/or API key***"
             
     def _build_messages(self, prompt):
         # Validate that all items in 'prompt' are strings
