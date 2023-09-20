@@ -1,7 +1,6 @@
 import gpt_service_web as gpt
 import streamlit as st
 
-
 st.set_page_config(page_title="👨‍🏫 Code Tutor - Learn Code")
 
 # initalize the class with role context
@@ -11,6 +10,7 @@ ct = gpt.CodeTutor(
     comment_level = 'normal'
 )
 
+#@st.cache
 def generate_response(prompt, only_code):
     with st.spinner('Forming an answer... :thought_balloon:'):
         return ct.get_response(
@@ -22,6 +22,7 @@ def generate_response(prompt, only_code):
 def display_content(content, custom_header=None):
     # st.text(ct.response_content)
     # st.text(ct.complete_prompt)
+    
     st.divider()
     with st.container():
         if custom_header:
@@ -30,6 +31,15 @@ def display_content(content, custom_header=None):
             st.warning(content)
         else:
             st.markdown(content)
+        
+def create_download(content):
+    with col1:
+        st.download_button(
+            label=":green[Download MD]",
+            data=content,
+            file_name=f'{selected_friendly_role}.md',
+            mime='text/markdown'
+        )  
 
 def extra_lesson(user_prompt, role_context):
     with st.spinner('Next lesson...'):
@@ -39,7 +49,7 @@ def extra_lesson(user_prompt, role_context):
 
 def handle_code_convert(user_prompt, language):
     format_style = 'code_convert'
-    header = f"# {language} Translation"
+    header = f"# {language} - translation"
     user_prompt = f"to {language}: {user_prompt}"
     return format_style, header, user_prompt
 
@@ -137,5 +147,9 @@ if answer_button:
     display_content(content, custom_header=custom_header)
     
     if extra_lesson_toggle:
-        more_content = extra_lesson(user_prompt, ct.role_context)
-        display_content(more_content, custom_header="Further Explanation")
+        extra_content = extra_lesson(user_prompt, ct.role_context)
+        combined_content = f"{content}\n\n{extra_content}"
+        display_content(extra_content, custom_header="Further Explanation")
+        create_download(combined_content)
+    else:
+        create_download(content)

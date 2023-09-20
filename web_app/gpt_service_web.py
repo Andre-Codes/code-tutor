@@ -5,7 +5,7 @@ import datetime
 import re
 
 # Load instructions from JSON file
-path_web = "/mount/src/code-tutor/web_app/instructions_web.json"
+path_web = "/mount/src/code-tutor/web_app/instructions_web.json" # streamlit server path
 path_local = "instructions_web.json"
 f_path = path_web if os.path.exists(path_web) else path_local
 with open(f_path, "r") as f:
@@ -142,7 +142,7 @@ class CodeTutor:
             response = openai.ChatCompletion.create(
                 model=self.model,
                 messages=self.__messages,
-                temperature=self.temperature,
+                temperature=self.temperature
             )
         except Exception as e:
             return "Connection to API failed - Verify internet connection or API key"
@@ -160,8 +160,8 @@ class CodeTutor:
         try:
             if self.response_content:
                 if save_output:
-                    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
-                    response_file = f"{self.role_context}_{timestamp}.{file_exts[self.format_style]}"
+                    self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
+                    response_file = f"{self.role_context}_{self.timestamp}.{file_exts[self.format_style]}"
                     with open(response_file, 'w') as f:
                         f.write(self.response_content)
                 if print_raw:
