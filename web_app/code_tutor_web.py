@@ -6,14 +6,18 @@ st.set_page_config(page_title="💻👨‍🏫 Code Tutor - Learn Code")
 
 # initalize the class with role context
 ct = gpt.CodeTutor(
-    role_context="code_help", 
-    explain_level='concise', 
-    comment_level='normal'
+    role_context = "code_help", 
+    explain_level = 'concise', 
+    comment_level = 'normal'
 )
 
 def generate_response(prompt, only_code):
     with st.spinner('Forming an answer ...'):
-        return ct.get_response(prompt=prompt, only_code=only_code, format_style=format_style)
+        return ct.get_response(
+            prompt = prompt, 
+            only_code = only_code, 
+            format_style = format_style
+        )
 
 def display_content(content, custom_header=None):
     # ct.complete_prompt
@@ -28,29 +32,34 @@ def extra_lesson(user_prompt, role_context):
         prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
         messages = [user_prompt, ct.response_content, prompt2]
         return ct.get_response(prompt=messages)
-    
-def format_language(lang):
-    if lang in convert_languages:
-        return f":blue[{lang}]" 
-    else:
-        return f":green[{lang}]"
 
 def handle_code_convert(user_prompt, language):
-
     format_style = 'code_convert'
     header = f"# {language} Translation"
     user_prompt = f"to {language}: {user_prompt}"
     return format_style, header, user_prompt
 
-# SIDE BAR
-ct.api_key = st.sidebar.text_input("Open API Key :key:", type="password") or ct.api_key
+# BEGIN WIDGETS
+# Side bar controls
+# Open API Key
+ct.api_key = st.sidebar.text_input(
+    label = "Open API Key :key:", 
+    type = "password",
+    help = "Get your API key from https://openai.com/"
+) or ct.api_key
 
-adv_settings = st.sidebar.expander("Advanced Settings :gear:", expanded=False)
+# Advanced settings expander
+adv_settings = st.sidebar.expander(
+    label = "Advanced Settings :gear:", 
+    expanded = False
+)
 
-# Add widgets to the expander
+# Add Open API key and Advanced Settings widgets to the expander
 with adv_settings:
     ct.model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"])
-    ct.temperature = st.slider("Temperature", 0.0, 1.0, 0.2, 0.1)
+    ct.temperature = st.slider(
+        "Temperature", 0.0, 1.0, 0.2, 0.1
+    )
     ct.temperature = round(ct.temperature * 10) / 10
 
 convert_languages = gpt.INSTRUCTIONS['role_contexts']['code_convert']['languages']
@@ -58,9 +67,6 @@ convert_file_formats = gpt.INSTRUCTIONS['role_contexts']['code_convert']['file_f
 convert_options = convert_languages + convert_file_formats
 
 custom_header = None
-
-
-#     
 
 # Sidebar with dropdown
 roles = gpt.CodeTutor.get_role_contexts()

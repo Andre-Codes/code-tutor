@@ -99,10 +99,7 @@ class CodeTutor:
             or explain_level is None else 'concise'
         
         # Validate and set temperature
-        if 0 <= temperature <= 1:
-            self.temperature = temperature
-        else:
-            raise ValueError("temperature must be between 0 and 1")
+        self.temperature = temperature
 
     
     def set_md_table_style(self, style):
