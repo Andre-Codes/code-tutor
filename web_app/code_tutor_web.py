@@ -2,7 +2,7 @@ import gpt_service_web as gpt
 import streamlit as st
 
 
-st.set_page_config(page_title="💻👨‍🏫 Code Tutor - Learn Code")
+st.set_page_config(page_title="👨‍🏫 Code Tutor - Learn Code")
 
 # initalize the class with role context
 ct = gpt.CodeTutor(
@@ -12,7 +12,7 @@ ct = gpt.CodeTutor(
 )
 
 def generate_response(prompt, only_code):
-    with st.spinner('Forming an answer...:thought_balloon:'):
+    with st.spinner('Forming an answer... :thought_balloon:'):
         return ct.get_response(
             prompt = prompt, 
             only_code = only_code, 
@@ -60,7 +60,7 @@ adv_settings = st.sidebar.expander(
 
 # Add Open API key and Advanced Settings widgets to the expander
 with adv_settings:
-    ct.model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"])
+    ct.model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"], help="Account must be authorized for gpt-4")
     ct.temperature = st.slider(
         "Temperature", 0.0, 1.0, 0.2, 0.1
     )
@@ -81,9 +81,14 @@ selected_friendly_role = st.sidebar.selectbox(
     roles.keys()
 )
 
+# get the role context name from json
 selected_json_role = roles[selected_friendly_role]
-
+# set the class variable to json name
 ct.role_context = selected_json_role
+# get the button phrase based on selected role
+button_phrase = (
+    gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['button_phrase']
+)
 
 st.title(":teacher: Code Tutor")
 
@@ -94,7 +99,7 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     answer_button = st.button(
-        f":blue[{gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['button_phrase']}]:sparkles:", 
+        f":blue[{button_phrase}] :sparkles:", 
         help="Generate an answer"
     )
 with col2:
