@@ -1,4 +1,4 @@
-# CodeTutor - A Python Wrapper for GPT-3.5-turbo
+# CodeTutor - An AI Teacher for Coding
 
 ** THIS README IS A WORK IN PROGRESS **
 
