@@ -73,7 +73,7 @@ roles = gpt.CodeTutor.get_role_contexts()
 roles = {gpt.INSTRUCTIONS['role_contexts'][role]['display_name']: role for role in roles}
 
 selected_friendly_role = st.sidebar.selectbox(
-    'Select an AI Role :bulb:', 
+    'Lesson Context :memo:', 
     roles.keys()
 )
 
@@ -81,7 +81,7 @@ selected_json_role = roles[selected_friendly_role]
 
 ct.role_context = selected_json_role
 
-st.title(" :computer: Code Tutor :teacher:")
+st.title(":teacher: Code Tutor")
 
 prompt_box = st.empty()
 
@@ -90,7 +90,7 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     answer_button = st.button(
-        f":blue[{gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['button_phrase']}]", 
+        f":blue[{gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['button_phrase']}]:sparkles:", 
         help="Generate an answer"
     )
 with col2:
@@ -129,6 +129,3 @@ if answer_button:
     if extra_lesson_toggle:
         more_content = extra_lesson(user_prompt, ct.role_context)
         display_content(more_content, custom_header="Further Explanation")
-        
-ct.model
-ct.temperature
