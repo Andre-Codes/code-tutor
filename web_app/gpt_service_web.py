@@ -58,7 +58,7 @@ class CodeTutor:
         explain_level=None,
         temperature=None,
         model="gpt-3.5-turbo",
-        api_key=None): # os.environ['OPENAI_API_KEY']
+        api_key=os.environ['OPENAI_API_KEY']): # os.environ['OPENAI_API_KEY']
         """
         Initializes the GPTService class with settings to control the prompt and response.
 
@@ -140,9 +140,10 @@ class CodeTutor:
         try:
             openai.api_key = self.api_key
             response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=self.__messages,
-                temperature=self.temperature
+                model=  self.model,
+                messages = self.__messages,
+                temperature = self.temperature,
+                top_p = 0.2
             )
         except Exception as e:
             return "Connection to API failed - Verify internet connection or API key"
