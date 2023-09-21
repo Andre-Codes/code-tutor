@@ -1,7 +1,7 @@
 {
     "response_formats": {
         "markdown": {
-            "instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. ",
+            "instruct": "Respond using markdown style formatting. Use the # character for headers, with at least one space in between the header and the next text. Generate a concise, descriptive title for the response. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. ",
             "table_styles": {
                 "bullets": "Also, format any table in the form of a bullet outline. The description for each param will be on a new line and indented",
                 "pipes": "Also, format any table using these instructions: To add a table, use three or more hyphens (---) to create each column header, and use pipes (|) to separate each column. For compatibility, add a pipe on either end of the row"
@@ -18,7 +18,7 @@
     "role_contexts": {
         "api_explain": {
             "system_role": "You're a helpful expert on analyzing library/API documentation.",
-            "instruct": "the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualize each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section.",
+            "instruct": "For the API/library, provide the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualize each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section.",
             "instruct_2": "Elaborate further on the overall concepts discussed, focusing on the original question. Act as if you are a teacher, providing a lesson to help a student understand. Provide ways to continue learning, resources, 'homework' type things the student can do to learn further.",
             "display_name": "API Explanation",
             "API Explanation": "api_explain",
@@ -27,7 +27,7 @@
         },
         "code_help": {
             "system_role": "You're a helpful teacher who answers coding language questions and teaches on them.",
-            "instruct": "provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response.",
+            "instruct": "For the following coding question, provide up to 3 examples, using various function/class parameters when available. If possible, provide several web links from various sources for related material under a 'Sources' section. Add a short title, and under that a summary of question at top of response.",
             "instruct_2": "Elaborate further on the overall concepts discussed, focusing on the original question. Act as if you are a teacher, providing a lesson to help a student understand. Provide ways to continue learning, resources, 'homework' type things the student can do to learn further.",
             "display_name": "Code Assistance",
             "Code Assistance": "code_help",
@@ -36,7 +36,7 @@
         },
         "code_convert": {
             "system_role": "You're computer language expert who translates one language to another.",
-            "instruct": "translate the following code to the specified language. Respond only with the converted code and code comments by itself, and nothing else.",
+            "instruct": "Translate the following code to the specified language. Respond only with the converted code and code comments by itself, and nothing else.",
             "instruct_2": "Make a markdown table comparing each line of code and a description of what was translated, and then if applicable, compare equivalent libraries or packages. Finally, go into detail on how the newly translated code works in relation to the original code; explaining the difference between operators, commands, data structures, etc.",
             "documentation": "Do not provide any explanation in your response.",
             "languages": ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"],

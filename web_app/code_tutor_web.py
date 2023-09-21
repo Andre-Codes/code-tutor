@@ -1,7 +1,7 @@
 import gpt_service_web as gpt
 import streamlit as st
 
-st.set_page_config(page_title="👨‍🏫 Code Tutor - Learn Code")
+st.set_page_config(page_title="Code Tutor - Learn Code", page_icon="👨‍🏫")
 
 # initalize the class with role context
 ct = gpt.CodeTutor(
@@ -21,7 +21,7 @@ def generate_response(prompt, only_code):
 
 def display_content(content, custom_header=None):
     # st.text(ct.response_content)
-    st.markdown(ct.complete_prompt)
+    # st.markdown(ct.complete_prompt)
     
     st.divider()
     with st.container():
@@ -113,15 +113,16 @@ with col1:
         help="Generate an answer"
     )
 with col2:
-    just_code_toggle = st.toggle(
-        "Just code", 
-        help="The result will contain only code. This is enforced when selecting 'Convert Code'.", 
-        key='just_code'
-    )
+    if selected_json_role != 'code_convert':
+        just_code_toggle = st.toggle(
+            "Just code", 
+            help="The result will contain only code. This is enforced when selecting 'Convert Code'.", 
+            key='just_code'
+        )
 with col3:
     extra_lesson_toggle = st.toggle(
         "Extra lesson", 
-        help="Provide additional information to the related question. The selected AI role directly affects this."
+        help="Provide additional, detailed information. Toggle this _before_ getting an answer."
     )
 
 user_prompt = prompt_box.text_area(
@@ -130,7 +131,7 @@ user_prompt = prompt_box.text_area(
     height=185,
     placeholder=gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['prompt_placeholder'], 
     key='prompt'
-)
+) or "...Teach me something unique and useful about Python."
 
 if selected_json_role == 'code_convert':
     # Display selection box for languages to convert to
@@ -144,8 +145,11 @@ else:
 
 # 
 if answer_button:
+    # set initial actions based on user selected settings
     if ct.model == 'gpt-4':
         st.toast('Be patient. Responses from GPT-4 can take awhile...', icon="⏳")
+    if user_prompt[0:3] == "...":
+        st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
     content = generate_response(user_prompt, just_code_toggle)
     display_content(content, custom_header=custom_header)
 
