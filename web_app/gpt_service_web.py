@@ -218,9 +218,6 @@ class CodeTutor:
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
-            prompt_context_key = 'prompt_context_true' if self.prompt_context else 'prompt_context_false'
-            prompt_context = INSTRUCTIONS['role_contexts'][self.role_context][prompt_context_key]
-
             comment_level = f"Provide {self.comment_level}" if self.comment_level is not None else "Do not add any"
             explain_level = f"Provide {self.explain_level}" if self.explain_level is not None else "Do not give any"
             default_documentation = (
@@ -234,9 +231,9 @@ class CodeTutor:
             )
 
             instructions = (
-                f"{prompt_context} {INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
+                f"{INSTRUCTIONS['role_contexts'][self.role_context]['instruct']}"
             )
-            user_content = f"{instructions}: {user_prompt}; {documentation}"
+            user_content = f"{instructions}; Request: {user_prompt}; {documentation}"
 
             system_role = INSTRUCTIONS['role_contexts'][self.role_context]['system_role']
         else:
