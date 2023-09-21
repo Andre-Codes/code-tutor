@@ -72,7 +72,7 @@ adv_settings = st.sidebar.expander(
 with adv_settings:
     ct.model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"], help="Account must be authorized for gpt-4")
     ct.temperature = st.slider(
-        "Temperature", 0.0, 1.0, 0.2, 0.1
+        "Temperature", 0.0, 2.0, 0.2, 0.1
     )
     ct.temperature = round(ct.temperature * 10) / 10
 
@@ -101,7 +101,7 @@ button_phrase = (
 )
 
 st.title(":teacher: Code Tutor")
-
+st.subheader("How can I help you?")
 prompt_box = st.empty()
 
 # Create two columns
@@ -126,6 +126,7 @@ with col3:
 
 user_prompt = prompt_box.text_area(
     label="How can I help?",
+    label_visibility = "hidden",
     height=185,
     placeholder=gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['prompt_placeholder'], 
     key='prompt'
@@ -143,6 +144,8 @@ else:
 
 # 
 if answer_button:
+    if ct.model == 'gpt-4':
+        st.info('Be patient. Responses from GPT-4 can take awhile...', icon="⏳")
     content = generate_response(user_prompt, just_code_toggle)
     display_content(content, custom_header=custom_header)
     
@@ -150,6 +153,7 @@ if answer_button:
         extra_content = extra_lesson(user_prompt, ct.role_context)
         combined_content = f"{content}\n\n{extra_content}"
         display_content(extra_content, custom_header="Further Explanation")
+        
         create_download(combined_content)
     else:
         create_download(content)
