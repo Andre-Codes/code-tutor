@@ -26,7 +26,7 @@ def display_content(content, custom_header=None):
     st.divider()
     with st.container():
         if custom_header:
-            st.markdown(f"{custom_header}")
+            st.markdown(f"# {custom_header}")
         if content[:3] == "***":
             st.warning(content)
         else:
@@ -122,7 +122,9 @@ with col2:
 with col3:
     extra_lesson_toggle = st.toggle(
         "Extra lesson", 
-        help="Provide additional, detailed information. Toggle this _before_ getting an answer."
+        help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
+        key='extra_lesson',
+        value=True
     )
 
 user_prompt = prompt_box.text_area(
@@ -131,7 +133,7 @@ user_prompt = prompt_box.text_area(
     height=185,
     placeholder=gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['prompt_placeholder'], 
     key='prompt'
-) or "...Teach me something unique and useful about Python."
+) or None
 
 if selected_json_role == 'code_convert':
     # Display selection box for languages to convert to
@@ -148,15 +150,19 @@ if answer_button:
     # set initial actions based on user selected settings
     if ct.model == 'gpt-4':
         st.toast('Be patient. Responses from GPT-4 can take awhile...', icon="⏳")
-    if user_prompt[0:3] == "...":
+    if user_prompt is None:
         st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
+        user_prompt = "Teach me something unique and useful about Python."
+        ct.role_context = 'random'
+        extra_lesson_toggle = True
+
     content = generate_response(user_prompt, just_code_toggle)
     display_content(content, custom_header=custom_header)
-
+    
     if extra_lesson_toggle:
         extra_content = extra_lesson(user_prompt, ct.role_context)
         combined_content = f"{content}\n\n{extra_content}"
-        display_content(extra_content, custom_header="Further Explanation")
+        display_content(extra_content, custom_header="Expanded Lesson")
         st.toast('Extra lesson ready!', icon='✅')
         create_download(combined_content)
     else:
