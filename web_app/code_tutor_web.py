@@ -21,7 +21,7 @@ def generate_response(prompt, only_code):
 
 def display_content(content, custom_header=None):
     # st.text(ct.response_content)
-    # st.text(ct.complete_prompt)
+    st.markdown(ct.complete_prompt)
     
     st.divider()
     with st.container():
@@ -42,14 +42,14 @@ def create_download(content):
         )  
 
 def extra_lesson(user_prompt, role_context):
-    with st.spinner('Next lesson...'):
+    with st.spinner('Next lesson ...'):
         prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
         messages = [user_prompt, ct.response_content, prompt2]
         return ct.get_response(prompt=messages)
 
-def handle_code_convert(user_prompt, language):
+def handle_code_convert(user_prompt, language, language_title):
     format_style = 'code_convert'
-    header = f"# {language} - translation"
+    header = f"# {language_title} translation"
     user_prompt = f"to {language}: {user_prompt}"
     return format_style, header, user_prompt
 
@@ -138,22 +138,22 @@ if selected_json_role == 'code_convert':
     "Convert to:", convert_options, format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
     )
     convert_language = selected_language.lower().replace('-', '')
-    format_style, custom_header, user_prompt = handle_code_convert(user_prompt, convert_language)
+    format_style, custom_header, user_prompt = handle_code_convert(user_prompt, convert_language, selected_language)
 else:
     format_style = 'markdown'
 
 # 
 if answer_button:
     if ct.model == 'gpt-4':
-        st.info('Be patient. Responses from GPT-4 can take awhile...', icon="⏳")
+        st.toast('Be patient. Responses from GPT-4 can take awhile...', icon="⏳")
     content = generate_response(user_prompt, just_code_toggle)
     display_content(content, custom_header=custom_header)
-    
+
     if extra_lesson_toggle:
         extra_content = extra_lesson(user_prompt, ct.role_context)
         combined_content = f"{content}\n\n{extra_content}"
         display_content(extra_content, custom_header="Further Explanation")
-        
+        st.toast('Extra lesson ready!', icon='✅')
         create_download(combined_content)
     else:
         create_download(content)

@@ -17,7 +17,7 @@
     },
     "role_contexts": {
         "api_explain": {
-            "system_role": "You're a helpful expert on analyzing python library documentation.",
+            "system_role": "You're a helpful expert on analyzing library/API documentation.",
             "prompt_context_true": "Using the provided documentation, summarize when available",
             "prompt_context_false": "For the following, provide me",
             "instruct": "the description, parameters, attributes, 'returns', code examples. Provide a minimum of 3 examples and the output, increasing in complexity, using various parameters. Make a table to visualize each parameter and definition. If possible, provide several web links from various sources for related material under a 'Sources' section.",
@@ -36,13 +36,13 @@
             "display_name": "Code Assistance",
             "Code Assistance": "code_help",
             "button_phrase": "Help Me!",
-            "prompt_placeholder": "I don't know how to use the lambda function correctly here:\n\nnumbers = [1, 2, 3, 4]\n\tsquared_numbers = map(lambda numbers: x * x, numbers)\n\tprint(squared_numbers) "
+            "prompt_placeholder": "The lambda function is not working correctly here:\n\nnumbers = [1, 2, 3, 4]\n\tsquared_numbers = map(lambda numbers: x * x, numbers)\n\tprint(squared_numbers) "
         },
         "code_convert": {
             "system_role": "You're computer language expert who translates one language to another.",
             "prompt_context_true": "Use the the provided documentation to assist in your response, and then",
             "prompt_context_false": "",
-            "instruct": "translate the following code to the specified language. Respond only with the converted code by itself, and nothing else.",
+            "instruct": "translate the following code to the specified language. Respond only with the converted code and code comments by itself, and nothing else.",
             "instruct_2": "Make a markdown table comparing each line of code and a description of what was translated, and then if applicable, compare equivalent libraries or packages. Finally, go into detail on how the newly translated code works in relation to the original code; explaining the difference between operators, commands, data structures, etc.",
             "documentation": "Do not provide any explanation in your response.",
             "languages": ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"],
