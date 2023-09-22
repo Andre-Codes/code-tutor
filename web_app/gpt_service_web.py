@@ -140,40 +140,29 @@ class CodeTutor:
         try:
             openai.api_key = self.api_key
             response = openai.ChatCompletion.create(
-                model=  self.model,
+                model = self.model,
                 messages = self.__messages,
                 temperature = self.temperature,
-                top_p = 0.2
+                top_p = 0.2,
+                stream = True
             )
         except Exception as e:
             return "Connection to API failed - Verify internet connection or API key"
         if response:
-            self.response_content = response['choices'][0]['message']['content']
+            self.response = response
 
-    def _handle_output(self, save_output, print_raw, **kwargs):
-        only_code = kwargs.get('only_code', False)
+    # MOVE TO STREAMLIT FILE?
+    # def _handle_output(self, only_code):
+    #     if not content:
+    #         content = self.response
         
-        file_exts = {
-            "markdown": "md",
-            "html": "html"
-        }
+    #     if only_code:
+    #         pattern = r'(```.*?```)'
+    #         matches = re.findall(pattern, content, re.DOTALL) 
+    #         content = '\n'.join(matches)
         
-        try:
-            if self.response_content:
-                if save_output:
-                    self.timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")  # for output file name
-                    response_file = f"{self.role_context}_{self.timestamp}.{file_exts[self.format_style]}"
-                    with open(response_file, 'w') as f:
-                        f.write(self.response_content)
-                if print_raw:
-                    print(self.response_content)
-                content = self.show(content=self.response_content, only_code=only_code)
-                return content
-            else:
-                return "No response."
-        except Exception as e:
-            return "***Your request could not be completed - Verify internet connection and/or API key***"
-            
+    #     return content
+    
     def _build_messages(self, prompt):
         # Validate that all items in 'prompt' are strings
         if not all(isinstance(item, str) for item in prompt):
@@ -197,14 +186,7 @@ class CodeTutor:
         # Combine system, user, and assistant messages
         self.__messages = system_msg + user_assistant_msgs
 
-    def get_response(
-            self,
-            prompt=None,
-            format_style='markdown',
-            save_output=False,
-            print_raw=False,
-            **kwargs
-        ):
+    def get_response(self, prompt=None, format_style='markdown'):
         # _build_messages requires prompt to be a list
         # convert prompt to a list if it is not already
         prompt = [prompt] if not isinstance(prompt, list) else prompt
@@ -212,9 +194,8 @@ class CodeTutor:
         self._build_prompt()
         self._build_messages(prompt)
         self._make_openai_call()
-        content = self._handle_output(save_output, print_raw, **kwargs)
         # Return finished response from OpenAI
-        return content
+        return self.response
     
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'basic':
@@ -241,20 +222,3 @@ class CodeTutor:
             user_content = user_prompt
 
         return system_role, user_content
-        
-    def show(self, content=None, only_code=False):
-        if not self.response_content:
-            print("No response to show.")
-            return
-            
-        # display_class = self.DISPLAY_MAPPING.get(self.format_style, None)
-        
-        if not content:
-            content = self.response_content
-        
-        if only_code:
-            pattern = r'(```.*?```)'
-            matches = re.findall(pattern, content, re.DOTALL) 
-            content = '\n'.join(matches)
-            
-        return content
