@@ -33,10 +33,9 @@ def display_response(response, custom_header=None):
             content_chunk = chunk['choices'][0]['delta']['content']  # extract the response
             if content_chunk:
                 collected_responses.append(content_chunk)  # save the response
-                formatted_response = "".join(collected_responses)
+                formatted_response = ''.join(collected_responses)
                 markdown_placeholder.markdown(formatted_response) #display the formatted chunk on the webpage
-    full_response_content = ''.join([m.get('content', '') for m in collected_responses])
-    return full_response_content
+    create_download(formatted_response)
 
 def create_download(response):
     with col1:
@@ -163,14 +162,16 @@ if answer_button:
         ct.role_context = 'random'
         extra_lesson_toggle = True
 
+    full_response_content = ''
+    # get the response from openai
     response = generate_response(user_prompt, just_code_toggle)
     display_response(response, custom_header=custom_header)
     
-    if extra_lesson_toggle:
-        extra_response = extra_lesson(user_prompt, ct.role_context)
-        combined_response = f"{response}\n\n{extra_response}"
-        display_response(extra_response, custom_header="Expanded Lesson")
-        st.toast('Extra lesson ready!', icon='✅')
-        create_download(combined_response)
-    else:
-        create_download(response)
+    # if extra_lesson_toggle:
+    #     extra_response = extra_lesson(user_prompt, ct.role_context)
+    #     combined_response = f"{response}\n\n{extra_response}"
+    #     display_response(extra_response, custom_header="Expanded Lesson")
+    #     st.toast('Extra lesson ready!', icon='✅')
+    #     create_download(combined_response)
+    # else:
+    #     create_download(full_response_content)
