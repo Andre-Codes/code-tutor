@@ -58,7 +58,7 @@ class CodeTutor:
         explain_level=None,
         temperature=None,
         model="gpt-3.5-turbo",
-        api_key=os.environ['OPENAI_API_KEY']): # os.environ['OPENAI_API_KEY']
+        api_key=None): # os.environ['OPENAI_API_KEY']
         """
         Initializes the GPTService class with settings to control the prompt and response.
 
