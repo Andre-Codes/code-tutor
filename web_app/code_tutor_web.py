@@ -1,5 +1,6 @@
 import gpt_service_web as gpt
 import streamlit as st
+import random
 
 st.set_page_config(page_title="Code Tutor - Learn Code", page_icon="👨‍🏫")
 
@@ -169,9 +170,9 @@ if answer_button:
             st.toast('Be patient. Responses from GPT-4 can be slower ...', icon="⏳")
         if user_prompt is None:
             st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
-            user_prompt = "Teach me something unique and useful about Python."
+            user_prompt = random.choice(gpt.INSTRUCTIONS['python_modules'])
             ct.role_context = 'random'
-            extra_lesson_toggle = False
+            extra_lesson_toggle = True
         response = generate_response(user_prompt)
         display_response(response, custom_header=custom_header, download_button=download_button) 
         
@@ -181,5 +182,6 @@ if answer_button:
             display_response(extra_response, download_button=True, custom_header="Expanded Lesson")
         
         st.toast(':teacher: Lesson Complete!', icon='✅')
+        
     except Exception:
         st.error("Connection to API failed \n\nVerify internet connection or API key", icon='🚨')
