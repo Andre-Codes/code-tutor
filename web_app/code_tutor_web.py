@@ -7,8 +7,8 @@ st.set_page_config(page_title="Code Tutor - Learn Code", page_icon="👨‍🏫"
 ct = gpt.CodeTutor()
 
 #@st.cache
-def generate_response(prompt, only_code):
-    with st.spinner('Forming an answer... :thought_balloon:'):
+def generate_response(prompt):
+    with st.spinner('...creating a lesson :thought_balloon:'):
         return ct.get_response(
             prompt = prompt,
             format_style = format_style
@@ -128,13 +128,6 @@ with col1:
         help="Generate an answer"
     )
 with col2:
-    if selected_json_role != 'code_convert':
-        just_code_toggle = st.toggle(
-            "Just code", 
-            help="The result will contain only code. This is enforced when selecting 'Convert Code'.", 
-            key='just_code'
-        )
-with col3:
     extra_lesson_toggle = st.toggle(
         "Extra lesson", 
         help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
@@ -151,7 +144,6 @@ user_prompt = prompt_box.text_area(
 ) or None
 
 if selected_json_role == 'code_convert':
-    just_code_toggle = True
     # Display selection box for languages to convert to
     selected_language = st.sidebar.selectbox(
     "Convert to:", convert_options, format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
@@ -163,28 +155,31 @@ else:
 
 # 
 if answer_button:
-    # set initial actions based on user selected settings
-    if ct.model == 'gpt-4':
-        st.toast('Be patient. Responses from GPT-4 can be slower ...', icon="⏳")
-    if user_prompt is None:
-        st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
-        user_prompt = "Teach me something unique and useful about Python."
-        ct.role_context = 'random'
-        extra_lesson_toggle = True
-    
     # control whether the download button gets created
     # based on whether or not a second response will be generated
     download_button = False if extra_lesson_toggle else True
 
     formatted_response = ''
     all_response_content = []
+    
     # get the response from openai
-    response = generate_response(user_prompt, just_code_toggle)
-    display_response(response, custom_header=custom_header, download_button=download_button)
-    
-    if extra_lesson_toggle:
-        prompt_messages = extra_lesson(user_prompt, ct.role_context)
-        extra_response = generate_response(prompt_messages, just_code_toggle)
-        display_response(extra_response, download_button=True, custom_header="Expanded Lesson")
-    
-    st.toast(':teacher: Lesson Complete!', icon='✅')
+    try:
+        # set initial actions based on user selected settings
+        if ct.model == 'gpt-4':
+            st.toast('Be patient. Responses from GPT-4 can be slower ...', icon="⏳")
+        if user_prompt is None:
+            st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
+            user_prompt = "Teach me something unique and useful about Python."
+            ct.role_context = 'random'
+            extra_lesson_toggle = False
+        response = generate_response(user_prompt)
+        display_response(response, custom_header=custom_header, download_button=download_button) 
+        
+        if extra_lesson_toggle:
+            prompt_messages = extra_lesson(user_prompt, ct.role_context)
+            extra_response = generate_response(prompt_messages)
+            display_response(extra_response, download_button=True, custom_header="Expanded Lesson")
+        
+        st.toast(':teacher: Lesson Complete!', icon='✅')
+    except Exception:
+        st.error("Connection to API failed \n\nVerify internet connection or API key", icon='🚨')
