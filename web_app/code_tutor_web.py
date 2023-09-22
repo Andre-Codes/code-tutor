@@ -35,17 +35,25 @@ def display_response(response, download_button, custom_header=None):
                 collected_responses.append(content_chunk)  # save the response
                 formatted_response = ''.join(collected_responses)
                 markdown_placeholder.markdown(f"{formatted_response}\n\n") #display the formatted chunk on the webpage
+    
+    response_file = handle_file_output(formatted_response)
+    
     if download_button:
-        create_download(formatted_response)
+        create_download(response_file)
+
+def handle_file_output(responses):
+    all_response_content.append(f"{responses} \n\n")
+    combined_responses = ''.join(all_response_content)
+    return combined_responses
 
 def create_download(response):
-    with col1:
-        st.download_button(
-            label=":green[Download  MD]",
-            data=response,
-            file_name=f'{selected_friendly_role}.md',
-            mime='text/markdown'
-        )  
+    # with col1:
+    st.download_button(
+        label=":green[Download] :floppy_disk:",
+        data=response,
+        file_name=f'{selected_friendly_role}.md',
+        mime='text/markdown'
+    )  
 
 def extra_lesson(user_prompt, role_context):
     with st.spinner('Next lesson ...'):
@@ -169,6 +177,7 @@ if answer_button:
     download_button = False if extra_lesson_toggle else True
 
     formatted_response = ''
+    all_response_content = []
     # get the response from openai
     response = generate_response(user_prompt, just_code_toggle)
     display_response(response, custom_header=custom_header, download_button=download_button)
@@ -177,4 +186,5 @@ if answer_button:
         prompt_messages = extra_lesson(user_prompt, ct.role_context)
         extra_response = generate_response(prompt_messages, just_code_toggle)
         display_response(extra_response, download_button=True, custom_header="Expanded Lesson")
-        st.toast(':teacher: All Lessons Ready!', icon='✅')
+    
+    st.toast(':teacher: Lesson Complete!', icon='✅')
