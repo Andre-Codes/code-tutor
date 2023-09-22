@@ -4,39 +4,45 @@ import streamlit as st
 st.set_page_config(page_title="Code Tutor - Learn Code", page_icon="👨‍🏫")
 
 # initalize the class with role context
-ct = gpt.CodeTutor(
-    role_context = "code_help", 
-    explain_level = 'concise', 
-    comment_level = 'normal'
-)
+ct = gpt.CodeTutor()
 
 #@st.cache
 def generate_response(prompt, only_code):
     with st.spinner('Forming an answer... :thought_balloon:'):
         return ct.get_response(
-            prompt = prompt, 
-            only_code = only_code, 
+            prompt = prompt,
             format_style = format_style
         )
 
-def display_content(content, custom_header=None):
-    # st.text(ct.response_content)
+def display_response(response, custom_header=None):
+    # st.text(ct.response)
     # st.markdown(ct.complete_prompt)
     
+    # create variables to collect the stream of chunks
+    collected_chunks = []
+    collected_responses = []
     st.divider()
-    with st.container():
-        if custom_header:
-            st.markdown(f"# {custom_header}")
-        if content[:3] == "***":
-            st.warning(content)
-        else:
-            st.markdown(content)
-        
-def create_download(content):
+    if custom_header:
+        st.markdown(f"#{custom_header}")
+    # Create a placeholder for the markdown
+    markdown_placeholder = st.empty()
+    # iterate through the stream of events
+    for chunk in response:
+        collected_chunks.append(chunk)  # save the event response
+        if chunk['choices'][0]['finish_reason'] != 'stop':
+            content_chunk = chunk['choices'][0]['delta']['content']  # extract the response
+            if content_chunk:
+                collected_responses.append(content_chunk)  # save the response
+                formatted_response = "".join(collected_responses)
+                markdown_placeholder.markdown(formatted_response) #display the formatted chunk on the webpage
+    full_response_content = ''.join([m.get('content', '') for m in collected_responses])
+    return full_response_content
+
+def create_download(response):
     with col1:
         st.download_button(
             label=":green[Download MD]",
-            data=content,
+            data=response,
             file_name=f'{selected_friendly_role}.md',
             mime='text/markdown'
         )  
@@ -44,12 +50,12 @@ def create_download(content):
 def extra_lesson(user_prompt, role_context):
     with st.spinner('Next lesson ...'):
         prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
-        messages = [user_prompt, ct.response_content, prompt2]
+        messages = [user_prompt, ct.response, prompt2]
         return ct.get_response(prompt=messages)
 
 def handle_code_convert(user_prompt, language, language_title):
     format_style = 'code_convert'
-    header = f"# {language_title} translation"
+    header = f"{language_title} translation"
     user_prompt = f"to {language}: {user_prompt}"
     return format_style, header, user_prompt
 
@@ -124,7 +130,7 @@ with col3:
         "Extra lesson", 
         help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
         key='extra_lesson',
-        value=True
+        value=False
     )
 
 user_prompt = prompt_box.text_area(
@@ -136,6 +142,7 @@ user_prompt = prompt_box.text_area(
 ) or None
 
 if selected_json_role == 'code_convert':
+    just_code_toggle = True
     # Display selection box for languages to convert to
     selected_language = st.sidebar.selectbox(
     "Convert to:", convert_options, format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
@@ -156,14 +163,14 @@ if answer_button:
         ct.role_context = 'random'
         extra_lesson_toggle = True
 
-    content = generate_response(user_prompt, just_code_toggle)
-    display_content(content, custom_header=custom_header)
+    response = generate_response(user_prompt, just_code_toggle)
+    display_response(response, custom_header=custom_header)
     
     if extra_lesson_toggle:
-        extra_content = extra_lesson(user_prompt, ct.role_context)
-        combined_content = f"{content}\n\n{extra_content}"
-        display_content(extra_content, custom_header="Expanded Lesson")
+        extra_response = extra_lesson(user_prompt, ct.role_context)
+        combined_response = f"{response}\n\n{extra_response}"
+        display_response(extra_response, custom_header="Expanded Lesson")
         st.toast('Extra lesson ready!', icon='✅')
-        create_download(combined_content)
+        create_download(combined_response)
     else:
-        create_download(content)
+        create_download(response)
