@@ -14,18 +14,18 @@ def generate_response(prompt, only_code):
             format_style = format_style
         )
 
-def display_response(response, custom_header=None):
+def display_response(response, download_button, custom_header=None):
     # st.text(ct.response)
     # st.markdown(ct.complete_prompt)
-    
-    # create variables to collect the stream of chunks
-    collected_chunks = []
-    collected_responses = []
+
     st.divider()
     if custom_header:
-        st.markdown(f"#{custom_header}")
+        st.markdown(f"# {custom_header}")
     # Create a placeholder for the markdown
     markdown_placeholder = st.empty()
+    
+    collected_chunks = []
+    collected_responses = []
     # iterate through the stream of events
     for chunk in response:
         collected_chunks.append(chunk)  # save the event response
@@ -34,13 +34,14 @@ def display_response(response, custom_header=None):
             if content_chunk:
                 collected_responses.append(content_chunk)  # save the response
                 formatted_response = ''.join(collected_responses)
-                markdown_placeholder.markdown(formatted_response) #display the formatted chunk on the webpage
-    create_download(formatted_response)
+                markdown_placeholder.markdown(f"{formatted_response}\n\n") #display the formatted chunk on the webpage
+    if download_button:
+        create_download(formatted_response)
 
 def create_download(response):
     with col1:
         st.download_button(
-            label=":green[Download MD]",
+            label=":green[Download  MD]",
             data=response,
             file_name=f'{selected_friendly_role}.md',
             mime='text/markdown'
@@ -48,9 +49,10 @@ def create_download(response):
 
 def extra_lesson(user_prompt, role_context):
     with st.spinner('Next lesson ...'):
+        # get second instruction set for continuing previous converstaion
         prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
-        messages = [user_prompt, ct.response, prompt2]
-        return ct.get_response(prompt=messages)
+        messages = [user_prompt, formatted_response, prompt2]
+        return messages
 
 def handle_code_convert(user_prompt, language, language_title):
     format_style = 'code_convert'
@@ -155,23 +157,24 @@ else:
 if answer_button:
     # set initial actions based on user selected settings
     if ct.model == 'gpt-4':
-        st.toast('Be patient. Responses from GPT-4 can take awhile...', icon="⏳")
+        st.toast('Be patient. Responses from GPT-4 can be slower ...', icon="⏳")
     if user_prompt is None:
         st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
         user_prompt = "Teach me something unique and useful about Python."
         ct.role_context = 'random'
         extra_lesson_toggle = True
+    
+    # control whether the download button gets created
+    # based on whether or not a second response will be generated
+    download_button = False if extra_lesson_toggle else True
 
-    full_response_content = ''
+    formatted_response = ''
     # get the response from openai
     response = generate_response(user_prompt, just_code_toggle)
-    display_response(response, custom_header=custom_header)
+    display_response(response, custom_header=custom_header, download_button=download_button)
     
-    # if extra_lesson_toggle:
-    #     extra_response = extra_lesson(user_prompt, ct.role_context)
-    #     combined_response = f"{response}\n\n{extra_response}"
-    #     display_response(extra_response, custom_header="Expanded Lesson")
-    #     st.toast('Extra lesson ready!', icon='✅')
-    #     create_download(combined_response)
-    # else:
-    #     create_download(full_response_content)
+    if extra_lesson_toggle:
+        prompt_messages = extra_lesson(user_prompt, ct.role_context)
+        extra_response = generate_response(prompt_messages, just_code_toggle)
+        display_response(extra_response, download_button=True, custom_header="Expanded Lesson")
+        st.toast(':teacher: All Lessons Ready!', icon='✅')
