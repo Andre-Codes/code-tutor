@@ -2,7 +2,7 @@ import gpt_service_web as gpt
 import streamlit as st
 import random
 
-st.set_page_config(page_title="Code Tutor - Learn Code", page_icon="👨‍🏫")
+st.set_page_config(page_title="Code Tutor - Learn Code", page_icon=":teacher:")
 
 # initalize the class with role context
 ct = gpt.CodeTutor()
