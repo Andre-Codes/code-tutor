@@ -181,6 +181,7 @@ if answer_button:
         )
 
         if extra_lesson_toggle:
+            app.stream = False
             prompt_messages = extra_lesson(user_prompt, app.role_context, displayed_response)
             extra_response = web.generate_response(app, prompt_messages)
             web.display_response(
@@ -191,7 +192,7 @@ if answer_button:
                 streaming=app.stream
             )
 
-        st.toast(':teacher: Lesson Complete!', icon='✅')
+        st.toast(':teacher: All replies complete!', icon='✅')
 
     except Exception as e:
         st.error(f"""There was an error while the response was being generated.
