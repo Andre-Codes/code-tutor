@@ -14,7 +14,7 @@ config_path = path_web if os.path.exists(path_web) else path_local
 # os.environ['OPENAI_API_KEY']
 
 # initialize the GPT class
-app = gpt.ChatEngine(config_path=config_path, stream=True, api_key=st.secrets["db_username"])
+app = gpt.ChatEngine(config_path=config_path, stream=True, api_key=st.secrets["OPENAI_API_KEY"])
 
 # get main app title information
 app_title = (
