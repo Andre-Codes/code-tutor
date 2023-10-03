@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import random
 import web_helpers as web
 import gpt_utils as gpt
 
@@ -164,7 +165,7 @@ if answer_button:
 
         if user_prompt is None:
             if app.CONFIG['allow_null_prompt']:
-                user_prompt = 'Tell me something interesting.'
+                user_prompt = random.choice(app.CONFIG['python_modules'])
                 app.role_context = 'random'
             else:
                 st.info('Please provide a prompt...', icon='😑')
