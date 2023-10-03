@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This Python class serves as an interface to the OpenAI GPT-3.5-turbo API. It allows for easy interaction with the model in various contexts such as basic Q&A, API explanation, coding assistance, and code refactoring.
+A context-based AI assistant for quick learning of various coding related concepts. Enjoy real-time responses for any question you can imagine. Choose from a variety of specialized contexts, including API explanation for in-depth library insights, general code assistance with suggestions and real-world code examples, code conversion for multilingual coding (Python to C++, SQL to Pandas, etc.), and PEP 8 standardization for code refinement. Get precise, tailored answers to your coding queries with ease.
 
 ## Table of Contents
 
