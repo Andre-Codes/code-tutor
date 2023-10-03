@@ -5,7 +5,7 @@ import datetime
 import re
 
 # Load instructions from JSON file
-path_web = "/mount/src/code-tutor/web_app/instructions_web.json" # streamlit server path
+path_web = "/app/code-tutor/web_app/instructions_web.json" # streamlit server path
 path_local = "instructions_web.json"
 f_path = path_web if os.path.exists(path_web) else path_local
 with open(f_path, "r") as f:
