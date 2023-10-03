@@ -5,7 +5,7 @@ import gpt_utils as gpt
 
 
 # Load instructions from JSON file
-path_web = "/mount/src/code-tutor/web_app/config.yaml"  # streamlit server path
+path_web = "/app/code-tutor/web_app/config.yaml"  # streamlit server path
 path_local = "config.yaml"
 config_path = path_web if os.path.exists(path_web) else path_local
 
