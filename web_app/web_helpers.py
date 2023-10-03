@@ -35,11 +35,12 @@ def display_response(response, assistant, all_response_content, role_name, strea
                     response_content = ''.join(collected_responses)
                     markdown_placeholder.markdown(f"{response_content}\n\n")
 
-        file_data = handle_file_output(response_content, all_response_content)  # not working with extra lesson
     else:
         response_content = response['choices'][0]['message']['content']
         markdown_placeholder.markdown(response_content)
         file_data = response_content
+        
+    file_data = handle_file_output(response_content, all_response_content)  # not working with extra lesson
 
     if assistant:
         create_download(file_data, role_name)
