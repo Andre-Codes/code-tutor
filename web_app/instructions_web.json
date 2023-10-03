@@ -119,7 +119,7 @@
         "pyopengl", "scapy", "pymongo", "redis", "kafka-python", "pyyaml", "configparser",
         "boto3", "google-cloud", "azure", "twisted", "zeromq", "protobuf", "grpcio",
         "elasticsearch", "airflow", "luigi", "graphene", "jupyter", "notebook", "sphinx",
-        "docutils"
+        "docutils", "gensim", "Scrapy", "music21"
     ]
     
 }
