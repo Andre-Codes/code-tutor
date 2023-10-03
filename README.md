@@ -4,23 +4,20 @@
 
 ## Introduction
 
-A context-based AI assistant for quick learning of various coding related concepts. Enjoy real-time responses for any question you can imagine. Choose from a variety of specialized contexts, including API explanation for in-depth library insights, general code assistance with suggestions and real-world code examples, code conversion for multilingual coding (Python to C++, SQL to Pandas, etc.), and PEP 8 standardization for code refinement. Get precise, tailored answers to your coding queries with ease.
+Context-based AI assistant for customized lessons on various coding related concepts. Enjoy real-time responses after choosing from a variety of specialized contexts, including API explanation for in-depth library insights, general code assistance with suggestions and real-world code examples, code conversion for multilingual coding (Python to C++, SQL to Pandas, etc.), and PEP 8 standardization to refine and polish your code. Get precise, tailored lessons and solutions to your coding queries with ease.
 
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Prerequisites](#prerequisites)
 - [Installation and Setup](#installation-and-setup)
 - [Usage](#usage)
 - [Methods Description](#methods-description)
 - [Examples](#examples)
 
-## Prerequisites
-
-- Python 3.x
-- OpenAI API Key
-
 ## Installation and Setup
+
+#### Jupyter Notebook module
+To use CodeTutor from within a Jupyter Notebook you must include the 
 
 ## Usage
 
