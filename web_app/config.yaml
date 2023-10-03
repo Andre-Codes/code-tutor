@@ -1,0 +1,108 @@
+app_ui:
+  page_title: "Code Tutor - Learn Code"
+  page_icon: "teacher" # use shortcodes (see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
+  title: "Code Tutor"
+  title_emoji: "teacher"
+  subheader: "What can I do for you?"
+allow_null_prompt: True
+response_formats:
+    markdown:
+        instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Generate a concise descriptive title for the response. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. "
+        table_styles:
+            bullets: "Also format any table in the form of a bullet outline. The description for each param will be on a new line and indented"
+            pipes: "Also format any table using these instructions: To add a table use three or more hyphens (---) to create each column header and use pipes (|) to separate each column. For compatibility add a pipe on either end of the row"
+    code_convert:
+        instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting."
+    html:
+        instruct: "Respond in HTML format. Create a button (or multiple) at top linked to the API site or embeded direct URLs for the related modules and/or functions used. Use HTML tables as requested and format them with borders. Use other HTML features to make the page visually appealing and engaging. When displaying any image use related API documentation sources to find them."
+        css: "Put any code inside <pre><code> tag using the following CSS for styling: code  font-family: 'Fira Code' monospace; background-color: #282a36; color: #50fa7b; padding: 1px; border-radius: 3px; box-shadow: 0 2px 5px rgba(0 0 0 0.2);  pre  overflow: auto; background-color: #282a30; color: #f8f8f2; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0 0 0 0.2); "
+role_contexts:
+    defaults:
+        system_role: "You're a helpful assistant"
+        instruct: "Write a Haiku"
+        documentation: "Do not acknowledge the request, simply answer it, and do not add extra comments."
+    api_explain:
+        enable: True # context will not appear in list if key is missing or set to 'False'
+        system_role: "You're a helpful expert on analyzing library/API documentation."
+        instruct: "For the API/library provide the description parameters attributes 'returns' code examples. Provide a minimum of 3 examples and the output increasing in complexity using various parameters. Make a table to visualize each parameter and definition. If possible provide several web links from various sources for related material under a 'Sources' section."
+        instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question. Act as if you are a teacher providing a lesson to help a student understand. Provide ways to continue learning resources 'homework' type things the student can do to learn further."
+        display_name: "API Explanation"
+        API Explanation: "api_explain"
+        button_phrase: "Explain This"
+        prompt_placeholder: "The pandas .agg method..."
+    code_help:
+        enable: True # context will not appear in list if key is missing or set to 'False'
+        system_role: "You're a helpful teacher who answers coding language questions and teaches on them."
+        instruct: "For the following coding question provide up to 3 examples using various function/class parameters when available. If possible provide several web links from various sources for related material under a 'Sources' section. Add a short title and under that a summary of question at top of response."
+        instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question. Act as if you are a teacher providing a lesson to help a student understand. Provide ways to continue learning resources 'homework' type things the student can do to learn further."
+        display_name: "Code Assistance"
+        Code Assistance: "code_help"
+        button_phrase: "Help Me!"
+        prompt_placeholder: "The lambda function is not working correctly here:\n\nnumbers = [1 2 3 4]\n\tsquared_numbers = map(lambda numbers: x * x numbers)\n\tprint(squared_numbers) "
+    code_convert:
+        enable: True # context will not appear in list if key is missing or set to 'False'
+        system_role: "You're computer language expert who translates one language to another."
+        instruct: "Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting. Translate the following code to the specified language. Title it '[language 1] to [language 2]'. Respond only with the converted code and code comments by itself and nothing else."
+        instruct_2: "Make a markdown table comparing each line of code and a description of what was translated and then if applicable compare equivalent libraries or packages. Finally go into detail on how the newly translated code works in relation to the original code; explaining the difference between operators commands data structures etc."
+        documentation: "Do not provide any explanation in your response."
+        languages: ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"]
+        file_formats: [".TXT", ".CSV", ".JSON", ".YAML", ".XML", ".MD", ".INI"]
+        display_name: "Code Conversion"
+        Code Conversion: "code_convert"
+        button_phrase: "Convert Code"
+        prompt_placeholder: "Enter a single line or entire block of code..."
+    pep8:
+        enable: True # context will not appear in list if key is missing or set to 'False'
+        system_role: "You're an expert in the python coding language and assisting with python pep8 standards."
+        instruct: "I need the following code refactored to be more efficient and 'pythonic' and conformed to the PEP 8 standards. Be sure to use comprehensions (list dictionary etc.) when necessary fix variable naming conventions indenting and overall structure ensure line length under 79 characters for code and 72 for comments and docstrings use any built-in methods to simplify code when possible and any other standards/best practices that conform to PEP 8 and make the code more readable efficient and pythonic."
+        instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question. Act as if you are a teacher providing a lesson to help a student understand PEP 8 standards. Provide ways to continue learning resources 'homework' type things the student can do to write more 'pythonic' code."
+        documentation: "Create a table with columns comparing all the changes that were made with an explanation column for why you made the change. If the code does not need any changes simply explain why it conforms to PEP8 and is 'pythonic'."
+        display_name: "PEP 8 Standardizer"
+        PEP 8 Standardizer: "pep8"
+        button_phrase: "Fix My Code"
+        prompt_placeholder: "from math import *\n\ndef BADLY_Formatted_Func(ABC=3D=4E=5):\n global Z\n Z=10\n A=A+1;B=B+1\n resultlist=[]\n for i in range(0A):\n  for j in range(0B): resultlist.append(i+j+C);resultlist.append(D)\n  resultlist.append(E)\n return sum(resultlist) Z"
+    random:
+        system_role: "You're programming language expert who provides lessons on coding."
+        instruct: "Give me a lesson on the following. Include code examples and the output when possible. Create a title in markdown format for the lesson that is descriptive yet concise."
+        instruct_2: "Elaborate further on the overall concepts discussed in more of a lecture format. Go in depth on the topics be broad with the scope of the lesson using visual aids when appropriate (tables bullet lists etc.)"
+        documentation: "Provide detailed code commenting and a comprehensive explanation of any code you provide."
+        display_name: ""
+        button_phrase: ""
+        prompt_placeholder: ""
+python_modules: [
+    "__future__", "__main__", "_thread", "_dummy_thread", "abc", "aifc", "argparse",
+    "array", "ast", "asynchat", "asyncio", "asyncore", "atexit", "audioop", "base64", "bdb",
+    "binascii", "binhex", "bisect", "builtins", "bz2", "cProfile", "calendar", "cgi", "cgitb",
+    "chunk", "cmath", "cmd", "code", "codecs", "codeop", "collections", "colorsys", "compileall",
+    "configparser", "contextlib", "contextvars", "copy", "copyreg", "crypt", "csv", "ctypes",
+    "curses", "dataclasses", "datetime", "dbm", "decimal", "difflib", "dis", "distutils", "doctest",
+    "email", "encodings", "enum", "errno", "faulthandler", "fcntl", "filecmp", "fileinput", "fnmatch",
+    "formatter", "fractions", "ftplib", "functools", "gc", "getopt", "getpass", "gettext", "glob",
+    "grp", "gzip", "hashlib", "heapq", "hmac", "html", "http", "imaplib", "imghdr", "imp", "importlib",
+    "inspect", "io", "ipaddress", "itertools", "json", "keyword", "lib2to3", "linecache", "locale",
+    "logging", "lzma", "mailbox", "mailcap", "marshal", "math", "mimetypes", "mmap", "modulefinder",
+    "msilib", "msvcrt", "multiprocessing", "netrc", "nis", "nntplib", "numbers", "operator", "optparse",
+    "os", "ossaudiodev", "parser", "pathlib", "pdb", "pickle", "pickletools", "pipes", "pkgutil", "platform",
+    "plistlib", "poplib", "posix", "pprint", "profile", "pstats", "pty", "pwd", "py_compile", "pyclbr",
+    "pydoc", "queue", "quopri", "random", "re", "readline", "reprlib", "resource", "rlcompleter", "runpy",
+    "sched", "secrets", "select", "selectors", "shelve", "shlex", "shutil", "signal", "site", "smtpd",
+    "smtplib", "sndhdr", "socket", "socketserver", "spwd", "sqlite3", "ssl", "stat", "statistics", "string",
+    "stringprep", "struct", "subprocess", "sunau", "symbol", "symtable", "sys", "sysconfig", "syslog",
+    "tabnanny", "tarfile", "telnetlib", "tempfile", "termios", "test", "textwrap", "threading", "time",
+    "timeit", "tkinter", "token", "tokenize", "trace", "traceback", "tracemalloc", "tty", "turtle",
+    "turtledemo", "types", "typing", "unicodedata", "unittest", "urllib", "uu", "uuid", "venv",
+    "warnings", "wave", "weakref", "webbrowser", "winreg", "winsound", "wsgiref", "xdrlib", "xml",
+    "xmlrpc", "zipapp", "zipfile", "zipimport", "zlib", "zoneinfo",
+    "Flask", "Django", "Tornado", "Pyramid", "Falcon", "pandas", "numpy", "matplotlib", "seaborn", "scikit-learn",
+    "scipy", "statsmodels", "tensorflow", "pytorch", "requests", "scrapy", "socket", "http.client",
+    "sqlite3", "sqlalchemy", "psycopg2", "pymysql", "mongoengine", "selenium", "pyautogui",
+    "unittest", "pytest", "nose", "Tkinter", "PyQt", "wxPython", "Kivy", "PIL", "xml.etree.ElementTree",
+    "csv", "argparse", "logging", "beautifulsoup4", "lxml", "pytest", "click", "celery",
+    "joblib", "fastapi", "asyncio", "aiohttp", "dash", "plotly", "gensim", "nltk",
+    "spacy", "textblob", "openpyxl", "pdfminer", "pycrypto", "cryptography", "fabric",
+    "paramiko", "skimage", "bokeh", "geopandas", "networkx", "biopython", "pygame",
+    "pyopengl", "scapy", "pymongo", "redis", "kafka-python", "pyyaml", "configparser",
+    "boto3", "google-cloud", "azure", "twisted", "zeromq", "protobuf", "grpcio",
+    "elasticsearch", "airflow", "luigi", "graphene", "jupyter", "notebook", "sphinx",
+    "docutils", "gensim", "Scrapy", "music21"
+]

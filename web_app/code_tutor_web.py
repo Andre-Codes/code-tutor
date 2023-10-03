@@ -1,66 +1,45 @@
-import gpt_service_web as gpt
 import streamlit as st
-import random
+import os
+import web_helpers as web
+import gpt_utils as gpt
 
-st.set_page_config(page_title="Code Tutor - Learn Code", page_icon=":teacher:")
 
-# initalize the class with role context
-ct = gpt.CodeTutor()
+# Load instructions from JSON file
+path_web = "/app/code-tutor/web_app/config.yaml"  # streamlit server path
+path_local = "config.yaml"
+config_path = path_web if os.path.exists(path_web) else path_local
 
-#@st.cache
-def generate_response(prompt):
-    with st.spinner('...creating a lesson :thought_balloon:'):
-        return ct.get_response(
-            prompt = prompt,
-            format_style = format_style
-        )
+# Set value for API Key
+# api_key = os.environ['OPENAI_API_KEY']
 
-def display_response(response, download_button, custom_header=None):
-    # st.text(ct.response)
-    # st.markdown(ct.complete_prompt)
+# initialize the GPT class
+app = gpt.ChatEngine(config_path=config_path, stream=True)
 
-    st.divider()
-    if custom_header:
-        st.markdown(f"# {custom_header}")
-    # Create a placeholder for the markdown
-    markdown_placeholder = st.empty()
-    
-    collected_chunks = []
-    collected_responses = []
-    # iterate through the stream of events
-    for chunk in response:
-        collected_chunks.append(chunk)  # save the event response
-        if chunk['choices'][0]['finish_reason'] != 'stop':
-            content_chunk = chunk['choices'][0]['delta']['content']  # extract the response
-            if content_chunk:
-                collected_responses.append(content_chunk)  # save the response
-                formatted_response = ''.join(collected_responses)
-                markdown_placeholder.markdown(f"{formatted_response}\n\n") #display the formatted chunk on the webpage
-    
-    response_file = handle_file_output(formatted_response)
-    
-    if download_button:
-        create_download(response_file)
+# get main app title information
+app_title = (
+    app.CONFIG['app_ui'].get('title', 'App Title')
+)
 
-def handle_file_output(responses):
-    all_response_content.append(f"{responses} \n\n")
-    combined_responses = ''.join(all_response_content)
-    return combined_responses
+title_emoji = (
+    app.CONFIG['app_ui'].get('title_emoji', 'question')
+)
 
-def create_download(response):
-    # with col1:
-    st.download_button(
-        label=":green[Download] :floppy_disk:",
-        data=response,
-        file_name=f'{selected_friendly_role}.md',
-        mime='text/markdown'
-    )  
+page_title = (
+    app.CONFIG['app_ui'].get('page_title', 'Streamlit App')
+)
 
-def extra_lesson(user_prompt, role_context):
-    with st.spinner('Next lesson ...'):
-        # get second instruction set for continuing previous converstaion
-        prompt2 = gpt.INSTRUCTIONS['role_contexts'][role_context]['instruct_2']
-        messages = [user_prompt, formatted_response, prompt2]
+# set page configuration
+st.set_page_config(page_title=page_title, page_icon=title_emoji)
+
+
+def extra_lesson(prompt_1, role_context, response_1):
+    with st.spinner('Next lesson...'):
+        # get second instruction set for continuing previous conversation
+        role_context = app.CONFIG['role_contexts'].get(role_context, {})
+        default_instruction = 'Provide additional details.'
+        instruct_2 = role_context.get('instruct_2', default_instruction)
+        prompt_2 = instruct_2
+        messages = [prompt_1, response_1, prompt_2]
         return messages
 
 def handle_code_convert(user_prompt, language, language_title):
@@ -71,53 +50,68 @@ def handle_code_convert(user_prompt, language, language_title):
 
 # BEGIN WIDGETS
 # Side bar controls
+
+
 # Open API Key
-ct.api_key = st.sidebar.text_input(
-    label = "Open API Key :key:", 
-    type = "password",
-    help = "Get your API key from https://openai.com/"
-) or ct.api_key
+app.api_key = st.sidebar.text_input(
+    label="OpenAI API Key :key:",
+    type="password",
+    help="Get your API key from https://openai.com/"
+) or app.api_key
 
 # Advanced settings expander
 adv_settings = st.sidebar.expander(
-    label = "Advanced Settings :gear:", 
-    expanded = False
+    label="Advanced Settings :gear:",
+    expanded=False
 )
 
 # Add Open API key and Advanced Settings widgets to the expander
 with adv_settings:
-    ct.model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"], help="Account must be authorized for gpt-4")
-    ct.temperature = st.slider(
+    app.model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"], help="Account must be authorized for gpt-4")
+    app.temperature = st.slider(
         "Temperature", 0.0, 2.0, 0.2, 0.1
     )
-    ct.temperature = round(ct.temperature * 10) / 10
+    app.temperature = round(app.temperature * 10) / 10
 
-convert_languages = gpt.INSTRUCTIONS['role_contexts']['code_convert']['languages']
-convert_file_formats = gpt.INSTRUCTIONS['role_contexts']['code_convert']['file_formats']
+convert_languages = app.CONFIG['role_contexts']['code_convert']['languages']
+convert_file_formats = app.CONFIG['role_contexts']['code_convert']['file_formats']
 convert_options = convert_languages + convert_file_formats
 
-custom_header = None
+#### Sidebar with dropdown of friendly role names ###
 
-# Sidebar with dropdown
-roles = gpt.CodeTutor.get_role_contexts()
-roles = {gpt.INSTRUCTIONS['role_contexts'][role]['display_name']: role for role in roles}
+# Get all list roles
+json_roles = app.get_role_contexts()
+
+# Create dictionary of enabled roles and display names
+# default to role key if no display_name value set
+roles = {
+    settings.get('display_name', role): role
+    for role, settings in app.CONFIG['role_contexts'].items()
+    if settings.get('enable', False)
+}
 
 selected_friendly_role = st.sidebar.selectbox(
-    'Lesson Context :memo:', 
+    'Prompt Context :memo:',
     roles.keys()
 )
 
 # get the role context name from json
 selected_json_role = roles[selected_friendly_role]
 # set the class variable to json name
-ct.role_context = selected_json_role
+app.role_context = selected_json_role
 # get the button phrase based on selected role
 button_phrase = (
-    gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['button_phrase']
+    app.CONFIG['role_contexts'][selected_json_role].get('button_phrase', 'Enter')
 )
 
-st.title(":teacher: Code Tutor")
-st.subheader("How can I help you?")
+# get other app title information
+subheader = (
+    app.CONFIG['app_ui'].get('subheader', 'How can I help you?')
+)
+
+# configure app title information
+st.title(f":{title_emoji}: {app_title}")
+st.subheader(subheader)
 prompt_box = st.empty()
 
 # Create two columns
@@ -125,63 +119,82 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     answer_button = st.button(
-        f":blue[{button_phrase}] :sparkles:", 
+        f":blue[{button_phrase}] :sparkles:",
         help="Generate an answer"
     )
 with col2:
     extra_lesson_toggle = st.toggle(
-        "Extra lesson", 
+        "Extra Details",
         help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
         key='extra_lesson',
         value=False
     )
 
+prompt_placeholder = (
+    app.CONFIG['role_contexts'][selected_json_role].get('prompt_placeholder', 'Enter your prompt...')
+)
+
 user_prompt = prompt_box.text_area(
-    label="How can I help?",
-    label_visibility = "hidden",
+    label="How can I help ?",
+    label_visibility="hidden",
     height=185,
-    placeholder=gpt.INSTRUCTIONS['role_contexts'][selected_json_role]['prompt_placeholder'], 
+    placeholder=prompt_placeholder,
     key='prompt'
 ) or None
 
 if selected_json_role == 'code_convert':
     # Display selection box for languages to convert to
     selected_language = st.sidebar.selectbox(
-    "Convert to:", convert_options, format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
+    "Convert to:", 
+    convert_options, 
+    format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
     )
     convert_language = selected_language.lower().replace('-', '')
     format_style, custom_header, user_prompt = handle_code_convert(user_prompt, convert_language, selected_language)
 else:
     format_style = 'markdown'
 
-# 
 if answer_button:
-    # control whether the download button gets created
-    # based on whether or not a second response will be generated
-    download_button = False if extra_lesson_toggle else True
-
-    formatted_response = ''
-    all_response_content = []
-    
-    # get the response from openai
     try:
-        # set initial actions based on user selected settings
-        if ct.model == 'gpt-4':
+        allow_download = not extra_lesson_toggle
+        all_response_content = []
+
+        if app.model == 'gpt-4':
             st.toast('Be patient. Responses from GPT-4 can be slower ...', icon="⏳")
+
         if user_prompt is None:
-            st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
-            user_prompt = random.choice(gpt.INSTRUCTIONS['python_modules'])
-            ct.role_context = 'random'
-            extra_lesson_toggle = True
-        response = generate_response(user_prompt)
-        display_response(response, custom_header=custom_header, download_button=download_button) 
-        
+            if app.CONFIG['allow_null_prompt']:
+                user_prompt = 'Tell me something interesting.'
+                app.role_context = 'random'
+            else:
+                st.info('Please provide a prompt...', icon='😑')
+
+        response = web.generate_response(app, user_prompt)
+
+        displayed_response = web.display_response(
+            response,
+            assistant=allow_download,
+            all_response_content=all_response_content,
+            role_name=selected_friendly_role,
+            streaming=app.stream
+        )
+
         if extra_lesson_toggle:
-            prompt_messages = extra_lesson(user_prompt, ct.role_context)
-            extra_response = generate_response(prompt_messages)
-            display_response(extra_response, download_button=True, custom_header="Expanded Lesson")
-        
+            prompt_messages = extra_lesson(user_prompt, app.role_context, displayed_response)
+            extra_response = web.generate_response(app, prompt_messages)
+            web.display_response(
+                extra_response,
+                assistant=True,
+                all_response_content=all_response_content,
+                role_name=selected_friendly_role,
+                streaming=app.stream
+            )
+
         st.toast(':teacher: Lesson Complete!', icon='✅')
-        
-    except Exception:
-        st.error("Connection to API failed \n\nVerify internet connection or API key", icon='🚨')
+
+    except Exception as e:
+        st.error(f"""There was an error while the response was being generated.
+                 Possible issues: \n
+                 -Incorrect or missing API key -No internet connection  \n\n 
+                 {e}
+                 """, icon='🚨')
