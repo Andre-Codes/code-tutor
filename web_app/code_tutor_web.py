@@ -171,7 +171,9 @@ if answer_button:
         if user_prompt is None:
             if app.CONFIG['allow_null_prompt']:
                 st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
-                user_prompt = random.choice(app.CONFIG['python_modules'])
+                subkeys = list(app.CONFIG['random_prompts'].keys())
+                random_subkey = random.choice(subkeys)
+                user_prompt = random.choice(app.CONFIG['random_prompts'][random_subkey])
                 app.role_context = 'random'
             else:
                 st.info('Please provide a prompt...', icon='😑')
