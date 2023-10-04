@@ -34,8 +34,8 @@ role_contexts:
     code_help:
         enable: True # context will not appear in list if key is missing or set to 'False'
         system_role: "You're an expert on coding languages and are able to teach the concepts."
-        instruct: "For the following coding question provide up to 3 examples using various function/class parameters when available. If possible provide several web links from various sources for related material under a 'Resources' section. Add a short title and under that a summary of question at top of response. If a line or block of code is sent to you, find any issues, provide suggestions, and always make more pythonic."
-        instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question. Act as if you are a teacher providing a lesson to help a student understand. Provide ways to continue learning resources 'homework' type things the student can do to learn further."
+        instruct: "For the following,  provide up to 3 code examples if the question is related to 'how' to do something. If a line or block of code is sent to you, find any bugs and provide suggestions. If helpful, provide several web links from various sources for related material under a 'Resources' section. Add a short title and under that a summary of question at top of response. Do not create any tables unless it is necessary for comparing multiple items related to the question."
+        instruct_2: "Elaborate further on the overall concepts discussed, focusing on the original question. If the previous question contained code, discuss the code in greater detail, explaining what it does and what changes you made or did make."
         display_name: "Code Assistance"
         Code Assistance: "code_help"
         button_phrase: "Help Me!"
