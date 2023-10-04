@@ -20,11 +20,11 @@ role_contexts:
     defaults:
         system_role: "You're a helpful assistant"
         instruct: "Write a Haiku"
-        documentation: "Do not acknowledge the request, simply answer it, and do not add extra comments. If the question is unrelated to coding, programming, APIs, and the like, do not answer the question and instead respond with 'I cannot answer that.'"
+        documentation: "Do not acknowledge the request, simply answer it, and do not add extra comments. "
     api_explain:
         enable: True # context will not appear in list if key is missing or set to 'False'
         system_role: "You're a helpful expert on analyzing library/API documentation."
-        instruct: "For the API/library provide the description parameters attributes 'returns' code examples. Provide a minimum of 3 examples and the output increasing in complexity using various parameters. Make a table to visualize each parameter and definition. If possible provide several web links from various sources for related material under a 'Sources' section."
+        instruct: "If the following question is unrelated to specific APIs/libraries do not answer the question and instead respond with 'I cannot answer that.' For the API/library provide the description parameters attributes 'returns' code examples. Provide a minimum of 3 examples and the output increasing in complexity using various parameters. Make a table to visualize each parameter and definition. If possible provide several web links from various sources for related material under a 'Sources' section."
         instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question. Act as if you are a teacher providing a lesson to help a student understand. Provide ways to continue learning resources 'homework' type things the student can do to learn further."
         display_name: "API Explanation"
         API Explanation: "api_explain"
