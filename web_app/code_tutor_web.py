@@ -8,13 +8,18 @@ import gpt_utils as gpt
 # Load instructions from JSON file
 path_web = "/app/code-tutor/web_app/config.yaml"  # streamlit server path
 path_local = "config.yaml"
-config_path = path_web if os.path.exists(path_web) else path_local
 
-# Set value for API Key
-# os.environ['OPENAI_API_KEY']
+# Set value for API Key & path for running via local or streamlit
+if os.path.exists(path_web):
+    config_path = path_web
+    api_key=st.secrets["OPENAI_API_KEY"]
+else:
+    config_path = path_local
+    api_key= os.environ['OPENAI_API_KEY']
+
 
 # initialize the GPT class
-app = gpt.ChatEngine(config_path=config_path, stream=True, api_key=st.secrets["OPENAI_API_KEY"])
+app = gpt.ChatEngine(config_path=config_path, stream=True, api_key=api_key)
 
 # get main app title information
 app_title = (
