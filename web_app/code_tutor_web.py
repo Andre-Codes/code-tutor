@@ -148,7 +148,7 @@ user_prompt = prompt_box.text_area(
     key='prompt'
 ) or None
 
-if selected_json_role == 'code_convert': # JUST ADDED THIS ##########
+if selected_json_role == 'code_convert':
     # Display selection box for languages to convert to
     selected_language = st.sidebar.selectbox(
     "Convert to:", 
