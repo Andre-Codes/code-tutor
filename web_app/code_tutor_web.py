@@ -178,6 +178,8 @@ if answer_button:
 
         response = web.generate_response(app, user_prompt)
 
+        app.complete_prompt
+        
         displayed_response = web.display_response(
             response,
             assistant=allow_download,
