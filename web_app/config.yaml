@@ -56,9 +56,9 @@ role_contexts:
         enable: True # context will not appear in list if key is missing or set to 'False'
         system_role: "You're an expert in the python coding language and assisting with python pep8 standards."
         instruct: "I need the following code refactored to be more efficient and 'pythonic' and conformed to the PEP 8 standards. Be sure to use comprehensions (list dictionary etc.) when necessary fix variable naming conventions indenting and overall structure ensure line length under 79 characters for code and 72 for comments and docstrings use any built-in methods to simplify code when possible and any other standards/best practices that conform to PEP 8 and make the code more readable efficient and pythonic."
-        instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question. Act as if you are a teacher providing a lesson to help a student understand PEP 8 standards. Provide ways to continue learning resources 'homework' type things the student can do to write more 'pythonic' code."
+        instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question and pep 8 concepts."
         documentation: "Create a table with columns comparing all the changes that were made with an explanation column for why you made the change. If the code does not need any changes simply explain why it conforms to PEP8 and is 'pythonic'."
-        display_name: "PEP 8 Standardizer"
+        display_name: "PEP 8 Formatting"
         PEP 8 Standardizer: "pep8"
         button_phrase: "Fix My Code"
         prompt_placeholder: "from math import *\n\ndef BADLY_Formatted_Func(ABC=3D=4E=5):\n global Z\n Z=10\n A=A+1;B=B+1\n resultlist=[]\n for i in range(0A):\n  for j in range(0B): resultlist.append(i+j+C);resultlist.append(D)\n  resultlist.append(E)\n return sum(resultlist) Z"
