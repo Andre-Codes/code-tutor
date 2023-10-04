@@ -148,7 +148,7 @@ user_prompt = prompt_box.text_area(
     key='prompt'
 ) or None
 
-if selected_json_role == 'code_convert' and user_prompt: # JUST ADDED THIS ##########
+if selected_json_role == 'code_convert': # JUST ADDED THIS ##########
     # Display selection box for languages to convert to
     selected_language = st.sidebar.selectbox(
     "Convert to:", 
@@ -156,7 +156,8 @@ if selected_json_role == 'code_convert' and user_prompt: # JUST ADDED THIS #####
     format_func=lambda x: f"{x} (file format)" if x in convert_file_formats else x
     )
     convert_language = selected_language.lower().replace('-', '')
-    format_style, custom_header, user_prompt = handle_code_convert(user_prompt, convert_language, selected_language)
+    if user_prompt:
+        format_style, custom_header, user_prompt = handle_code_convert(user_prompt, convert_language, selected_language)
 else:
     format_style = 'markdown'
 
@@ -179,8 +180,6 @@ if answer_button:
                 st.info('Please provide a prompt...', icon='😑')
 
         response = web.generate_response(app, user_prompt)
-
-        app.complete_prompt
         
         displayed_response = web.display_response(
             response,
