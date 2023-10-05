@@ -176,6 +176,48 @@ def setup_app_config():
         config_path = path_local
         api_key = os.environ['OPENAI_API_KEY']
     return config_path, api_key
+  
+def extra_lesson(prompt_1, role_context, response_1):
+    with st.spinner('Next lesson...'):
+        # get second instruction set for continuing previous conversation
+        role_context = CONFIG['role_contexts'].get(role_context, {})
+        default_instruction = 'Provide additional details.'
+        instruct_2 = role_context.get('instruct_2', default_instruction)
+        prompt_2 = instruct_2
+        messages = [prompt_1, response_1, prompt_2]
+        return messages
+
+# Function to setup the main UI
+def setup_main_area(config_settings):
+    st.title(f":{config_settings['title_emoji']}: {config_settings['app_title']}")
+    st.subheader(config_settings['subheader'])
+    prompt_box = st.empty()
+    
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        answer_button = st.button(
+            f":blue[{config_settings['button_phrase']}] :sparkles:",
+            help="Generate an answer"
+        )
+    with col2:
+        extra_lesson_toggle = st.toggle(
+            "Extra Details",
+            help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
+            key='extra_lesson',
+            value=False
+        )
+
+    chat_engine.user_prompt = prompt_box.text_area(
+        label="How can I help ?",
+        label_visibility="hidden",
+        height=185,
+        placeholder=config_settings['prompt_placeholder'],
+        key='prompt'
+    ) or None
+    
+    return chat_engine.user_prompt, extra_lesson_toggle, answer_button
+
 
 # Function to setup the sidebar
 def setup_sidebar(chat_engine):
@@ -228,48 +270,6 @@ def handle_code_convert():
     chat_engine.user_prompt = f"to {new_language}: {chat_engine.user_prompt}"
     
     return new_language
-
-    
-def extra_lesson(prompt_1, role_context, response_1):
-    with st.spinner('Next lesson...'):
-        # get second instruction set for continuing previous conversation
-        role_context = CONFIG['role_contexts'].get(role_context, {})
-        default_instruction = 'Provide additional details.'
-        instruct_2 = role_context.get('instruct_2', default_instruction)
-        prompt_2 = instruct_2
-        messages = [prompt_1, response_1, prompt_2]
-        return messages
-
-# Function to setup the main UI
-def setup_main_area(config_settings):
-    st.title(f":{config_settings['title_emoji']}: {config_settings['app_title']}")
-    st.subheader(config_settings['subheader'])
-    prompt_box = st.empty()
-    
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        answer_button = st.button(
-            f":blue[{config_settings['button_phrase']}] :sparkles:",
-            help="Generate an answer"
-        )
-    with col2:
-        extra_lesson_toggle = st.toggle(
-            "Extra Details",
-            help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
-            key='extra_lesson',
-            value=False
-        )
-
-    chat_engine.user_prompt = prompt_box.text_area(
-        label="How can I help ?",
-        label_visibility="hidden",
-        height=185,
-        placeholder=config_settings['prompt_placeholder'],
-        key='prompt'
-    ) or None
-    
-    return chat_engine.user_prompt, extra_lesson_toggle, answer_button
 
 # Function to handle the response
 def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role):
