@@ -14,11 +14,11 @@ import gpt_utils as gpt
 #         messages = [prompt_1, response_1, prompt_2]
 #         return messages
 
-# def handle_code_convert(user_prompt, language, language_title):
+# def handle_code_convert(chat_engine.user_prompt, language, language_title):
 #     format_style = 'code_convert'
 #     header = f"{language_title} translation"
-#     user_prompt = f"to {language}: {user_prompt}"
-#     return format_style, header, user_prompt
+#     chat_engine.user_prompt = f"to {language}: {chat_engine.user_prompt}"
+#     return format_style, header, chat_engine.user_prompt
 
 # # Load instructions from JSON file
 # path_web = "/app/code-tutor/web_app/config.yaml"  # streamlit server path
@@ -138,7 +138,7 @@ import gpt_utils as gpt
 #     chat_engine.CONFIG['role_contexts'][selected_json_role].get('prompt_placeholder', 'Enter your prompt...')
 # )
 
-# user_prompt = prompt_box.text_area(
+# chat_engine.user_prompt = prompt_box.text_area(
 #     label="How can I help ?",
 #     label_visibility="hidden",
 #     height=185,
@@ -220,11 +220,14 @@ def handle_code_convert():
     convert_options = convert_settings['languages'] + convert_settings['file_formats']
     selected_language = st.sidebar.selectbox(
             "Convert to:", 
-            convert_options, 
+            convert_options,
+            key='language',
             format_func=lambda x: f"{x} (file format)" if x in convert_settings['file_formats'] else x
         )
-    convert_language = selected_language.lower().replace('-', '')
-    user_prompt = f"to {convert_language}: {user_prompt}"
+    new_language = selected_language.lower().replace('-', '')
+    chat_engine.user_prompt = f"to {new_language}: {chat_engine.user_prompt}"
+    
+    return new_language
 
     
 def extra_lesson(prompt_1, role_context, response_1):
@@ -258,17 +261,18 @@ def setup_main_area(config_settings):
             value=False
         )
 
-    user_prompt = prompt_box.text_area(
+    chat_engine.user_prompt = prompt_box.text_area(
         label="How can I help ?",
         label_visibility="hidden",
         height=185,
         placeholder=config_settings['prompt_placeholder'],
         key='prompt'
     ) or None
-    return user_prompt, extra_lesson_toggle, answer_button
+    
+    return chat_engine.user_prompt, extra_lesson_toggle, answer_button
 
 # Function to handle the response
-def handle_response(chat_engine, user_prompt, extra_lesson_toggle, selected_friendly_role):
+def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role):
     try:
         allow_download = not extra_lesson_toggle
         all_response_content = []
@@ -276,17 +280,17 @@ def handle_response(chat_engine, user_prompt, extra_lesson_toggle, selected_frie
         if chat_engine.model == 'gpt-4':
             st.toast('Be patient. Responses from GPT-4 can be slower ...', icon="⏳")
 
-        if user_prompt is None:
+        if chat_engine.user_prompt is None:
             if CONFIG['allow_null_prompt']:
                 st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
                 subkeys = list(CONFIG['random_prompts'].keys())
                 random_subkey = random.choice(subkeys)
-                user_prompt = random.choice(CONFIG['random_prompts'][random_subkey])
+                chat_engine.user_prompt = random.choice(CONFIG['random_prompts'][random_subkey])
                 chat_engine.role_context = 'random'
             else:
                 st.info('Please provide a prompt...', icon='😑')
 
-        response = web.generate_response(chat_engine, user_prompt)
+        response = web.generate_response(chat_engine, chat_engine.user_prompt)
         
         displayed_response = web.display_response(
             response,
@@ -301,7 +305,7 @@ def handle_response(chat_engine, user_prompt, extra_lesson_toggle, selected_frie
 
         if extra_lesson_toggle:
             chat_engine.stream = False
-            prompt_messages = extra_lesson(user_prompt, chat_engine.role_context, displayed_response)
+            prompt_messages = extra_lesson(chat_engine.user_prompt, chat_engine.role_context, displayed_response)
             extra_response = web.generate_response(chat_engine, prompt_messages)
             web.display_response(
                 extra_response,
@@ -319,12 +323,13 @@ def handle_response(chat_engine, user_prompt, extra_lesson_toggle, selected_frie
 # Main function
 def main():
     selected_role, selected_friendly_role = setup_sidebar(chat_engine)
+    
     config_settings = load_config_settings(chat_engine, selected_role)
 
-    user_prompt, extra_lesson_toggle, answer_button = setup_main_area(config_settings)
+    chat_engine.user_prompt, extra_lesson_toggle, answer_button = setup_main_area(config_settings)
 
     if answer_button:
-        handle_response(chat_engine, user_prompt, extra_lesson_toggle, selected_friendly_role)
+        handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role)
 
 if __name__ == '__main__':
     

@@ -47,7 +47,8 @@ class ChatEngine:
         model="gpt-3.5-turbo",
         stream=False,
         api_key=None, # os.environ['OPENAI_API_KEY']
-        config_path=None):
+        config_path=None,
+        user_prompt=None):
         """
         Initializes the GPTService class with settings to control the prompt and response.
 
@@ -74,6 +75,9 @@ class ChatEngine:
 
         # Set the GPT model
         self.model = model
+        
+        # 
+        self.user_prompt = user_prompt
 
         # Validate and set role_context
         available_role_contexts = self.CONFIG.get('role_contexts', {}).keys()
