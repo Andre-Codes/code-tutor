@@ -248,10 +248,13 @@ def setup_sidebar(chat_engine):
     selected_friendly_role = st.sidebar.selectbox('Prompt Context :memo:', roles.keys())
     selected_role = roles[selected_friendly_role]
 
-    if selected_role == 'code_convert':
-        handle_code_convert()
+    helper_prompt = ''
+
+    match selected_role:
+        case 'code_convert':
+            helper_prompt = handle_code_convert()
                 
-    return selected_role, selected_friendly_role
+    return selected_role, selected_friendly_role, helper_prompt
 
 # Function to handle code_convert settings
 def handle_code_convert():
@@ -267,12 +270,12 @@ def handle_code_convert():
             format_func=lambda x: f"{x} (file format)" if x in convert_settings['file_formats'] else x
         )
     new_language = selected_language.lower().replace('-', '')
-    chat_engine.user_prompt = f"to {new_language}: {chat_engine.user_prompt}"
+    helper_prompt = f"to {new_language}: "
     
-    return new_language
+    return helper_prompt
 
 # Function to handle the response
-def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role):
+def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt):
     try:
         allow_download = not extra_lesson_toggle
         all_response_content = []
@@ -289,8 +292,10 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role):
                 chat_engine.role_context = 'random'
             else:
                 st.info('Please provide a prompt...', icon='😑')
+        else:
+            prompt = f"{helper_prompt}{chat_engine.user_prompt}"
 
-        response = web.generate_response(chat_engine, chat_engine.user_prompt)
+        response = web.generate_response(chat_engine, prompt)
         
         displayed_response = web.display_response(
             response,
@@ -301,7 +306,8 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role):
         )
         
         chat_engine.complete_prompt
-        
+        print()
+        chat_engine.user_prompt
 
         if extra_lesson_toggle:
             chat_engine.stream = False
@@ -322,14 +328,14 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role):
 
 # Main function
 def main():
-    selected_role, selected_friendly_role = setup_sidebar(chat_engine)
+    chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine)
     
-    config_settings = load_config_settings(chat_engine, selected_role)
+    config_settings = load_config_settings(chat_engine, chat_engine.role_context)
 
     chat_engine.user_prompt, extra_lesson_toggle, answer_button = setup_main_area(config_settings)
 
     if answer_button:
-        handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role)
+        handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt)
 
 if __name__ == '__main__':
     
