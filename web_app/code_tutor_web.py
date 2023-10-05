@@ -4,6 +4,21 @@ import random
 import web_helpers as web
 import gpt_utils as gpt
 
+def extra_lesson(prompt_1, role_context, response_1):
+    with st.spinner('Next lesson...'):
+        # get second instruction set for continuing previous conversation
+        role_context = app.CONFIG['role_contexts'].get(role_context, {})
+        default_instruction = 'Provide additional details.'
+        instruct_2 = role_context.get('instruct_2', default_instruction)
+        prompt_2 = instruct_2
+        messages = [prompt_1, response_1, prompt_2]
+        return messages
+
+def handle_code_convert(user_prompt, language, language_title):
+    format_style = 'code_convert'
+    header = f"{language_title} translation"
+    user_prompt = f"to {language}: {user_prompt}"
+    return format_style, header, user_prompt
 
 # Load instructions from JSON file
 path_web = "/app/code-tutor/web_app/config.yaml"  # streamlit server path
@@ -36,23 +51,6 @@ page_title = (
 
 # set page configuration
 st.set_page_config(page_title=page_title, page_icon=title_emoji)
-
-
-def extra_lesson(prompt_1, role_context, response_1):
-    with st.spinner('Next lesson...'):
-        # get second instruction set for continuing previous conversation
-        role_context = app.CONFIG['role_contexts'].get(role_context, {})
-        default_instruction = 'Provide additional details.'
-        instruct_2 = role_context.get('instruct_2', default_instruction)
-        prompt_2 = instruct_2
-        messages = [prompt_1, response_1, prompt_2]
-        return messages
-
-def handle_code_convert(user_prompt, language, language_title):
-    format_style = 'code_convert'
-    header = f"{language_title} translation"
-    user_prompt = f"to {language}: {user_prompt}"
-    return format_style, header, user_prompt
 
 # BEGIN WIDGETS
 # Side bar controls
@@ -204,8 +202,4 @@ if answer_button:
         st.toast(':teacher: All replies complete!', icon='✅')
 
     except Exception as e:
-        st.error(f"""There was an error while the response was being generated.
-                 Possible issues: \n
-                 -Incorrect or missing API key -No internet connection  \n\n 
-                 {e}
-                 """, icon='🚨')
+        st.error(f"There was an error while the response was being generated.", icon='🚨')
