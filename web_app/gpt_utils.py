@@ -135,10 +135,11 @@ class ChatEngine:
                 top_p = 0.2,
                 stream = self.stream
             )
+            if response:
+                self.response = response
         except Exception as e:
-            return "Connection to API failed - Verify internet connection or API key"
-        if response:
-            self.response = response
+            raise ValueError("Connection to API failed - Verify internet connection or API key: {e}")
+
 
     def _build_messages(self, prompt):
         # Validate that all items in 'prompt' are strings

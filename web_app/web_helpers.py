@@ -2,10 +2,14 @@ import streamlit as st
 
 
 def generate_response(app, prompt):
+    if prompt is None:
+        raise ValueError("No prompt provided.")
     with st.spinner('...thinking :thought_balloon:'):
-        return app.get_response(prompt=prompt, format_style='markdown')
-
-
+        try:
+            return app.get_response(prompt=prompt, format_style='markdown')
+        except Exception as e:
+            raise ValueError("No response received from AI service.")
+            
 def handle_file_output(responses, all_response_content):
     all_response_content.append(f"{responses} \n\n")
     file_data = ''.join(all_response_content)
