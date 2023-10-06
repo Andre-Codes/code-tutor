@@ -4,7 +4,7 @@ app_ui:
   title: "Code Tutor"
   title_emoji: "teacher"
   subheader: "What can I do for you?"
-allow_null_prompt: False
+allow_null_prompt: True
 response_formats:
     markdown:
         instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Generate a concise descriptive title for the response. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. "
@@ -26,11 +26,11 @@ role_contexts:
         system_role: "You're an expert and teacher of library/API documentation who only answers questions related to those areas."
         instruct: "If the following question is unrelated to specific APIs/libraries do not answer the question and instead respond with 'I cannot answer that.' For the API/library provide the description parameters attributes 'returns' code examples. Provide a minimum of 3 examples (more for complex methods) and the output, increasing in complexity and using various parameters. If applicable create a markdown table to visualize each parameter and definition. If possible provide several web links from various sources for related material under a 'Resources' section."
         # this second set on instruction is passed as an additional prompt using the 
-        # assistant chat completion to continue the 'converstaion'
+        # assistant chat completion to continue the 'conversation'
         instruct_2: "Elaborate further on the overall concepts discussed focusing on the original question. Refer to other methods/classes within the library, or other libraries entirely. Conclude with suggestions for further learning such as tools and websites."
         # 'documentation' is anything you want appended to the very end of the prompt
         # typically used for controlling how detailed the generated response is and how it's concluded
-        documentation: "Be detailed with your response, providing additional information to create a comprehensive lesson to teach the reader how to understand and implement the library/API in question."
+        documentation: "Be detailed with your response, providing additional information to create a comprehensive lesson to teach the reader how to understand and implement the library/API in question. Conclude with, if applicable, real-world scenarios where this will be useful and how one could implement it."
         display_name: "API Analysis"
         API Explanation: "api_explain"
         button_phrase: "Explain This"
