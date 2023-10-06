@@ -26,7 +26,7 @@ def setup_app_config(path_web, path_local):
         api_key = st.secrets["OPENAI_API_KEY"]
     else:
         config_path = path_local
-        api_key = 123 # os.environ["OPENAI_API_KEY"]
+        api_key = os.environ["OPENAI_API_KEY"]
         
     chat_engine = gpt.ChatEngine(config_path=config_path, stream=True, api_key=api_key)
     config_data = chat_engine.CONFIG
@@ -90,9 +90,19 @@ def setup_sidebar(chat_engine):
 
     # Add Open API key and Advanced Settings widgets to the expander
     with adv_settings:
-        chat_engine.model = st.selectbox("Model", ["gpt-3.5-turbo", "gpt-4"], help="Account must be authorized for gpt-4")
+        chat_engine.model = st.selectbox(
+            "Model", 
+            ["gpt-3.5-turbo", "gpt-4"], 
+            help="Some API keys are not authorized for use with gpt-4"
+        )
         chat_engine.temperature = st.slider(
-            "Temperature", 0.0, 2.0, 0.2, 0.1
+            "Temperature", 0.0, 2.0, 1.0, 0.1,
+            help = """
+            temperature controls the "creativity" of the response.
+            A higher value results in more diverse and unexpected 
+            responses, while lower values result in more conservative
+            and predictable responses.
+            """
         )
         chat_engine.temperature = round(chat_engine.temperature * 10) / 10
     
@@ -165,10 +175,6 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
             role_name=selected_friendly_role,
             streaming=chat_engine.stream
         )
-        
-        chat_engine.complete_prompt
-        print()
-        chat_engine.user_prompt
 
         if extra_lesson_toggle:
             chat_engine.stream = False
