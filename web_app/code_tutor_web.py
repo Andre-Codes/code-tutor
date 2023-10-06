@@ -199,7 +199,7 @@ def main():
     st.set_page_config(
         page_title=page_title,
         page_icon=page_icon,
-        initial_sidebar_state='auto'
+        initial_sidebar_state='expanded'
     )
     # save the selected AI context, role name, and any helper prompts
     chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine)
