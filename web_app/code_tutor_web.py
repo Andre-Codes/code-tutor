@@ -117,9 +117,8 @@ def setup_sidebar(chat_engine):
     helper_prompt = ''
 
     # adjust prompt or other parameters based on selected role context
-    match selected_role:
-        case 'code_convert':
-            helper_prompt = handle_code_convert()
+    if selected_role == 'code_convert':
+        helper_prompt = handle_code_convert()
                 
     return selected_role, selected_friendly_role, helper_prompt
 
