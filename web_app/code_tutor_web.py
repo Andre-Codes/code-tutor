@@ -6,12 +6,11 @@ import gpt_utils as gpt
 
 
 # Function to load configurations
-def load_config_settings(chat_engine, selected_role):
+def load_app_config(chat_engine, selected_role):
     config_settings = {
         # general app settings:
         'app_title': config_data['app_ui'].get('title', 'App Title'),
         'title_emoji': config_data['app_ui'].get('title_emoji', 'question'),
-        'page_title': config_data['app_ui'].get('page_title', 'Streamlit App'),
         'subheader': config_data['app_ui'].get('subheader', 'How can I help you?'),
         # role specific:
         'button_phrase': config_data['role_contexts'][selected_role].get('button_phrase', 'Enter'),
@@ -194,10 +193,18 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
 
 # Main function
 def main():
+    # set main page configuration
+    page_title = config_data['app_ui'].get('page_title', 'Streamlit App')
+    page_icon = config_data['app_ui'].get('page_icon', 'bulb')
+    st.set_page_config(
+        page_title=page_title,
+        page_icon=page_icon,
+        initial_sidebar_state='auto'
+    )
     # save the selected AI context, role name, and any helper prompts
     chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine)
     # load appropriate settings based on selected role
-    config_settings = load_config_settings(chat_engine, chat_engine.role_context)
+    config_settings = load_app_config(chat_engine, chat_engine.role_context)
     # save the user's prompt, toggle & answer button state
     chat_engine.user_prompt, extra_lesson_toggle, answer_button = setup_main_area(config_settings)
     # if answer button is clicked, initiate the OpenAI response
