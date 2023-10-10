@@ -14,6 +14,7 @@ st.set_page_config(
     initial_sidebar_state='expanded'
 )
 
+
 # Function to load configurations
 def load_app_config(selected_role):
     config_settings = {
@@ -23,11 +24,13 @@ def load_app_config(selected_role):
         'subheader': config_data['app_ui'].get('subheader', 'How can I help you?'),
         # role specific:
         'button_phrase': config_data['role_contexts'][selected_role].get('button_phrase', 'Enter'),
-        'prompt_placeholder': config_data['role_contexts'][selected_role].get('prompt_placeholder', 'Enter your prompt...')
+        'prompt_placeholder': config_data['role_contexts'][selected_role].get('prompt_placeholder',
+                                                                              'Enter your prompt...')
     }
     return config_settings
 
-# Function to setup the app configurations
+
+# Function to set up the app configurations
 @st.cache_data
 def setup_app_config(path_web, path_local):
     if os.path.exists(path_web):
@@ -42,6 +45,7 @@ def setup_app_config(path_web, path_local):
     
     return chat_engine, config_data
   
+
 def extra_lesson(prompt_1, role_context, response_1):
     with st.spinner('Next lesson...'):
         # get second instruction set for continuing previous conversation
@@ -52,7 +56,8 @@ def extra_lesson(prompt_1, role_context, response_1):
         messages = [prompt_1, response_1, prompt_2]
         return messages
 
-# Function to setup the main UI
+
+# Function to set up the main UI
 def setup_main_area(config_settings):
     st.title(f":{config_settings['title_emoji']}: {config_settings['app_title']}")
     st.subheader(config_settings['subheader'])
@@ -84,7 +89,7 @@ def setup_main_area(config_settings):
     return chat_engine.user_prompt, extra_lesson_toggle, answer_button
 
 
-# Function to setup the sidebar
+# Function to set up the sidebar
 def setup_sidebar(chat_engine):
     
     chat_engine.api_key = st.sidebar.text_input(
@@ -101,20 +106,20 @@ def setup_sidebar(chat_engine):
     with adv_settings:
         chat_engine.model = st.selectbox(
             "Model", 
-            ["gpt-3.5-turbo", "gpt-4"], 
+            ["gpt-3.5-turbo", "gpt-4"],
+            index=1,  # MOST RECENT CHANGE
             help="Some API keys are not authorized for use with gpt-4"
         )
         chat_engine.temperature = st.slider(
             "Temperature", 0.0, 2.0, 1.0, 0.1,
-            help = """
+            help="""
             temperature controls the "creativity" of the response.
             A higher value results in more diverse and unexpected 
             responses, while lower values result in more conservative
             and predictable responses.
             """
-        )
-        chat_engine.temperature = round(chat_engine.temperature * 10) / 10
-    
+        )  # MOST RECENT CHANGE (removed rounding)
+            
     roles = {
         settings.get('display_name', role): role
         for role, settings in config_data['role_contexts'].items()
@@ -130,6 +135,7 @@ def setup_sidebar(chat_engine):
         helper_prompt = handle_code_convert()
                 
     return selected_role, selected_friendly_role, helper_prompt
+
 
 # Function to handle code_convert settings
 def handle_code_convert():
@@ -148,6 +154,7 @@ def handle_code_convert():
     helper_prompt = f"to {new_language}: "
     
     return helper_prompt
+
 
 # Function to handle the response
 def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt):
@@ -201,6 +208,7 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
     except Exception as e:
         st.error(f"There was an error while your request was being sent: {e}", icon='🚨')
 
+
 # Main function
 def main():
     # save the selected AI context, role name, and any helper prompts
@@ -213,10 +221,11 @@ def main():
     if answer_button:
         handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt)
 
+
 if __name__ == '__main__':
     # create the chat engine instance and retrieve the custom configuration data
     chat_engine, config_data = setup_app_config(
-        path_web = "/app/code-tutor/web_app/config.yaml", # streamlit server path
-        path_local = "config.yaml" # local path
+        path_web="/app/code-tutor/web_app/config.yaml",  # streamlit server path
+        path_local="config.yaml"  # local path
     )
     main()
