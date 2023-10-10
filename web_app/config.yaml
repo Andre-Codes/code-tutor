@@ -47,7 +47,7 @@ role_contexts:
     code_convert:
         enable: True 
         system_role: "You're computer language expert who translates one language to another."
-        instruct: "Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting. Translate the following code to the specified language. Respond only with the converted code and code comments by itself and nothing else."
+        instruct: "Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting. Translate the following code to the specified language. Respond only with the converted code and it's comments."
         instruct_2: "Make a markdown table comparing each line of code and a description of what was translated and then if applicable compare equivalent libraries or packages. Finally go into detail on how the newly translated code works in relation to the original code; explaining the difference between operators commands data structures etc."
         documentation: "Do not provide any explanation in your response."
         languages: ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"]
