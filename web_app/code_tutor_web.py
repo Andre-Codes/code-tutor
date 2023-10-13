@@ -163,7 +163,7 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
         all_response_content = []
 
         if chat_engine.model == 'gpt-4':
-            st.toast('Be patient. Responses from GPT-4 can be slower ...', icon="⏳")
+            st.toast('Be patient. Responses from GPT-4 can be slower...', icon="⏳")
 
         if chat_engine.user_prompt is None:
             if config_data['allow_null_prompt']:
@@ -182,7 +182,7 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
             chat_engine.user_prompt = f"{helper_prompt}{chat_engine.user_prompt}"
 
         response = generate_response(chat_engine, chat_engine.user_prompt)
-        
+        chat_engine.complete_prompt
         displayed_response = display_response(
             response,
             assistant=allow_download,
@@ -203,7 +203,7 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
                 streaming=chat_engine.stream
             )
 
-        st.toast(':teacher: All replies complete!', icon='✅')
+        st.toast(':teacher: All replies ready!', icon='✅')
 
     except Exception as e:
         st.error(f"There was an error while your request was being sent: {e}", icon='🚨')
