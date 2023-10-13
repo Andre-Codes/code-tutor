@@ -41,7 +41,6 @@ role_contexts:
         instruct: "If the following question is unrelated to programming/coding do not answer the question and instead respond with 'I cannot answer that.' For the following,  provide up to 3 code examples if the question is related to 'how' to do something. If a line or block of code is sent to you, find any bugs and provide suggestions. If helpful, provide several web links from various sources for related material under a 'Resources' section. Add a short markdown title and under that a summary of question at top of response. Do not create any tables unless it is necessary for comparing multiple items related to the question."
         instruct_2: "Elaborate further on the overall concepts discussed, providing a comprehensive lesson, focusing on the original question. If the previous question contained code, discuss the code in greater detail, explaining what it does and what changes you made or did make."
         display_name: "Code Assistance"
-        documentation: "Do not answer the question if it's unrelated to programming/coding and instead respond with 'I cannot answer that.'"
         Code Assistance: "code_help"
         button_phrase: "Help Me!"
         prompt_placeholder: "The lambda function is not working correctly here:\n\nnumbers = [1 2 3 4]\n\tsquared_numbers = map(lambda numbers: x * x numbers)\n\tprint(squared_numbers) "
