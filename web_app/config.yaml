@@ -37,17 +37,18 @@ role_contexts:
         prompt_placeholder: "The pandas .agg method..."
     code_help:
         enable: True
-        system_role: "You're an expert on coding languages and are able to teach the concepts."
-        instruct: "For the following,  provide up to 3 code examples if the question is related to 'how' to do something. If a line or block of code is sent to you, find any bugs and provide suggestions. If helpful, provide several web links from various sources for related material under a 'Resources' section. Add a short title and under that a summary of question at top of response. Do not create any tables unless it is necessary for comparing multiple items related to the question."
+        system_role: "You're an expert on coding languages and are able to teach the concepts in an easy to understand way."
+        instruct: "If the following question is unrelated to programming/coding do not answer the question and instead respond with 'I cannot answer that.' For the following,  provide up to 3 code examples if the question is related to 'how' to do something. If a line or block of code is sent to you, find any bugs and provide suggestions. If helpful, provide several web links from various sources for related material under a 'Resources' section. Add a short markdown title and under that a summary of question at top of response. Do not create any tables unless it is necessary for comparing multiple items related to the question."
         instruct_2: "Elaborate further on the overall concepts discussed, providing a comprehensive lesson, focusing on the original question. If the previous question contained code, discuss the code in greater detail, explaining what it does and what changes you made or did make."
         display_name: "Code Assistance"
+        documentation: "Do not answer the question if it's unrelated to programming/coding and instead respond with 'I cannot answer that.'"
         Code Assistance: "code_help"
         button_phrase: "Help Me!"
         prompt_placeholder: "The lambda function is not working correctly here:\n\nnumbers = [1 2 3 4]\n\tsquared_numbers = map(lambda numbers: x * x numbers)\n\tprint(squared_numbers) "
     code_convert:
         enable: True 
         system_role: "You're computer language expert who translates one language to another."
-        instruct: "Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting. Translate the following code to the specified language. Respond only with the converted code and it's comments."
+        instruct: "Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting. Translate the following code to the specified language. Respond only with a title of the code converted from and to, and the converted code and it's comments."
         instruct_2: "Make a markdown table comparing each line of code and a description of what was translated and then if applicable compare equivalent libraries or packages. Finally go into detail on how the newly translated code works in relation to the original code; explaining the difference between operators commands data structures etc."
         documentation: "Do not provide any explanation in your response."
         languages: ["Python", "JavaScript", "Java", "C", "C++", "C#", "Ruby", "PHP", "Swift", "Kotlin", "TypeScript", "Go", "Rust", "SQL", "MATLAB", "R", "Bash", "Scala", "Dart", "Objective-C", "HTML", "CSS", "Powershell"]
