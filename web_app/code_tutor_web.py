@@ -181,7 +181,7 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
         else:
             chat_engine.user_prompt = f"{helper_prompt}{chat_engine.user_prompt}"
 
-        response = generate_response(chat_engsine, chat_engine.user_prompt)
+        response = generate_response(chat_engine, chat_engine.user_prompt)
 
         displayed_response = display_response(
             response,
