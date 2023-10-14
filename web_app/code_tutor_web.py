@@ -16,6 +16,7 @@ st.set_page_config(
 
 
 # Function to load configurations
+@st.cache_data
 def load_app_config(selected_role):
     config_settings = {
         # general app settings:
@@ -151,8 +152,16 @@ def handle_code_convert():
             format_func=lambda x: f"{x} (file format)" if x in convert_settings['file_formats'] else x
         )
     new_language = selected_language.lower().replace('-', '')
+
     helper_prompt = f"to {new_language}: "
-    
+
+    # handle language specific instructions to append to main prompt
+    # these additional instructions may eventually be added to the YAML config
+    if new_language == 'sql':
+        helper_prompt = "If appropriate, use sub-queries, window functions, " \
+                        "etc. to make it efficient and concise. Natural language " \
+                        + helper_prompt
+
     return helper_prompt
 
 
