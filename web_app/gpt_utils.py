@@ -9,7 +9,7 @@ class ChatEngine:
     Attributes:
         api_key (str): The OpenAI API key, sourced from environment variables.
         model (str): The GPT model name to be used. Defaults to "gpt-3.5-turbo".
-        role_context (str): Operational context for the GPT model, e.g., 'basic', 'api_explain'.
+        role_context (str): Operational context for the GPT model, e.g., 'general', 'api_explain'.
         comment_level (str): Level of comment verbosity.
         explain_level (str): Level of explanation verbosity.
         temperature (float): Controls randomness in output. Lower is more deterministic.
@@ -43,7 +43,7 @@ class ChatEngine:
     def __init__(
         self,
         role_context=None,
-        temperature=None,
+        temperature=1,
         model="gpt-3.5-turbo",
         stream=False,
         api_key=None, # os.environ['OPENAI_API_KEY']
@@ -57,7 +57,7 @@ class ChatEngine:
             role_context (str, optional): Operational context for GPT. This directly control \
                 what is sent to the GPT model in addition to the user inputted prompt. \
                     Use the `get_role_contexts()` method to view the available roles. \
-                        Defaults to 'basic'.
+                        Defaults to 'general'.
             comment_level (str, optional): Level of comment verbosity. Defaults to 'normal'.
             explain_level (str, optional): Level of explanation verbosity. Defaults to 'concise'.
             temperature (float, optional): Controls randomness in output. Defaults to 0.
@@ -81,7 +81,7 @@ class ChatEngine:
 
         # Validate and set role_context
         available_role_contexts = self.CONFIG.get('role_contexts', {}).keys()
-        self.role_context = role_context if role_context in available_role_contexts else 'basic'
+        self.role_context = role_context if role_context in available_role_contexts else 'general'
 
         # Validate and set temperature
         self.temperature = temperature
@@ -169,7 +169,7 @@ class ChatEngine:
         self.__messages = system_msg + user_assistant_msgs
 
     def _handle_role_instructions(self, user_prompt):
-        if self.role_context != 'basic':
+        if self.role_context != 'general':
 
             default_documentation = (
                 self.CONFIG.get('role_contexts', {})
