@@ -6,11 +6,14 @@ app_ui:
       title_emoji: "teacher"
       subheader: "What can I do for you?"
     prompt:  # settings/controls related to the prompt and prompt area
-        prompt_box: True
+        prompt_box: True  # inverse is used to control the 'disabled' param
         response_button: True
         extra_response_toggle: True
-
-allow_null_prompt: True
+        allow_null_prompt: True
+    sidebar:
+        api_key: True
+        adv_settings: True  # additional settings for API call (model, temp)
+        role_context: True
 response_formats:
     markdown:
         instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Generate a concise descriptive title for the response. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. "
