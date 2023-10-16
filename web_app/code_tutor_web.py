@@ -7,6 +7,8 @@ import gpt_utils as gpt
 
 # set main page configuration
 page_title = "Code Tutor - Learn Code"
+# use shortcodes for icons
+# see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
 page_icon = "teacher"
 st.set_page_config(
     page_title=page_title,
@@ -20,9 +22,9 @@ st.set_page_config(
 def load_app_config(selected_role):
     config_settings = {
         # general app settings:
-        'app_title': config_data['app_ui'].get('title', 'App Title'),
-        'title_emoji': config_data['app_ui'].get('title_emoji', 'question'),
-        'subheader': config_data['app_ui'].get('subheader', 'How can I help you?'),
+        'app_title': config_data['app_ui']['main'].get('title', 'App Title'),
+        'title_emoji': config_data['app_ui']['main'].get('title_emoji', 'question'),
+        'subheader': config_data['app_ui']['main'].get('subheader', 'How can I help you?'),
         # role specific:
         'button_phrase': config_data['role_contexts'][selected_role].get('button_phrase', 'Enter'),
         'prompt_placeholder': config_data['role_contexts'][selected_role].get('prompt_placeholder',
@@ -32,7 +34,7 @@ def load_app_config(selected_role):
 
 
 # Function to set up the app configurations
-@st.cache_data
+# @st.cache_data
 def setup_app_config(path_web, path_local):
     if os.path.exists(path_web):
         config_path = path_web
@@ -47,7 +49,7 @@ def setup_app_config(path_web, path_local):
     return chat_engine, config_data
   
 
-def extra_lesson(prompt_1, role_context, response_1):
+def extra_response(prompt_1, role_context, response_1):
     with st.spinner('Next lesson...'):
         # get second instruction set for continuing previous conversation
         role_context = config_data['role_contexts'].get(role_context, {})
@@ -59,35 +61,38 @@ def extra_lesson(prompt_1, role_context, response_1):
 
 
 # Function to set up the main UI
-def setup_main_area(config_settings):
-    st.title(f":{config_settings['title_emoji']}: {config_settings['app_title']}")
-    st.subheader(config_settings['subheader'])
-    prompt_box = st.empty()
+def setup_main_area(app_config):
+    st.title(f":{app_config['title_emoji']}: {app_config['app_title']}")
+    st.subheader(app_config['subheader'])
+
+    if app_config['app_ui']['prompt']['prompt_box']:
+        prompt_box = st.empty()
     
     col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        answer_button = st.button(
-            f":blue[{config_settings['button_phrase']}] :sparkles:",
-            help="Generate an answer"
+    if app_config['app_ui']['prompt']['response_button']:
+        with col1:
+            response_button = st.button(
+                f":blue[{app_config['button_phrase']}] :sparkles:",
+                help="Generate an answer"
         )
-    with col2:
-        extra_lesson_toggle = st.toggle(
-            "Extra Details",
-            help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
-            key='extra_lesson',
-            value=False
-        )
+    if app_config['app_ui']['prompt']['extra_response_toggle']:
+        with col2:
+            extra_response_toggle = st.toggle(
+                "Extra Details",
+                help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
+                key='extra_response',
+                value=False
+            )
 
     chat_engine.user_prompt = prompt_box.text_area(
         label="How can I help ?",
         label_visibility="hidden",
         height=185,
-        placeholder=config_settings['prompt_placeholder'],
+        placeholder=app_config['prompt_placeholder'],
         key='prompt'
     ) or None
     
-    return chat_engine.user_prompt, extra_lesson_toggle, answer_button
+    return chat_engine.user_prompt, extra_response_toggle, response_button
 
 
 # Function to set up the sidebar
@@ -166,9 +171,9 @@ def handle_code_convert():
 
 
 # Function to handle the response
-def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt):
+def handle_response(chat_engine, extra_response_toggle, selected_friendly_role, helper_prompt):
 
-    allow_download = not extra_lesson_toggle
+    allow_download = not extra_response_toggle
     all_response_content = []
 
     if chat_engine.user_prompt is None:
@@ -201,9 +206,9 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
             streaming=chat_engine.stream
         )
 
-        if extra_lesson_toggle:
+        if extra_response_toggle:
             chat_engine.stream = False
-            prompt_messages = extra_lesson(chat_engine.user_prompt, chat_engine.role_context, displayed_response)
+            prompt_messages = extra_response(chat_engine.user_prompt, chat_engine.role_context, displayed_response)
             extra_response = generate_response(chat_engine, prompt_messages)
             display_response(
                 extra_response,
@@ -227,10 +232,10 @@ def main():
     # load appropriate settings based on selected role
     config_settings = load_app_config(chat_engine.role_context)
     # save the user's prompt, toggle & answer button state
-    chat_engine.user_prompt, extra_lesson_toggle, answer_button = setup_main_area(config_settings)
+    chat_engine.user_prompt, extra_response_toggle, response_button = setup_main_area(config_settings)
     # if answer button is clicked, initiate the OpenAI response
-    if answer_button:
-        handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt)
+    if response_button:
+        handle_response(chat_engine, extra_response_toggle, selected_friendly_role, helper_prompt)
 
 
 if __name__ == '__main__':
