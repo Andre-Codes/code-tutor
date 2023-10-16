@@ -8,7 +8,7 @@ def generate_response(app, prompt):
         try:
             return app.get_response(prompt=prompt, format_style='markdown')
         except Exception as e:
-            raise ValueError("No response received from AI service.")
+            raise e
             
 def handle_file_output(responses, all_response_content):
     all_response_content.append(f"{responses} \n\n")

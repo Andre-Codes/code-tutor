@@ -167,28 +167,29 @@ def handle_code_convert():
 
 # Function to handle the response
 def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt):
-    try:
-        allow_download = not extra_lesson_toggle
-        all_response_content = []
 
+    allow_download = not extra_lesson_toggle
+    all_response_content = []
+
+    if chat_engine.user_prompt is None:
+        if config_data['allow_null_prompt']:
+            st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
+            subkeys = list(config_data['random_prompts'].keys())
+            random_subkey = random.choice(subkeys)
+            # create prompt with random choice and append keyword for clarity
+            chat_engine.user_prompt = (
+                f"'{random.choice(config_data['random_prompts'][random_subkey])}' \
+                    {config_data['random_prompts'][random_subkey][0]}"
+            )
+            chat_engine.role_context = 'random'
+        else:
+            st.info('Please provide a prompt...', icon='😑')
+    else:
+        chat_engine.user_prompt = f"{helper_prompt}{chat_engine.user_prompt}"
+
+    try:
         if chat_engine.model == 'gpt-4':
             st.toast('Be patient. Responses from GPT-4 can be slower...', icon="⏳")
-
-        if chat_engine.user_prompt is None:
-            if config_data['allow_null_prompt']:
-                st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
-                subkeys = list(config_data['random_prompts'].keys())
-                random_subkey = random.choice(subkeys)
-                # create prompt with random choice and append keyword for clarity
-                chat_engine.user_prompt = (
-                    f"'{random.choice(config_data['random_prompts'][random_subkey])}' \
-                        {config_data['random_prompts'][random_subkey][0]}"
-                )
-                chat_engine.role_context = 'random'
-            else:
-                st.info('Please provide a prompt...', icon='😑')
-        else:
-            chat_engine.user_prompt = f"{helper_prompt}{chat_engine.user_prompt}"
 
         response = generate_response(chat_engine, chat_engine.user_prompt)
 
@@ -211,11 +212,12 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
                 role_name=selected_friendly_role,
                 streaming=chat_engine.stream
             )
-
         st.toast(':teacher: All replies ready!', icon='✅')
-
     except Exception as e:
-        st.error(f"There was an error while your request was being sent: {e}", icon='🚨')
+        st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
+
+
+
 
 
 # Main function

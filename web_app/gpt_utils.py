@@ -137,8 +137,12 @@ class ChatEngine:
             )
             if response:
                 self.response = response
-        except Exception as e:
-            raise ValueError("Connection to API failed - Verify internet connection or API key: {e}")
+        except openai.error.APIConnectionError as e:
+            raise e
+        except openai.error.ServiceUnavailableError as e:
+            raise e
+        except openai.error.APIError as e:
+            raise e
 
 
     def _build_messages(self, prompt):
