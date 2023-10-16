@@ -1,9 +1,15 @@
 app_ui:
-  page_title: "Code Tutor - Learn Code"
-  page_icon: "teacher" # use shortcodes (see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
-  title: "Code Tutor"
-  title_emoji: "teacher"
-  subheader: "What can I do for you?"
+    main:  # settings that control the main page configurations
+      page_title: "Code Tutor - Learn Code"
+      page_icon: "teacher" # use shortcodes (see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
+      title: "Code Tutor"
+      title_emoji: "teacher"
+      subheader: "What can I do for you?"
+    prompt:  # settings/controls related to the prompt and prompt area
+        prompt_box: True
+        response_button: True
+        extra_response_toggle: True
+
 allow_null_prompt: True
 response_formats:
     markdown:
