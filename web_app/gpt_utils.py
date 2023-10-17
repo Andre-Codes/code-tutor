@@ -10,8 +10,6 @@ class ChatEngine:
         api_key (str): The OpenAI API key, sourced from environment variables.
         model (str): The GPT model name to be used. Defaults to "gpt-3.5-turbo".
         role_context (str): Operational context for the GPT model, e.g., 'general', 'api_explain'.
-        comment_level (str): Level of comment verbosity.
-        explain_level (str): Level of explanation verbosity.
         temperature (float): Controls randomness in output. Lower is more deterministic.
         
     Class Variables:
@@ -38,17 +36,16 @@ class ChatEngine:
     #     'markdown': Markdown
     # }
 
-    MD_TABLE_STYLE = "pipes" # default format for markdown tables
+    MD_TABLE_STYLE = "pipes"  # default format for markdown tables
 
     def __init__(
-        self,
-        role_context=None,
-        temperature=1,
-        model="gpt-3.5-turbo",
-        stream=False,
-        api_key=None, # os.environ['OPENAI_API_KEY']
-        config_path=None,
-        user_prompt=None):
+            self,
+            role_context=None,
+            temperature=1,
+            model="gpt-3.5-turbo",
+            stream=False,
+            api_key=None,  # os.environ['OPENAI_API_KEY']
+            config_path=None):
         """
         Initializes the GPTService class with settings to control the prompt and response.
 
@@ -75,9 +72,6 @@ class ChatEngine:
 
         # Set the GPT model
         self.model = model
-        
-        # 
-        self.user_prompt = user_prompt
 
         # Validate and set role_context
         available_role_contexts = self.CONFIG.get('role_contexts', {}).keys()
@@ -86,11 +80,11 @@ class ChatEngine:
         # Validate and set temperature
         self.temperature = temperature
 
-
     def set_md_table_style(self, style):
         available_table_styles = self.CONFIG['response_formats']['markdown']['table_styles'].keys()
         if style not in available_table_styles:
-            raise ValueError(f"Invalid MD_TABLE_STYLE. Available styles: {list(self.CONFIG['table_formatting'].keys())}.")
+            raise ValueError(
+                f"Invalid MD_TABLE_STYLE. Available styles: {list(self.CONFIG['table_formatting'].keys())}.")
         self.MD_TABLE_STYLE = self.CONFIG['response_formats']['markdown']['table_styles'][style]
 
     def get_format_styles(self):
@@ -129,11 +123,11 @@ class ChatEngine:
         try:
             openai.api_key = self.api_key
             response = openai.ChatCompletion.create(
-                model = self.model,
-                messages = self.__messages,
-                temperature = self.temperature,
-                top_p = 0.2,
-                stream = self.stream
+                model=self.model,
+                messages=self.__messages,
+                temperature=self.temperature,
+                top_p=0.2,
+                stream=self.stream
             )
             if response:
                 self.response = response
@@ -143,7 +137,6 @@ class ChatEngine:
             raise e
         except openai.error.APIError as e:
             raise e
-
 
     def _build_messages(self, prompt):
         # Validate that all items in 'prompt' are strings
