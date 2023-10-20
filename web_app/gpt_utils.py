@@ -160,7 +160,6 @@ class ChatEngine:
 
         # Combine system, user, and assistant messages
         self.__messages = system_msg + user_assistant_msgs
-        print(self.__messages)
 
     def _handle_role_instructions(self, user_prompt):
         if self.role_context != 'general':
