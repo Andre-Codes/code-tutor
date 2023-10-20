@@ -75,7 +75,7 @@ def setup_app_controls(app_config):
     st.subheader(app_config['subheader'])
 
     prompt_box = st.empty()
-    
+
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -222,7 +222,6 @@ def handle_response(chat_engine,
         response_1 = display_response(
             response,
             assistant=allow_download,
-            all_response_content=all_response_content,
             role_name=selected_friendly_role,
             streaming=chat_engine.stream
         )
@@ -234,11 +233,14 @@ def handle_response(chat_engine,
             display_response(
                 response_2,
                 assistant=True,
-                all_response_content=all_response_content,
                 role_name=selected_friendly_role,
                 streaming=chat_engine.stream
             )
+
         st.toast(':teacher: All replies ready!', icon='✅')
+
+        return response_1
+
     except Exception as e:
         st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
 
@@ -247,13 +249,36 @@ def handle_response(chat_engine,
 def main():
     # load appropriate settings based on selected role
     config_settings = load_app_config()
+
     # save the selected AI context, role name, and any helper prompts
     chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine, config_settings)
+
     # save the user's prompt, toggle & answer button state
     chat_engine.user_prompt, extra_response_toggle, response_button = setup_app_controls(config_settings)
+
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
     # if answer button is clicked, initiate the OpenAI response
     if response_button:
-        handle_response(chat_engine, extra_response_toggle, selected_friendly_role, helper_prompt, config_settings)
+        response = handle_response(chat_engine, extra_response_toggle, selected_friendly_role, helper_prompt, config_settings)
+        st.session_state.setdefault('messages', []).extend([chat_engine.user_prompt, response])
+
+
+    # Store the prompt and the response in a session_state list
+    # for use in chatting function
+    if chat_prompt := st.chat_input("Any questions?"):
+        st.session_state.setdefault('messages', []).extend([chat_engine.user_prompt, response, chat_prompt])
+
+        response = generate_response(chat_engine, st.session_state['messages'])
+
+        response_2 = display_response(
+            response,
+            assistant=False,
+            role_name=selected_friendly_role,
+            streaming=chat_engine.stream
+        )
 
 
 if __name__ == '__main__':
