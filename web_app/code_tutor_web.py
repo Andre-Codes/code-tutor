@@ -18,7 +18,7 @@ st.set_page_config(
 
 
 # Function to load configurations
-@st.cache_data
+# @st.cache_data
 def load_app_config():
     config_settings = {
         # main app settings:
@@ -36,12 +36,14 @@ def load_app_config():
         'api_key': config_data['app_ui']['sidebar']['api_key'],
         'adv_settings': config_data['app_ui']['sidebar']['adv_settings'],
         'role_context': config_data['app_ui']['sidebar']['role_context'],
+
+        'all_role_contexts': config_data['role_contexts']
     }
     return config_settings
 
 
 # Function to set up the app configurations
-@st.cache_data
+# @st.cache_data
 def setup_app_config(path_web, path_local):
     if os.path.exists(path_web):
         config_path = path_web
@@ -50,7 +52,7 @@ def setup_app_config(path_web, path_local):
         config_path = path_local
         api_key = os.environ["OPENAI_API_KEY"]
         
-    chat_engine = gpt.ChatEngine(config_path=config_path, stream=True, api_key=api_key)
+    chat_engine = gpt.ChatEngine(stream=True, api_key=api_key, config_path=config_path)
     config_data = chat_engine.CONFIG
     
     return chat_engine, config_data
@@ -96,7 +98,7 @@ def setup_app_controls(app_config):
         label="How can I help ?",
         label_visibility="hidden",
         height=185,
-        placeholder="Ask me anything related to programming languages, APIs, libraries, etc...",
+        placeholder=app_config['all_role_contexts'][chat_engine.role_context]['prompt_placeholder'],
         key='prompt'
     ) or None
     
