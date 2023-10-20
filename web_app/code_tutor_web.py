@@ -189,21 +189,22 @@ def handle_code_convert():
 
 # Function to handle the response
 def handle_response(chat_engine,
-                    extra_response_toggle,
                     selected_friendly_role,
-                    helper_prompt,
-                    app_config):
+                    app_config,
+                    extra_response_toggle,
+                    helper_prompt='',
+                    prompt=None):
 
     allow_download = not extra_response_toggle
     all_response_content = []
 
-    if chat_engine.user_prompt is None:
+    if prompt is None:
         if app_config['allow_null_prompt']:
             st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
             sub_keys = list(config_data['random_prompts'].keys())
             random_subkey = random.choice(sub_keys)
             # create prompt with random choice and append keyword for clarity
-            chat_engine.user_prompt = (
+            prompt = (
                 f"'{random.choice(config_data['random_prompts'][random_subkey])}' \
                     {config_data['random_prompts'][random_subkey][0]}"
             )
@@ -211,13 +212,13 @@ def handle_response(chat_engine,
         else:
             st.info('Please provide a prompt...', icon='😑')
     else:
-        chat_engine.user_prompt = f"{helper_prompt}{chat_engine.user_prompt}"
+        prompt = f"{helper_prompt}{prompt}"
 
     try:
         if chat_engine.model == 'gpt-4':
             st.toast('Be patient. Responses from GPT-4 can be slower...', icon="⏳")
 
-        response = generate_response(chat_engine, chat_engine.user_prompt)
+        response = generate_response(chat_engine, prompt)
 
         response_1 = display_response(
             response,
@@ -228,7 +229,7 @@ def handle_response(chat_engine,
 
         if extra_response_toggle:
             chat_engine.stream = False
-            prompt_messages = extra_response(chat_engine.user_prompt, chat_engine.role_context, response_1)
+            prompt_messages = extra_response(prompt, chat_engine.role_context, response_1)
             response_2 = generate_response(chat_engine, prompt_messages)
             display_response(
                 response_2,
@@ -260,25 +261,34 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    # Display chat history
+    for message in st.session_state.messages:
+        st.markdown(message)
+
     # if answer button is clicked, initiate the OpenAI response
     if response_button:
-        response = handle_response(chat_engine, extra_response_toggle, selected_friendly_role, helper_prompt, config_settings)
-        st.session_state.setdefault('messages', []).extend([chat_engine.user_prompt, response])
-
+        response = handle_response(chat_engine, selected_friendly_role,
+                                   config_settings, extra_response_toggle,
+                                   helper_prompt, prompt=chat_engine.user_prompt)
+        st.session_state.messages.extend([chat_engine.user_prompt, response])
 
     # Store the prompt and the response in a session_state list
     # for use in chatting function
     if chat_prompt := st.chat_input("Any questions?"):
-        st.session_state.setdefault('messages', []).extend([chat_engine.user_prompt, response, chat_prompt])
+        st.session_state.messages.append(chat_prompt)
 
-        response = generate_response(chat_engine, st.session_state['messages'])
+        response = handle_response(chat_engine, selected_friendly_role,
+                                   config_settings, extra_response_toggle,
+                                   prompt=st.session_state['messages'])
 
-        response_2 = display_response(
-            response,
-            assistant=False,
-            role_name=selected_friendly_role,
-            streaming=chat_engine.stream
-        )
+        # response_2 = display_response(
+        #     response,
+        #     assistant=False,
+        #     role_name=selected_friendly_role,
+        #     streaming=chat_engine.stream
+        # )
+
+        st.session_state.messages.append(response)
 
 
 if __name__ == '__main__':
