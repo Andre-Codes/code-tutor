@@ -157,7 +157,7 @@ class ChatEngine:
         if isinstance(prompt, list) and len(prompt) > 1:
             user_assistant_msgs = [
                 {
-                    "role": "assistant" if i % 2 == 0 else "user",
+                    "role": "assistant" if i % 2 else "user",
                     "content": prompt[i]
                 }
                 for i in range(len(prompt))
