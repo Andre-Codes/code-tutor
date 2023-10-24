@@ -38,7 +38,9 @@ def display_response(response, assistant, role_name, streaming):
                 if content_chunk:
                     collected_responses.append(content_chunk)
                     response_content = ''.join(collected_responses)
-                    markdown_placeholder.markdown(f"{response_content}\n\n")
+                    markdown_placeholder.markdown(f"{response_content}🖋️\n\n")
+            else:
+                markdown_placeholder.markdown(response_content)
 
     else:
         response_content = response['choices'][0]['message']['content']
