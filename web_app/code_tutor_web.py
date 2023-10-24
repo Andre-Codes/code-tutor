@@ -107,11 +107,11 @@ def setup_app_controls(app_config):
 
 # Function to set up the sidebar
 def setup_sidebar(chat_engine, app_config):
-
+    logo = st.sidebar.empty()
     api_key = st.sidebar.empty()
     adv_settings = st.sidebar.empty()
     role_context = st.sidebar.empty()
-
+    logo.image("ct_logo.png")
     chat_engine.api_key = api_key.text_input(
         label="OpenAI API Key :key:",
         type="password",
@@ -262,7 +262,7 @@ def main():
     # Display chat history, alternating user prompt and response
     for i, message in enumerate(st.session_state[context]['messages']):
         if i % 2:
-            st.chat_message('ai', avatar='👨‍🏫').markdown(message)
+            st.chat_message('ai', avatar='ct_logo.png').markdown(message)
         else:
             st.chat_message('user').markdown(message)
     # Initiate the OpenAI response upon button press
@@ -277,7 +277,7 @@ def main():
 
     # Store the prompt and the response in a session_state list
     # for use in chatting function
-    if chat_prompt := st.chat_input(disabled=not response_button, placeholder="Any questions?"):
+    if chat_prompt := st.chat_input(placeholder="Any questions?"):
         st.session_state[context]['messages'].append(chat_prompt)
 
         response = handle_response(chat_engine, selected_friendly_role,
