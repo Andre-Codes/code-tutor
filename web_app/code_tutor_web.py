@@ -211,8 +211,6 @@ def handle_response(chat_engine,
             chat_engine.role_context = 'random'
         else:
             st.info('Please provide a prompt...', icon='😑')
-    else:
-        prompt = f"{helper_prompt}{prompt}"
 
     try:
         if chat_engine.model == 'gpt-4':
@@ -253,22 +251,21 @@ def main():
 
     # save the selected AI context, role name, and any helper prompts
     chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine, config_settings)
-    context = chat_engine.role_context
     # save the user's prompt, toggle & answer button state
     chat_engine.user_prompt, extra_response_toggle, response_button = setup_app_controls(config_settings)
 
+    # Save currently selected context
+    context = chat_engine.role_context
     # Initialize chat history
     if context not in st.session_state:
         st.session_state.setdefault(context, {}).setdefault('messages', [])
-
-    # Display chat history
+    # Display chat history, alternating user prompt and response
     for i, message in enumerate(st.session_state[context]['messages']):
         if i % 2:
             st.chat_message('ai', avatar='👨‍🏫').markdown(message)
         else:
             st.chat_message('user').markdown(message)
-
-    # if answer button is clicked, initiate the OpenAI response
+    # Initiate the OpenAI response upon button press
     if response_button:
         response = handle_response(chat_engine, selected_friendly_role,
                                    config_settings, extra_response_toggle,
@@ -277,7 +274,7 @@ def main():
 
     # Store the prompt and the response in a session_state list
     # for use in chatting function
-    if chat_prompt := st.chat_input(placeholder="Any questions?"):
+    if chat_prompt := st.chat_input(disabled=not response_button, placeholder="Any questions?"):
         st.session_state[context]['messages'].append(chat_prompt)
 
         response = handle_response(chat_engine, selected_friendly_role,
