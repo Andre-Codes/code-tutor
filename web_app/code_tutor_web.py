@@ -238,7 +238,7 @@ def handle_response(chat_engine,
 
         st.toast(':teacher: All replies ready!', icon='✅')
 
-        return response_1
+        return response_1, prompt
 
     except Exception as e:
         st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
@@ -267,10 +267,10 @@ def main():
             st.chat_message('user').markdown(message)
     # Initiate the OpenAI response upon button press
     if response_button:
-        response = handle_response(chat_engine, selected_friendly_role,
+        response, prompt = handle_response(chat_engine, selected_friendly_role,
                                    config_settings, extra_response_toggle,
                                    helper_prompt, prompt=chat_engine.user_prompt)
-        st.session_state[context]['messages'].extend([chat_engine.user_prompt, response])
+        st.session_state[context]['messages'].extend([prompt, response])
 
     # Store the prompt and the response in a session_state list
     # for use in chatting function
