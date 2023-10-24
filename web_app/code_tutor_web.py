@@ -40,12 +40,12 @@ def setup_app_config(path_web, path_local):
     else:
         config_path = path_local
         api_key = os.environ["OPENAI_API_KEY"]
-        
+
     chat_engine = gpt.ChatEngine(config_path=config_path, stream=True, api_key=api_key)
     config_data = chat_engine.CONFIG
-    
+
     return chat_engine, config_data
-  
+
 
 def extra_lesson(prompt_1, role_context, response_1):
     with st.spinner('Next lesson...'):
@@ -63,7 +63,7 @@ def setup_main_area(config_settings):
     st.title(f":{config_settings['title_emoji']}: {config_settings['app_title']}")
     st.subheader(config_settings['subheader'])
     prompt_box = st.empty()
-    
+
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -86,17 +86,17 @@ def setup_main_area(config_settings):
         placeholder=config_settings['prompt_placeholder'],
         key='prompt'
     ) or None
-    
+
     return chat_engine.user_prompt, extra_lesson_toggle, answer_button
 
 
 # Function to set up the sidebar
 def setup_sidebar(chat_engine):
-    
+
     chat_engine.api_key = st.sidebar.text_input(
         "OpenAI API Key :key:", type="password"
     ) or chat_engine.api_key
-    
+
     # Advanced settings expander
     adv_settings = st.sidebar.expander(
         label="Advanced Settings :gear:",
@@ -106,7 +106,7 @@ def setup_sidebar(chat_engine):
     # Add Open API key and Advanced Settings widgets to the expander
     with adv_settings:
         chat_engine.model = st.selectbox(
-            "Model", 
+            "Model",
             ["gpt-3.5-turbo", "gpt-4"],
             index=1,  # MOST RECENT CHANGE
             help="Some API keys are not authorized for use with gpt-4"
@@ -120,7 +120,7 @@ def setup_sidebar(chat_engine):
             and predictable responses.
             """
         )  # MOST RECENT CHANGE (removed rounding)
-            
+
     roles = {
         settings.get('display_name', role): role
         for role, settings in config_data['role_contexts'].items()
@@ -134,7 +134,7 @@ def setup_sidebar(chat_engine):
     # adjust prompt or other parameters based on selected role context
     if selected_role == 'code_convert':
         helper_prompt = handle_code_convert()
-                
+
     return selected_role, selected_friendly_role, helper_prompt
 
 
@@ -146,7 +146,7 @@ def handle_code_convert():
     }
     convert_options = convert_settings['languages'] + convert_settings['file_formats']
     selected_language = st.sidebar.selectbox(
-            "Convert to:", 
+            "Convert to:",
             convert_options,
             key='language',
             format_func=lambda x: f"{x} (file format)" if x in convert_settings['file_formats'] else x
@@ -165,12 +165,12 @@ def handle_code_convert():
     return helper_prompt
 
 
-# Function to handle the response
+# Handle the inputted prompt and response
 def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt):
 
     allow_download = not extra_lesson_toggle
     all_response_content = []
-
+    # Perform check for prompt, if none, create random prompt
     if chat_engine.user_prompt is None:
         if config_data['allow_null_prompt']:
             st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
@@ -190,9 +190,9 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
     try:
         if chat_engine.model == 'gpt-4':
             st.toast('Be patient. Responses from GPT-4 can be slower...', icon="⏳")
-
+        # Perform API call with prompt
         response = generate_response(chat_engine, chat_engine.user_prompt)
-
+        # Display and format the response on the web page
         displayed_response = display_response(
             response,
             assistant=allow_download,
@@ -200,7 +200,7 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
             role_name=selected_friendly_role,
             streaming=chat_engine.stream
         )
-
+        # Perform a followup API with prompt and assistant messages
         if extra_lesson_toggle:
             chat_engine.stream = False
             prompt_messages = extra_lesson(chat_engine.user_prompt, chat_engine.role_context, displayed_response)
@@ -215,9 +215,6 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
         st.toast(':teacher: All replies ready!', icon='✅')
     except Exception as e:
         st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
-
-
-
 
 
 # Main function
