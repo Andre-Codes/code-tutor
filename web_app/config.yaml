@@ -26,6 +26,10 @@ response_formats:
         instruct: "Respond in HTML format. Create a button (or multiple) at top linked to the API site or embeded direct URLs for the related modules and/or functions used. Use HTML tables as requested and format them with borders. Use other HTML features to make the page visually appealing and engaging. When displaying any image use related API documentation sources to find them."
         css: "Put any code inside <pre><code> tag using the following CSS for styling: code  font-family: 'Fira Code' monospace; background-color: #282a36; color: #50fa7b; padding: 1px; border-radius: 3px; box-shadow: 0 2px 5px rgba(0 0 0 0.2);  pre  overflow: auto; background-color: #282a30; color: #f8f8f2; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0 0 0 0.2); "
 role_contexts:
+    testing:
+        enable: True
+        system_role: "You provide very brief and concise responses."
+        prompt_placeholder: ""
     defaults:
         system_role: "You're a programming language expert and can teach the concepts like you're a professor."
         instruct: "For the following code, API, library, or general coding question, respond with coding examples and provide detailed explanations, as well as break down any parameters and for API documentation."
