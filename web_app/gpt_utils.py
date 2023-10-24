@@ -68,7 +68,6 @@ class ChatEngine:
 
         # Set up API access
         self.api_key = api_key
-        openai.api_key = self.api_key
 
         # Turn off/on streaming of response
         self.stream = stream
@@ -300,6 +299,7 @@ class ChatEngine:
 
         # validate and set the instance variable for prompt
         self._validate_and_assign_params(prompt, format_style)
+        openai.api_key = self.api_key
 
         if response_type == 'text':
             self._build_prompt()
