@@ -162,7 +162,6 @@ class ChatEngine:
             raise e
         except openai.error.APIError as e:
             raise e
-
     def _image_api_call(self, prompt):
         try:
             response = openai.Image.create(
@@ -295,4 +294,3 @@ class ChatEngine:
                 return self.response['data'][0]['url']
 
         return self.response
-

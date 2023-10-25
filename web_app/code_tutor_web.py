@@ -52,11 +52,11 @@ def setup_app_config(path_web, path_local):
         config_path = path_local
         api_key = os.environ["OPENAI_API_KEY"]
         
-    chat_engine = gpt.ChatEngine(stream=True, api_key=api_key, config_path=config_path)
+    chat_engine = gpt.ChatEngine(config_path=config_path, stream=True, api_key=api_key)
     config_data = chat_engine.CONFIG
-    
+
     return chat_engine, config_data
-  
+
 
 def extra_response(prompt_1, role_context, response_1):
     with st.spinner('Next lesson...'):
@@ -117,7 +117,7 @@ def setup_sidebar(chat_engine, app_config):
         type="password",
         value=''
     ) or chat_engine.api_key
-    
+
     # Advanced settings expander
     if app_config['adv_settings']:
         adv_settings = adv_settings.expander(
@@ -156,7 +156,7 @@ def setup_sidebar(chat_engine, app_config):
     # adjust prompt or other parameters based on selected role context
     if selected_role == 'code_convert':
         helper_prompt = handle_code_convert()
-                
+
     return selected_role, selected_friendly_role, helper_prompt
 
 
@@ -168,7 +168,7 @@ def handle_code_convert():
     }
     convert_options = convert_settings['languages'] + convert_settings['file_formats']
     selected_language = st.sidebar.selectbox(
-            "Convert to:", 
+            "Convert to:",
             convert_options,
             key='language',
             format_func=lambda x: f"{x} (file format)" if x in convert_settings['file_formats'] else x
@@ -185,7 +185,6 @@ def handle_code_convert():
                         + helper_prompt
 
     return helper_prompt
-
 
 # Function to handle the response
 def handle_response(chat_engine,
@@ -215,10 +214,10 @@ def handle_response(chat_engine,
     try:
         if chat_engine.model == 'gpt-4':
             st.toast('Be patient. Responses from GPT-4 can be slower...', icon="⏳")
-
-        response = generate_response(chat_engine, prompt)
-
-        response_1 = display_response(
+        # Perform API call with prompt
+        response = generate_response(chat_engine, chat_engine.user_prompt)
+        # Display and format the response on the web page
+        displayed_response = display_response(
             response,
             assistant=allow_download,
             role_name=selected_friendly_role,
@@ -237,12 +236,10 @@ def handle_response(chat_engine,
             )
 
         st.toast(':teacher: All replies ready!', icon='✅')
-
         return response_1, prompt
 
     except Exception as e:
         raise e
-
 
 # Main function
 def main():
