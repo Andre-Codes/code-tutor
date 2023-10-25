@@ -18,7 +18,7 @@ st.set_page_config(
 
 
 # Function to load configurations
-# @st.cache_data
+@st.cache_data
 def load_app_config():
     config_settings = {
         # main app settings:
@@ -43,7 +43,7 @@ def load_app_config():
 
 
 # Function to set up the app configurations
-# @st.cache_data
+@st.cache_data
 def setup_app_config(path_web, path_local):
     if os.path.exists(path_web):
         config_path = path_web
@@ -107,11 +107,11 @@ def setup_app_controls(app_config):
 
 # Function to set up the sidebar
 def setup_sidebar(chat_engine, app_config):
-
+    logo = st.sidebar.empty()
     api_key = st.sidebar.empty()
     adv_settings = st.sidebar.empty()
     role_context = st.sidebar.empty()
-
+    logo.image("ct_logo.png")
     chat_engine.api_key = api_key.text_input(
         label="OpenAI API Key :key:",
         type="password",
@@ -241,7 +241,7 @@ def handle_response(chat_engine,
         return response_1, prompt
 
     except Exception as e:
-        st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
+        raise e
 
 
 # Main function
@@ -259,25 +259,30 @@ def main():
     # Initialize chat history
     if context not in st.session_state:
         st.session_state.setdefault(context, {}).setdefault('messages', [])
+
     # Display chat history, alternating user prompt and response
     for i, message in enumerate(st.session_state[context]['messages']):
         if i % 2:
-            st.chat_message('ai', avatar='👨‍🏫').markdown(message)
+            st.chat_message('ai', avatar='ct_logo.png').markdown(message)
         else:
             st.chat_message('user').markdown(message)
     # Initiate the OpenAI response upon button press
     if response_button:
-        response, prompt = handle_response(chat_engine, selected_friendly_role,
-                                   config_settings, extra_response_toggle,
-                                   helper_prompt, prompt=chat_engine.user_prompt)
-        st.session_state[context]['messages'].extend([prompt, response])
+        try:
+            response, prompt = handle_response(chat_engine, selected_friendly_role,
+                                       config_settings, extra_response_toggle,
+                                       helper_prompt, prompt=chat_engine.user_prompt)
+            st.session_state[context]['messages'].append(prompt)
+            st.session_state[context]['messages'].append(response)
+        except Exception as e:
+            st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
 
     # Store the prompt and the response in a session_state list
     # for use in chatting function
-    if chat_prompt := st.chat_input(disabled=not response_button, placeholder="Any questions?"):
+    if chat_prompt := st.chat_input(placeholder="Any questions?"):
         st.session_state[context]['messages'].append(chat_prompt)
 
-        response = handle_response(chat_engine, selected_friendly_role,
+        response, _ = handle_response(chat_engine, selected_friendly_role,
                                    config_settings, extra_response_toggle,
                                    prompt=st.session_state[context]['messages'])
 
