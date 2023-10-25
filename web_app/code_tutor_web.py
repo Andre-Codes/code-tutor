@@ -18,7 +18,7 @@ st.set_page_config(
 
 
 # Function to load configurations
-# @st.cache_data
+@st.cache_data
 def load_app_config():
     config_settings = {
         # main app settings:
@@ -43,7 +43,7 @@ def load_app_config():
 
 
 # Function to set up the app configurations
-# @st.cache_data
+@st.cache_data
 def setup_app_config(path_web, path_local):
     if os.path.exists(path_web):
         config_path = path_web
@@ -248,6 +248,7 @@ def handle_response(chat_engine,
 def main():
     # load appropriate settings based on selected role
     config_settings = load_app_config()
+    st.write(random.randint(0, 1000))
 
     # save the selected AI context, role name, and any helper prompts
     chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine, config_settings)
@@ -259,6 +260,7 @@ def main():
     # Initialize chat history
     if context not in st.session_state:
         st.session_state.setdefault(context, {}).setdefault('messages', [])
+
     # Display chat history, alternating user prompt and response
     for i, message in enumerate(st.session_state[context]['messages']):
         if i % 2:
@@ -271,7 +273,8 @@ def main():
             response, prompt = handle_response(chat_engine, selected_friendly_role,
                                        config_settings, extra_response_toggle,
                                        helper_prompt, prompt=chat_engine.user_prompt)
-            st.session_state[context]['messages'].extend([prompt, response])
+            st.session_state[context]['messages'].append(prompt)
+            st.session_state[context]['messages'].append(response)
         except Exception as e:
             st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
 
@@ -279,10 +282,10 @@ def main():
     # for use in chatting function
     if chat_prompt := st.chat_input(placeholder="Any questions?"):
         st.session_state[context]['messages'].append(chat_prompt)
-
-        response = handle_response(chat_engine, selected_friendly_role,
+        prompt = st.session_state[context]['messages']
+        response, _ = handle_response(chat_engine, selected_friendly_role,
                                    config_settings, extra_response_toggle,
-                                   prompt=st.session_state[context]['messages'])
+                                   prompt=prompt)
 
         st.session_state[context]['messages'].append(response)
 

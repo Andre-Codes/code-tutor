@@ -6,7 +6,7 @@ def generate_response(app, prompt):
         raise ValueError("No prompt provided.")
     with st.spinner('...thinking :thought_balloon:'):
         try:
-            return app.get_response(prompt=prompt, format_style='markdown')
+            return app.get_response(prompt=prompt, format_style='general')
         except Exception as e:
             raise e
             

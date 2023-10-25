@@ -1,6 +1,9 @@
 import openai
 import yaml
 
+import numpy as np
+np.set_printoptions(threshold=np.inf)
+
 
 class ChatEngine:
     """
@@ -94,7 +97,6 @@ class ChatEngine:
 
     def get_format_styles(self):
         available_formats = list(self.CONFIG['response_formats'].keys())
-        print("Available response formats:", available_formats)
 
     def get_role_contexts(self):
         available_role_contexts = list(self.CONFIG['role_contexts'].keys())
@@ -179,7 +181,7 @@ class ChatEngine:
     def _build_messages(self, prompt, **kwargs):
         # Validate that all items in 'prompt' are strings
         if not all(isinstance(item, str) for item in prompt):
-            raise ValueError("All elements in the list should be strings")
+            raise ValueError(f"All elements in the list should be strings {prompt}")
         # Initialize system message
         # override system_role if provided
         if 'system_role' in kwargs:
@@ -187,7 +189,6 @@ class ChatEngine:
         system_msg = [{"role": "system", "content": self.system_role}]
         # Determine user and assistant messages based on the length of the 'prompt'
         if isinstance(prompt, list) and len(prompt) > 1:
-            print('prompt is a list')
             user_assistant_msgs = [
                 {
                     "role": "assistant" if i % 2 else "user",
@@ -195,7 +196,6 @@ class ChatEngine:
                 }
                 for i in range(len(prompt))
             ]
-            print(user_assistant_msgs)
         else:
             user_assistant_msgs = [{"role": "user", "content": self.complete_prompt}]
         # Combine system, user, and assistant messages
@@ -212,46 +212,24 @@ class ChatEngine:
             str: The inputted prompt with role/context instructions..
         """
 
-        default_documentation = (
-            self.CONFIG.get('role_contexts', {})
-            .get('defaults', {})
-            .get('documentation', '')
-        )
+        default_documentation = self.CONFIG.get('role_contexts', {}).get('defaults', {}).get('documentation', '')
 
-        default_role_instructions = (
-            self.CONFIG.get('role_contexts', {})
-            .get('defaults', {})
-            .get('instruct', '')
-        )
+        default_role_instructions = self.CONFIG.get('role_contexts', {}).get('defaults', {}).get('instruct', '')
 
-        default_system_role = (
-            self.CONFIG.get('role_contexts', {})
-            .get('defaults', {})
-            .get('system_role', "You're a helpful assistant.")
-        )
+        default_system_role = self.CONFIG.get('role_contexts', {}).get('defaults', {}).get('system_role', "You're a helpful assistant.")
 
-        documentation = (
-            self.CONFIG.get('role_contexts', {})
-            .get(self.role_context, {})
-            .get('documentation', default_documentation)
-        )
+        documentation = self.CONFIG.get('role_contexts', {}).get(self.role_context, {}).get('documentation', default_documentation)
 
-        role_instructions = (
-            self.CONFIG.get('role_contexts', {})
-            .get(self.role_context, {})
-            .get('instruct', default_role_instructions)
-        )
+        role_instructions = self.CONFIG.get('role_contexts', {}).get(self.role_context, {}).get('instruct', default_role_instructions)
 
-        system_role = (
-            self.CONFIG.get('role_contexts', {})
-            .get(self.role_context, {})
-            .get('system_role', default_system_role)
-        )
+        system_role = self.CONFIG.get('role_contexts', {}).get(self.role_context, {}).get('system_role', default_system_role)
+
         # set the system_role class variable
         self.system_role = system_role
         # construct the prompt by prefixing any role instructions
         # and appending any documentation to the end
         prompt_with_context = f"{role_instructions}{user_prompt}{documentation}"
+        #raise AssertionError("prompt with context:" + str(prompt_with_context))
         self.prompt = prompt_with_context
 
         return prompt_with_context
