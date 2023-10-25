@@ -7,6 +7,8 @@ import gpt_utils as gpt
 
 # set main page configuration
 page_title = "Code Tutor - Learn Code"
+# use shortcodes for icons
+# see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
 page_icon = "teacher"
 st.set_page_config(
     page_title=page_title,
@@ -17,16 +19,25 @@ st.set_page_config(
 
 # Function to load configurations
 @st.cache_data
-def load_app_config(selected_role):
+def load_app_config():
     config_settings = {
-        # general app settings:
-        'app_title': config_data['app_ui'].get('title', 'App Title'),
-        'title_emoji': config_data['app_ui'].get('title_emoji', 'question'),
-        'subheader': config_data['app_ui'].get('subheader', 'How can I help you?'),
-        # role specific:
-        'button_phrase': config_data['role_contexts'][selected_role].get('button_phrase', 'Enter'),
-        'prompt_placeholder': config_data['role_contexts'][selected_role].get('prompt_placeholder',
-                                                                              'Enter your prompt...')
+        # main app settings:
+        'app_title': config_data['app_ui']['main'].get('title', 'App Title'),
+        'title_emoji': config_data['app_ui']['main'].get('title_emoji', 'question'),
+        'subheader': config_data['app_ui']['main'].get('subheader', 'How can I help you?'),
+
+        # prompt/box controls:
+        'prompt_box': config_data['app_ui']['prompt']['prompt_box'],
+        'response_button': config_data['app_ui']['prompt']['response_button'],
+        'extra_response_toggle': config_data['app_ui']['prompt']['extra_response_toggle'],
+        'allow_null_prompt': config_data['app_ui']['prompt']['allow_null_prompt'],
+
+        # Sidebar Controls
+        'api_key': config_data['app_ui']['sidebar']['api_key'],
+        'adv_settings': config_data['app_ui']['sidebar']['adv_settings'],
+        'role_context': config_data['app_ui']['sidebar']['role_context'],
+
+        'all_role_contexts': config_data['role_contexts']
     }
     return config_settings
 
@@ -40,14 +51,14 @@ def setup_app_config(path_web, path_local):
     else:
         config_path = path_local
         api_key = os.environ["OPENAI_API_KEY"]
-
+        
     chat_engine = gpt.ChatEngine(config_path=config_path, stream=True, api_key=api_key)
     config_data = chat_engine.CONFIG
 
     return chat_engine, config_data
 
 
-def extra_lesson(prompt_1, role_context, response_1):
+def extra_response(prompt_1, role_context, response_1):
     with st.spinner('Next lesson...'):
         # get second instruction set for continuing previous conversation
         role_context = config_data['role_contexts'].get(role_context, {})
@@ -59,74 +70,85 @@ def extra_lesson(prompt_1, role_context, response_1):
 
 
 # Function to set up the main UI
-def setup_main_area(config_settings):
-    st.title(f":{config_settings['title_emoji']}: {config_settings['app_title']}")
-    st.subheader(config_settings['subheader'])
+def setup_app_controls(app_config):
+    st.title(f":{app_config['title_emoji']}: {app_config['app_title']}")
+    st.subheader(app_config['subheader'])
+
     prompt_box = st.empty()
 
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        answer_button = st.button(
-            f":blue[{config_settings['button_phrase']}] :sparkles:",
-            help="Generate an answer"
+        response_button = st.button(
+            f":blue[Get an Answer] :sparkles:",
+            help="Generate an answer",
+            disabled=not app_config['response_button']  # inverse of enabled status
         )
+
     with col2:
-        extra_lesson_toggle = st.toggle(
+        extra_response_toggle = st.toggle(
             "Extra Details",
             help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
-            key='extra_lesson',
-            value=False
+            key='extra_response',
+            value=False,
+            disabled=not app_config['extra_response_toggle']
         )
 
     chat_engine.user_prompt = prompt_box.text_area(
         label="How can I help ?",
         label_visibility="hidden",
         height=185,
-        placeholder=config_settings['prompt_placeholder'],
+        placeholder=app_config['all_role_contexts'][chat_engine.role_context]['prompt_placeholder'],
         key='prompt'
     ) or None
-
-    return chat_engine.user_prompt, extra_lesson_toggle, answer_button
+    
+    return chat_engine.user_prompt, extra_response_toggle, response_button
 
 
 # Function to set up the sidebar
-def setup_sidebar(chat_engine):
-
-    chat_engine.api_key = st.sidebar.text_input(
-        "OpenAI API Key :key:", type="password"
+def setup_sidebar(chat_engine, app_config):
+    logo = st.sidebar.empty()
+    api_key = st.sidebar.empty()
+    adv_settings = st.sidebar.empty()
+    role_context = st.sidebar.empty()
+    logo.image("ct_logo.png")
+    chat_engine.api_key = api_key.text_input(
+        label="OpenAI API Key :key:",
+        type="password",
+        value=''
     ) or chat_engine.api_key
 
     # Advanced settings expander
-    adv_settings = st.sidebar.expander(
-        label="Advanced Settings :gear:",
-        expanded=False
-    )
-
-    # Add Open API key and Advanced Settings widgets to the expander
-    with adv_settings:
-        chat_engine.model = st.selectbox(
-            "Model",
-            ["gpt-3.5-turbo", "gpt-4"],
-            index=1,  # MOST RECENT CHANGE
-            help="Some API keys are not authorized for use with gpt-4"
+    if app_config['adv_settings']:
+        adv_settings = adv_settings.expander(
+            label="Advanced Settings :gear:",
+            expanded=False
         )
-        chat_engine.temperature = st.slider(
-            "Temperature", 0.0, 2.0, 1.0, 0.1,
-            help="""
-            temperature controls the "creativity" of the response.
-            A higher value results in more diverse and unexpected 
-            responses, while lower values result in more conservative
-            and predictable responses.
-            """
-        )  # MOST RECENT CHANGE (removed rounding)
+
+        # Add Open API key and Advanced Settings widgets to the expander
+        with adv_settings:
+            chat_engine.model = st.selectbox(
+                "Model",
+                ["gpt-3.5-turbo", "gpt-4"],
+                index=1,  # MOST RECENT CHANGE
+                help="Some API keys are not authorized for use with gpt-4"
+            )
+            chat_engine.temperature = st.slider(
+                "Temperature", 0.0, 2.0, 1.0, 0.1,
+                help="""
+                temperature controls the "creativity" of the response.
+                A higher value results in more diverse and unexpected 
+                responses, while lower values result in more conservative
+                and predictable responses.
+                """
+            )
 
     roles = {
         settings.get('display_name', role): role
         for role, settings in config_data['role_contexts'].items()
         if settings.get('enable', False)
     }
-    selected_friendly_role = st.sidebar.selectbox('Prompt Context :memo:', roles.keys())
+    selected_friendly_role = role_context.selectbox('Prompt Context :memo:', roles.keys())
     selected_role = roles[selected_friendly_role]
 
     helper_prompt = ''
@@ -176,28 +198,30 @@ def handle_code_convert():
 
     return helper_prompt
 
+# Function to handle the response
+def handle_response(chat_engine,
+                    selected_friendly_role,
+                    app_config,
+                    extra_response_toggle,
+                    helper_prompt='',
+                    prompt=None):
 
-# Handle the inputted prompt and response
-def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt):
-
-    allow_download = not extra_lesson_toggle
+    allow_download = not extra_response_toggle
     all_response_content = []
-    # Perform check for prompt, if none, create random prompt
-    if chat_engine.user_prompt is None:
-        if config_data['allow_null_prompt']:
+
+    if prompt is None:
+        if app_config['allow_null_prompt']:
             st.info("Not sure what to ask? Creating a random lesson!", icon="🎲")
-            subkeys = list(config_data['random_prompts'].keys())
-            random_subkey = random.choice(subkeys)
+            sub_keys = list(config_data['random_prompts'].keys())
+            random_subkey = random.choice(sub_keys)
             # create prompt with random choice and append keyword for clarity
-            chat_engine.user_prompt = (
+            prompt = (
                 f"'{random.choice(config_data['random_prompts'][random_subkey])}' \
                     {config_data['random_prompts'][random_subkey][0]}"
             )
             chat_engine.role_context = 'random'
         else:
             st.info('Please provide a prompt...', icon='😑')
-    else:
-        chat_engine.user_prompt = f"{helper_prompt}{chat_engine.user_prompt}"
 
     try:
         if chat_engine.model == 'gpt-4':
@@ -208,38 +232,70 @@ def handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, he
         displayed_response = display_response(
             response,
             assistant=allow_download,
-            all_response_content=all_response_content,
             role_name=selected_friendly_role,
             streaming=chat_engine.stream
         )
-        # Perform a followup API with prompt and assistant messages
-        if extra_lesson_toggle:
+
+        if extra_response_toggle:
             chat_engine.stream = False
-            prompt_messages = extra_lesson(chat_engine.user_prompt, chat_engine.role_context, displayed_response)
-            extra_response = generate_response(chat_engine, prompt_messages)
+            prompt_messages = extra_response(prompt, chat_engine.role_context, response_1)
+            response_2 = generate_response(chat_engine, prompt_messages)
             display_response(
-                extra_response,
+                response_2,
                 assistant=True,
-                all_response_content=all_response_content,
                 role_name=selected_friendly_role,
                 streaming=chat_engine.stream
             )
-        st.toast(':teacher: All replies ready!', icon='✅')
-    except Exception as e:
-        st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
 
+        st.toast(':teacher: All replies ready!', icon='✅')
+        return response_1, prompt
+
+    except Exception as e:
+        raise e
 
 # Main function
 def main():
-    # save the selected AI context, role name, and any helper prompts
-    chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine)
     # load appropriate settings based on selected role
-    config_settings = load_app_config(chat_engine.role_context)
+    config_settings = load_app_config()
+
+    # save the selected AI context, role name, and any helper prompts
+    chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine, config_settings)
     # save the user's prompt, toggle & answer button state
-    chat_engine.user_prompt, extra_lesson_toggle, answer_button = setup_main_area(config_settings)
-    # if answer button is clicked, initiate the OpenAI response
-    if answer_button:
-        handle_response(chat_engine, extra_lesson_toggle, selected_friendly_role, helper_prompt)
+    chat_engine.user_prompt, extra_response_toggle, response_button = setup_app_controls(config_settings)
+
+    # Save currently selected context
+    context = chat_engine.role_context
+    # Initialize chat history
+    if context not in st.session_state:
+        st.session_state.setdefault(context, {}).setdefault('messages', [])
+
+    # Display chat history, alternating user prompt and response
+    for i, message in enumerate(st.session_state[context]['messages']):
+        if i % 2:
+            st.chat_message('ai', avatar='ct_logo.png').markdown(message)
+        else:
+            st.chat_message('user').markdown(message)
+    # Initiate the OpenAI response upon button press
+    if response_button:
+        try:
+            response, prompt = handle_response(chat_engine, selected_friendly_role,
+                                       config_settings, extra_response_toggle,
+                                       helper_prompt, prompt=chat_engine.user_prompt)
+            st.session_state[context]['messages'].append(prompt)
+            st.session_state[context]['messages'].append(response)
+        except Exception as e:
+            st.error(f"There was an error handling your question!\n\n{e}", icon='🚨')
+
+    # Store the prompt and the response in a session_state list
+    # for use in chatting function
+    if chat_prompt := st.chat_input(placeholder="Any questions?"):
+        st.session_state[context]['messages'].append(chat_prompt)
+
+        response, _ = handle_response(chat_engine, selected_friendly_role,
+                                   config_settings, extra_response_toggle,
+                                   prompt=st.session_state[context]['messages'])
+
+        st.session_state[context]['messages'].append(response)
 
 
 if __name__ == '__main__':
