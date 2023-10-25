@@ -4,7 +4,6 @@ import random
 from web_helpers import generate_response, display_response
 import gpt_utils as gpt
 
-
 # set main page configuration
 page_title = "Code Tutor - Learn Code"
 # use shortcodes for icons
@@ -51,12 +50,12 @@ def setup_app_config(path_web, path_local):
     else:
         config_path = path_local
         api_key = os.environ["OPENAI_API_KEY"]
-        
+
     chat_engine = gpt.ChatEngine(stream=True, api_key=api_key, config_path=config_path)
     config_data = chat_engine.CONFIG
-    
+
     return chat_engine, config_data
-  
+
 
 def extra_response(prompt_1, role_context, response_1):
     with st.spinner('Next lesson...'):
@@ -101,7 +100,7 @@ def setup_app_controls(app_config):
         placeholder=app_config['all_role_contexts'][chat_engine.role_context]['prompt_placeholder'],
         key='prompt'
     ) or None
-    
+
     return chat_engine.user_prompt, extra_response_toggle, response_button
 
 
@@ -117,7 +116,7 @@ def setup_sidebar(chat_engine, app_config):
         type="password",
         value=''
     ) or chat_engine.api_key
-    
+
     # Advanced settings expander
     if app_config['adv_settings']:
         adv_settings = adv_settings.expander(
@@ -156,7 +155,7 @@ def setup_sidebar(chat_engine, app_config):
     # adjust prompt or other parameters based on selected role context
     if selected_role == 'code_convert':
         helper_prompt = handle_code_convert()
-                
+
     return selected_role, selected_friendly_role, helper_prompt
 
 
@@ -168,11 +167,11 @@ def handle_code_convert():
     }
     convert_options = convert_settings['languages'] + convert_settings['file_formats']
     selected_language = st.sidebar.selectbox(
-            "Convert to:", 
-            convert_options,
-            key='language',
-            format_func=lambda x: f"{x} (file format)" if x in convert_settings['file_formats'] else x
-        )
+        "Convert to:",
+        convert_options,
+        key='language',
+        format_func=lambda x: f"{x} (file format)" if x in convert_settings['file_formats'] else x
+    )
     new_language = selected_language.lower().replace('-', '')
 
     helper_prompt = f"to {new_language}: "
@@ -194,7 +193,6 @@ def handle_response(chat_engine,
                     extra_response_toggle,
                     helper_prompt='',
                     prompt=None):
-
     allow_download = not extra_response_toggle
     all_response_content = []
 
@@ -270,8 +268,8 @@ def main():
     if response_button:
         try:
             response, prompt = handle_response(chat_engine, selected_friendly_role,
-                                       config_settings, extra_response_toggle,
-                                       helper_prompt, prompt=chat_engine.user_prompt)
+                                               config_settings, extra_response_toggle,
+                                               helper_prompt, prompt=chat_engine.user_prompt)
             st.session_state[context]['messages'].append(prompt)
             st.session_state[context]['messages'].append(response)
         except Exception as e:
@@ -279,14 +277,15 @@ def main():
 
     # Store the prompt and the response in a session_state list
     # for use in chatting function
-    if chat_prompt := st.chat_input(placeholder="Any questions?"):
-        st.session_state[context]['messages'].append(chat_prompt)
+    if len(st.session_state[context]['messages']) > 1:
+        if chat_prompt := st.chat_input(placeholder="Any questions?"):
+            st.session_state[context]['messages'].append(chat_prompt)
 
-        response, _ = handle_response(chat_engine, selected_friendly_role,
-                                   config_settings, extra_response_toggle,
-                                   prompt=st.session_state[context]['messages'])
+            response, _ = handle_response(chat_engine, selected_friendly_role,
+                                          config_settings, extra_response_toggle,
+                                          prompt=st.session_state[context]['messages'])
 
-        st.session_state[context]['messages'].append(response)
+            st.session_state[context]['messages'].append(response)
 
 
 if __name__ == '__main__':
