@@ -135,6 +135,18 @@ def setup_sidebar(chat_engine):
     if selected_role == 'code_convert':
         helper_prompt = handle_code_convert()
 
+    st.sidebar.divider()
+    disclaimer = st.sidebar.container()
+    disclaimer.info("""
+    The content provided on this platform is generated using 
+    artificial intelligence (AI) techniques. AI-generated 
+    content is subject to potential errors, biases, and inaccuracies inherent 
+    to automated systems. Users are advised to exercise discretion and 
+    critically evaluate the content before relying on it for decision-making, 
+    coding, or any other purpose. Official OpenAI terms and policies can be
+    read here: https://openai.com/policies
+    """, icon="ℹ️")
+
     return selected_role, selected_friendly_role, helper_prompt
 
 
