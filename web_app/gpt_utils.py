@@ -41,6 +41,7 @@ class ChatEngine:
     def __init__(
             self,
             role_context=None,
+            system_role=None,
             temperature=1,
             model="gpt-3.5-turbo",
             stream=False,
@@ -51,13 +52,16 @@ class ChatEngine:
 
         # Parameters
         ----------
-            role_context (str, optional): Operational context for GPT. This directly control \
-                what is sent to the GPT model in addition to the user inputted prompt. \
-                    Use the `get_role_contexts()` method to view the available roles. \
-                        Defaults to 'general'.
+            role_context (str, optional): Operational context for GPT. This directly controls
+            what information is sent to the GPT model in addition to the user's prompt.
+            Use the `get_role_contexts()` method to view the available roles. Defaults to 'general'.
+
             comment_level (str, optional): Level of comment verbosity. Defaults to 'normal'.
+
             explain_level (str, optional): Level of explanation verbosity. Defaults to 'concise'.
+
             temperature (float, optional): Controls randomness in output. Defaults to 0.
+
             model (str, optional): The GPT model name to use. Defaults to "gpt-3.5-turbo".
         """
         if config_path:
@@ -65,6 +69,9 @@ class ChatEngine:
                 self.CONFIG = yaml.safe_load(f)
         else:
             self.CONFIG = {}
+
+        # Set system role
+        self.system_role = system_role or "You're a helpful assistant who answers questions."
 
         # Set up API access
         self.api_key = api_key
@@ -214,7 +221,7 @@ class ChatEngine:
 
         default_role_instructions = self.CONFIG.get('role_contexts', {}).get('defaults', {}).get('instruct', '')
 
-        default_system_role = self.CONFIG.get('role_contexts', {}).get('defaults', {}).get('system_role', "You're a helpful assistant.")
+        default_system_role = self.CONFIG.get('role_contexts', {}).get('defaults', {}).get('system_role', self.system_role)
 
         documentation = self.CONFIG.get('role_contexts', {}).get(self.role_context, {}).get('documentation', default_documentation)
 

@@ -9,6 +9,8 @@ page_title = "Code Tutor - Learn Code"
 # use shortcodes for icons
 # see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
 page_icon = "teacher"
+ai_avatar = "ct_logo_head.png"
+page_logo = "ct_logo.png"
 st.set_page_config(
     page_title=page_title,
     page_icon=page_icon,
@@ -70,7 +72,7 @@ def extra_response(prompt_1, role_context, response_1):
 
 # Function to set up the main UI
 def setup_app_controls(app_config):
-    st.title(f":{app_config['title_emoji']}: {app_config['app_title']}")
+    st.title(f":{app_config['title_emoji']}: :blue[{app_config['app_title']}]")
     st.subheader(app_config['subheader'])
 
     prompt_box = st.empty()
@@ -110,7 +112,7 @@ def setup_sidebar(chat_engine, app_config):
     api_key = st.sidebar.empty()
     adv_settings = st.sidebar.empty()
     role_context = st.sidebar.empty()
-    logo.image("ct_logo.png")
+    logo.image(page_logo)
     chat_engine.api_key = api_key.text_input(
         label="OpenAI API Key :key:",
         type="password",
@@ -129,8 +131,8 @@ def setup_sidebar(chat_engine, app_config):
             chat_engine.model = st.selectbox(
                 "Model",
                 ["gpt-3.5-turbo", "gpt-4"],
-                index=1,  # MOST RECENT CHANGE
-                help="Some API keys are not authorized for use with gpt-4"
+                index=0,
+                help="GPT-3: fast, streamlined responses | GPT-4: slower response, high accurate and detail, especially with code."
             )
             chat_engine.temperature = st.slider(
                 "Temperature", 0.0, 2.0, 1.0, 0.1,
@@ -150,11 +152,13 @@ def setup_sidebar(chat_engine, app_config):
     selected_friendly_role = role_context.selectbox('Prompt Context :memo:', roles.keys())
     selected_role = roles[selected_friendly_role]
 
-    helper_prompt = ''
-
-    # adjust prompt or other parameters based on selected role context
+    # perform actions based on selected role context
     if selected_role == 'code_convert':
-        helper_prompt = handle_code_convert()
+        if chat_engine.model != "gpt-4":
+            st.sidebar.warning("The 'GPT-4' model is highly recommended for code conversion", icon="⚠️")
+        # Save code_convert system role and pass to handling function
+        code_convert_role = config_data['role_contexts']['code_convert']['system_role']
+        handle_code_convert(code_convert_role)
 
     st.sidebar.divider()
     disclaimer = st.sidebar.container()
@@ -168,11 +172,11 @@ def setup_sidebar(chat_engine, app_config):
     read here: https://openai.com/policies
     """, icon="ℹ️")
 
-    return selected_role, selected_friendly_role, helper_prompt
+    return selected_role, selected_friendly_role
 
 
 # Function to handle code_convert settings
-def handle_code_convert():
+def handle_code_convert(system_role):
     convert_settings = {
         'languages': config_data['role_contexts']['code_convert'].get('languages', []),
         'file_formats': config_data['role_contexts']['code_convert'].get('file_formats', []),
@@ -186,16 +190,15 @@ def handle_code_convert():
     )
     new_language = selected_language.lower().replace('-', '')
 
-    helper_prompt = f"to {new_language}: "
-
     # handle language specific instructions to append to main prompt
     # these additional instructions may eventually be added to the YAML config
     if new_language == 'sql':
-        helper_prompt = "If appropriate, use sub-queries, window functions, " \
-                        "etc. to make it efficient and concise. Natural language " \
-                        + helper_prompt
-
-    return helper_prompt
+        chat_engine.system_role = system_role.format(
+            f"{new_language} from natural language. If appropriate, use sub-queries, window "
+            f"functions, pivot tables, etc. to make it efficient and concise"
+        )
+    else:
+        chat_engine.system_role = system_role.format(new_language)
 
 
 # Function to handle the response
@@ -203,7 +206,6 @@ def handle_response(chat_engine,
                     selected_friendly_role,
                     app_config,
                     extra_response_toggle,
-                    helper_prompt='',
                     prompt=None):
     allow_download = not extra_response_toggle
     all_response_content = []
@@ -226,7 +228,7 @@ def handle_response(chat_engine,
         if chat_engine.model == 'gpt-4':
             st.toast('Be patient. Responses from GPT-4 can be slower...', icon="⏳")
 
-        response = generate_response(chat_engine, prompt)
+        response = generate_response(chat_engine, prompt, chat_engine.role_context)
 
         response_1 = display_response(
             response,
@@ -259,8 +261,8 @@ def main():
     # load appropriate settings based on selected role
     config_settings = load_app_config()
 
-    # save the selected AI context, role name, and any helper prompts
-    chat_engine.role_context, selected_friendly_role, helper_prompt = setup_sidebar(chat_engine, config_settings)
+    # save the selected AI context, role name
+    chat_engine.role_context, selected_friendly_role = setup_sidebar(chat_engine, config_settings)
     # save the user's prompt, toggle & answer button state
     chat_engine.user_prompt, extra_response_toggle, response_button = setup_app_controls(config_settings)
 
@@ -273,7 +275,7 @@ def main():
     # Display chat history, alternating user prompt and response
     for i, message in enumerate(st.session_state[context]['messages']):
         if i % 2:
-            st.chat_message('ai', avatar='ct_logo.png').markdown(message)
+            st.chat_message('ai', avatar=ai_avatar).markdown(message)
         else:
             st.chat_message('user').markdown(message)
     # Initiate the OpenAI response upon button press
@@ -281,7 +283,7 @@ def main():
         try:
             response, prompt = handle_response(chat_engine, selected_friendly_role,
                                                config_settings, extra_response_toggle,
-                                               helper_prompt, prompt=chat_engine.user_prompt)
+                                               prompt=chat_engine.user_prompt)
             st.session_state[context]['messages'].append(prompt)
             st.session_state[context]['messages'].append(response)
         except Exception as e:
@@ -291,6 +293,7 @@ def main():
     # for use in chatting function
     if len(st.session_state[context]['messages']) > 1:
         if chat_prompt := st.chat_input(placeholder="Any questions?"):
+            st.chat_message('user').markdown(chat_prompt)
             st.session_state[context]['messages'].append(chat_prompt)
 
             response, _ = handle_response(chat_engine, selected_friendly_role,

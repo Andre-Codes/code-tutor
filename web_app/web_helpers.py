@@ -1,15 +1,24 @@
 import streamlit as st
 
 
-def generate_response(app, prompt):
+ai_avatar = "ct_logo_head.png"
+
+def generate_response(app, prompt, role_context):
     if prompt is None:
         raise ValueError("No prompt provided.")
     with st.spinner('...thinking :thought_balloon:'):
         try:
-            return app.get_response(prompt=prompt, format_style='general')
+            # override system role with customized role
+            if role_context == 'code_convert':
+                response = app.get_response(prompt=prompt, system_role=app.system_role)
+                return response
+            else:
+                response = app.get_response(prompt=prompt)
+                return response
         except Exception as e:
             raise e
-            
+
+
 def handle_file_output(responses):
     all_response_content = []
     all_response_content.append(f"{responses} \n\n")
@@ -38,15 +47,16 @@ def display_response(response, assistant, role_name, streaming):
                 if content_chunk:
                     collected_responses.append(content_chunk)
                     response_content = ''.join(collected_responses)
-                    markdown_placeholder.markdown(f"{response_content}🖋️\n\n")
+                    # TODO: use st.chat_message('ai').markdown
+                    markdown_placeholder.chat_message('ai', avatar=ai_avatar).markdown(f"{response_content}🖋️\n\n")
             else:
-                markdown_placeholder.markdown(response_content)
+                markdown_placeholder.chat_message('ai', avatar=ai_avatar).markdown(response_content)
 
     else:
         response_content = response['choices'][0]['message']['content']
         markdown_placeholder.markdown(response_content)
         file_data = response_content
-        
+
     file_data = handle_file_output(response_content)  # not working with extra lesson
 
     if assistant:
