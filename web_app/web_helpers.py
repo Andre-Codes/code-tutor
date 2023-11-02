@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-ai_avatar = "/app/code-tutor/web_app/ct_logo_head.png"  # /app/code-tutor/web_app/
+ai_avatar = "ct_logo_head.png"  # /app/code-tutor/web_app/
 
 def generate_response(app, prompt, role_context):
     if prompt is None:
