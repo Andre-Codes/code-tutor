@@ -277,7 +277,7 @@ def main():
         if i % 2:
             st.chat_message('ai', avatar=ai_avatar).markdown(message)
         else:
-            st.chat_message('user').markdown(message)
+            st.chat_message('user').text(message)
     # Initiate the OpenAI response upon button press
     if response_button:
         try:
