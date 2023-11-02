@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-ai_avatar = "/app/code-tutor/web_app/ct_logo_head.png"
+ai_avatar = "ct_logo_head.png"  # /app/code-tutor/web_app/
 
 def generate_response(app, prompt, role_context):
     if prompt is None:
@@ -35,7 +35,7 @@ def create_download(response, role_name):
     )
 
 
-def display_response(response, assistant, role_name, streaming):
+def display_response(response, download, role_name, streaming):
     st.divider()
     markdown_placeholder = st.empty()
     collected_responses = []
@@ -59,7 +59,7 @@ def display_response(response, assistant, role_name, streaming):
 
     file_data = handle_file_output(response_content)  # not working with extra lesson
 
-    if assistant:
+    if download:
         create_download(file_data, role_name)
 
     return response_content

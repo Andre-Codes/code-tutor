@@ -9,8 +9,8 @@ page_title = "Code Tutor - Learn Code"
 # use shortcodes for icons
 # see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
 page_icon = "teacher"
-ai_avatar = "/app/code-tutor/web_app/ct_logo_head.png"
-page_logo = "/app/code-tutor/web_app/ct_logo.png"
+ai_avatar = "ct_logo_head.png"  # /app/code-tutor/web_app/
+page_logo = "ct_logo.png"
 st.set_page_config(
     page_title=page_title,
     page_icon=page_icon,
@@ -30,7 +30,6 @@ def load_app_config():
         # prompt/box controls:
         'prompt_box': config_data['app_ui']['prompt']['prompt_box'],
         'response_button': config_data['app_ui']['prompt']['response_button'],
-        'extra_response_toggle': config_data['app_ui']['prompt']['extra_response_toggle'],
         'allow_null_prompt': config_data['app_ui']['prompt']['allow_null_prompt'],
 
         # Sidebar Controls
@@ -59,17 +58,6 @@ def setup_app_config(path_web, path_local):
     return chat_engine, config_data
 
 
-def extra_response(prompt_1, role_context, response_1):
-    with st.spinner('Next lesson...'):
-        # get second instruction set for continuing previous conversation
-        role_context = config_data['role_contexts'].get(role_context, {})
-        default_instruction = 'Provide additional details.'
-        instruct_2 = role_context.get('instruct_2', default_instruction)
-        prompt_2 = instruct_2
-        messages = [prompt_1, response_1, prompt_2]
-        return messages
-
-
 # Function to set up the main UI
 def setup_app_controls(app_config):
     st.title(f":{app_config['title_emoji']}: :blue[{app_config['app_title']}]")
@@ -86,24 +74,22 @@ def setup_app_controls(app_config):
             disabled=not app_config['response_button']  # inverse of enabled status
         )
 
-    with col2:
-        extra_response_toggle = st.toggle(
-            "Extra Details",
-            help="Provide additional, detailed information. Toggle this _before_ getting an answer.",
-            key='extra_response',
-            value=False,
-            disabled=not app_config['extra_response_toggle']
-        )
-
     chat_engine.user_prompt = prompt_box.text_area(
-        label="How can I help ?",
-        label_visibility="hidden",
+        label="",
+        label_visibility="visible",
         height=185,
         placeholder=app_config['all_role_contexts'][chat_engine.role_context]['prompt_placeholder'],
-        key='prompt'
+        key='prompt',
+        help="""
+        Entering in a prompt/question here will always start a new lesson 
+        context. After conversing with Code Tutor, you can return here at 
+        any time to start a new lesson without removing any previous ones.
+        This allows you to create a long thread of multiple lesson contexts,
+        as well as compare different model and temp. values as you progress.
+        """
     ) or None
 
-    return chat_engine.user_prompt, extra_response_toggle, response_button
+    return chat_engine.user_prompt, response_button
 
 
 # Function to set up the sidebar
@@ -205,9 +191,8 @@ def handle_code_convert(system_role):
 def handle_response(chat_engine,
                     selected_friendly_role,
                     app_config,
-                    extra_response_toggle,
                     prompt=None):
-    allow_download = not extra_response_toggle
+
     all_response_content = []
 
     if prompt is None:
@@ -232,21 +217,10 @@ def handle_response(chat_engine,
 
         response_1 = display_response(
             response,
-            assistant=allow_download,
+            download=True,
             role_name=selected_friendly_role,
             streaming=chat_engine.stream
         )
-
-        if extra_response_toggle:
-            chat_engine.stream = False
-            prompt_messages = extra_response(prompt, chat_engine.role_context, response_1)
-            response_2 = generate_response(chat_engine, prompt_messages)
-            display_response(
-                response_2,
-                assistant=True,
-                role_name=selected_friendly_role,
-                streaming=chat_engine.stream
-            )
 
         st.toast(':teacher: All replies ready!', icon='✅')
 
@@ -264,7 +238,7 @@ def main():
     # save the selected AI context, role name
     chat_engine.role_context, selected_friendly_role = setup_sidebar(chat_engine, config_settings)
     # save the user's prompt, toggle & answer button state
-    chat_engine.user_prompt, extra_response_toggle, response_button = setup_app_controls(config_settings)
+    chat_engine.user_prompt, response_button = setup_app_controls(config_settings)
 
     # Save currently selected context
     context = chat_engine.role_context
@@ -282,8 +256,7 @@ def main():
     if response_button:
         try:
             response, prompt = handle_response(chat_engine, selected_friendly_role,
-                                               config_settings, extra_response_toggle,
-                                               prompt=chat_engine.user_prompt)
+                                               config_settings, prompt=chat_engine.user_prompt)
             st.session_state[context]['messages'].append(prompt)
             st.session_state[context]['messages'].append(response)
         except Exception as e:
@@ -297,8 +270,7 @@ def main():
             st.session_state[context]['messages'].append(chat_prompt)
 
             response, _ = handle_response(chat_engine, selected_friendly_role,
-                                          config_settings, extra_response_toggle,
-                                          prompt=st.session_state[context]['messages'])
+                                          config_settings,prompt=st.session_state[context]['messages'])
 
             st.session_state[context]['messages'].append(response)
 
