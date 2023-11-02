@@ -9,8 +9,8 @@ page_title = "Code Tutor - Learn Code"
 # use shortcodes for icons
 # see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
 page_icon = "teacher"
-ai_avatar = "ct_logo_head.png"  # /app/code-tutor/web_app/
-page_logo = "ct_logo.png"
+ai_avatar = "/app/code-tutor/web_app/ct_logo_head.png"  # /app/code-tutor/web_app/
+page_logo = "/app/code-tutor/web_app/ct_logo.png"
 st.set_page_config(
     page_title=page_title,
     page_icon=page_icon,
@@ -118,7 +118,11 @@ def setup_sidebar(chat_engine, app_config):
                 "Model",
                 ["gpt-3.5-turbo", "gpt-4"],
                 index=0,
-                help="GPT-3: fast, streamlined responses | GPT-4: slower response, high accurate and detail, especially with code."
+                help="""
+                GPT-3: very fast, streamlined responses, yet prone to mistakes.
+                 | GPT-4: slower response, yet better accuracy and attention 
+                 to detail, especially with code.
+                 """
             )
             chat_engine.temperature = st.slider(
                 "Temperature", 0.0, 2.0, 1.0, 0.1,
