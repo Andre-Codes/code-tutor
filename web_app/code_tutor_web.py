@@ -9,8 +9,8 @@ page_title = "Code Tutor - Learn Code"
 # use shortcodes for icons
 # see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
 page_icon = "teacher"
-ai_avatar = "ct_logo_head.png"
-page_logo = "ct_logo.png"
+ai_avatar = "/app/code-tutor/web_app/ct_logo_head.png"
+page_logo = "/app/code-tutor/web_app/ct_logo.png"
 st.set_page_config(
     page_title=page_title,
     page_icon=page_icon,
