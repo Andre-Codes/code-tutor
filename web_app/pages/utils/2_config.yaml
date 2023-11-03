@@ -1,0 +1,40 @@
+app_ui:
+    main:  # settings that control the main page configurations
+      page_title: "Code Tutor - Learn Code"
+      page_icon: "100" # use shortcodes (see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
+      title: "Challenge Center"
+      title_emoji: "100"
+      subheader: "What do you want to be tested on today?"
+    prompt:  # settings/controls related to the prompt and prompt area
+        prompt_box: True  # inverse is used to control the 'disabled' param
+        response_button: True
+        extra_response_toggle: True
+        allow_null_prompt: True
+    sidebar:
+        api_key: True
+        adv_settings: True  # additional settings for API call (model, temp)
+        role_context: False
+response_formats:
+    markdown:
+        instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Generate a concise descriptive title for the response. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. "
+        table_styles:
+            bullets: "Also format any table in the form of a bullet outline. The description for each param will be on a new line and indented"
+            pipes: "Also format any table using these instructions: To add a table use three or more hyphens (---) to create each column header and use pipes (|) to separate each column. For compatibility add a pipe on either end of the row"
+    code_convert:
+        instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting."
+    html:
+        instruct: "Respond in HTML format. Create a button (or multiple) at top linked to the API site or embeded direct URLs for the related modules and/or functions used. Use HTML tables as requested and format them with borders. Use other HTML features to make the page visually appealing and engaging. When displaying any image use related API documentation sources to find them."
+        css: "Put any code inside <pre><code> tag using the following CSS for styling: code  font-family: 'Fira Code' monospace; background-color: #282a36; color: #50fa7b; padding: 1px; border-radius: 3px; box-shadow: 0 2px 5px rgba(0 0 0 0.2);  pre  overflow: auto; background-color: #282a30; color: #f8f8f2; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0 0 0 0.2); "
+    json:
+        instruct: "Respond in valid JSON format."
+role_contexts:
+    defaults:
+        system_role: "You're a programming language expert and can teach the concepts like you're a professor."
+        instruct: "For the following code, API, library, or general coding question, respond with coding examples and provide detailed explanations, as well as break down any parameters and for API documentation."
+        documentation: "Do not acknowledge the request, simply answer it, and do not add extra comments. "
+    quiz:
+        enable: True
+        system_role: "You're a programming language professor. You provide Python coding quizzes by asking 10 multiple choice questions. You will always provide up to 4 choices (using letters as choice options) for the possible answer. Each question will be in a json field called question, the choices in list in a field called choices, the answer (i.e. 'A' or 'C') in a field called answer, only if code snippets are used, add a field called code to store them, and a brief lesson explaining the correct answer in field called explanation. All the questions will be in a list in a field called questions."
+        instruct: "You will ask all 10 questions at once. Always incorporate several code snippets. Ask questions specifically related to: "
+        display_name: "Pop Quiz!"
+        prompt_placeholder: "What do you want to be quizzed on today?"
