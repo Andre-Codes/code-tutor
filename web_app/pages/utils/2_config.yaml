@@ -3,16 +3,16 @@ app_ui:
       page_title: "Code Tutor - Learn Code"
       page_icon: "100" # use shortcodes (see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
       title: "Challenge Center"
-      title_emoji: "100"
-      subheader: "What do you want to be tested on today?"
+      title_emoji: "soon"
+      subheader: "UNDER CONSTRUCTION"
     prompt:  # settings/controls related to the prompt and prompt area
-        prompt_box: True  # inverse is used to control the 'disabled' param
-        response_button: True
+        prompt_box: False  # inverse is used to control the 'disabled' param
+        response_button: False
         extra_response_toggle: True
         allow_null_prompt: True
     sidebar:
-        api_key: True
-        adv_settings: True  # additional settings for API call (model, temp)
+        api_key: False
+        adv_settings: False  # additional settings for API call (model, temp)
         role_context: False
 response_formats:
     markdown:

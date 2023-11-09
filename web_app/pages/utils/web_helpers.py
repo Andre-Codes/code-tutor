@@ -1,29 +1,30 @@
 import streamlit as st
 import json
 
+
 ai_avatar = "pages/images/ct_logo_head.png"  # /app/code-tutor/web_app/
 
 
 def generate_response(app, prompt, role_context):
     if prompt is None:
         raise ValueError("No prompt provided.")
+    param_configs = {
+        'code_convert': {'prompt': prompt, 'system_role': app.system_role},
+        'quiz': {'prompt': prompt, 'format_style': 'json'}
+    }
     with st.spinner('...thinking :thought_balloon:'):
         try:
-            # override system role with customized role
-            if role_context == 'code_convert':
-                response = app.get_response(prompt=prompt, system_role=app.system_role)
-            elif role_context == 'quiz':
-                response = app.get_response(prompt=prompt, format_style='json')
-            else:
-                response = app.get_response(prompt=prompt)
+            # Use the dictionary to get the appropriate parameters
+            params = param_configs.get(role_context, {'prompt': prompt})
+            # Call the get_response method with the unpacked parameters
+            response = app.get_response(**params)
             return response
         except Exception as e:
             raise e
 
 
 def handle_file_output(responses):
-    all_response_content = []
-    all_response_content.append(f"{responses} \n\n")
+    all_response_content = [f"{responses} \n\n"]
     file_data = ''.join(all_response_content)
     return file_data
 
@@ -49,7 +50,6 @@ def display_response(response, download, role_name, streaming):
                 if content_chunk:
                     collected_responses.append(content_chunk)
                     response_content = ''.join(collected_responses)
-                    # TODO: use st.chat_message('ai').markdown
                     markdown_placeholder.chat_message('ai', avatar=ai_avatar).markdown(f"{response_content}🖋️\n\n")
             else:
                 markdown_placeholder.chat_message('ai', avatar=ai_avatar).markdown(response_content)

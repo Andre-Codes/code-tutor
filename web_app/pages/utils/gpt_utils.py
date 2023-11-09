@@ -291,7 +291,6 @@ class ChatEngine:
         elif response_type == 'image':
             prompt = self._handle_role_instructions(prompt)
             self._image_api_call(prompt)
-        print(self.response['choices'][0]['message']['content'])
         # Return finished response from OpenAI
         if not raw_output and not self.stream:
             if response_type == 'text':
