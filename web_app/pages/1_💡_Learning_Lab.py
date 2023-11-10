@@ -205,7 +205,7 @@ def handle_code_convert(system_role):
     if new_language == 'sql':
         chat_engine.system_role = system_role.format(
             f"{new_language} from natural language. If appropriate, use sub-queries, window "
-            f"functions, pivot tables, etc. to make it efficient and concise"
+            f"functions, with statements, pivot tables, etc. to make it efficient and concise"
         )
     else:
         chat_engine.system_role = system_role.format(new_language)

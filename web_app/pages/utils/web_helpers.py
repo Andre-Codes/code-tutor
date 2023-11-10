@@ -53,7 +53,7 @@ def display_response(response, streaming, download=True, role_name=None):
                 if content_chunk:
                     collected_responses.append(content_chunk)
                     response_content = ''.join(collected_responses)
-                    markdown_placeholder.chat_message('ai', avatar=ai_avatar).markdown(f"{response_content}🖋️\n\n")
+                    markdown_placeholder.chat_message('ai', avatar=ai_avatar).markdown(f"{response_content}\n\n")
             else:
                 markdown_placeholder.chat_message('ai', avatar=ai_avatar).markdown(response_content)
     elif role_name == 'quiz':
