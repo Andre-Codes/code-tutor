@@ -151,7 +151,6 @@ class ChatEngine:
             self.complete_prompt = prompt
 
     def _text_api_call(self, **kwargs):
-        print(self.__messages)
         if 'streaming' in kwargs:
             self.stream = kwargs['streaming']
         try:
@@ -179,7 +178,7 @@ class ChatEngine:
                     {
                         "role": "user",
                         "content": [
-                            {"type": "text", "text": "What python code is necessary to produce this visual?"},
+                            {"type": "text", "text": "What python code is necessary to produce this visualized data?"},
                             {
                                 "type": "image_url",
                                 "image_url": {
