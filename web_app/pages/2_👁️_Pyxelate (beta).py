@@ -30,6 +30,13 @@ def encode_image(image_file):
     return base64.b64encode(bytes_data).decode('utf-8')
 
 
+def clear_chat():
+    # Delete all the items in Session state
+    if 'vision' in st.session_state:
+        del st.session_state['vision']
+    if 'code_snippet' in st.session_state:
+        del st.session_state['code_snippet']
+
 def main():
     st.title("Visualization to Python")
     st.subheader("Convert an image to code")
@@ -44,6 +51,7 @@ def main():
     image_file = st.file_uploader(
         "Upload an image file",
         key='image_file',
+        on_change=clear_chat,
         help=("Images can be of any data visualization such as plots, charts, "
               "graphs, or dataframe-like tables.")
     )
@@ -65,8 +73,8 @@ def main():
        You're an expert in Python data visualizations. You will optimize,
        debug, and write efficient code for generating visualizations. The visuals
        may be dataframes, charts, graphs, etc. Always include a code snippet 
-       of the complete code in your responses. You only respond to coding 
-       and visualization questions.
+       of the complete code in your responses even if no changes were made.
+       You only respond to coding and visualization questions.
        """
 
     if image_file and len(st.session_state['vision']['messages']) < 1:
