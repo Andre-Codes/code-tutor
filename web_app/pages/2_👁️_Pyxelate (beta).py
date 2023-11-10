@@ -40,20 +40,25 @@ def main():
      *Always test the code before using in production*.
     """, icon='⚠️')
 
+    image_file = st.file_uploader(
+        "Upload an image file",
+        key='image_file',
+        help=("Images can be of any data visualization such as plots, charts, "
+              "graphs, or dataframe-like tables.")
+    )
     st.divider()
-
-    image_file = st.file_uploader("Upload an image file", key='image_file')
 
     # Initialize the session state for chat messages
     if 'vision' not in st.session_state:
         st.session_state.setdefault('vision', {}).setdefault('messages', [])
 
     # Display chat history, alternating user prompt and response
-    for i, message in enumerate(st.session_state['vision']['messages']):
-        if i % 2:
-            st.chat_message('ai', avatar=ai_avatar).markdown(message)
-        else:
-            st.chat_message('user').text(message)
+    if image_file:
+        for i, message in enumerate(st.session_state['vision']['messages']):
+            if i % 2:
+                st.chat_message('ai', avatar=ai_avatar).markdown(message)
+            else:
+                st.chat_message('user').text(message)
 
     system_role = """
        You're an expert in Python data visualizations. You will optimize,
@@ -72,8 +77,12 @@ def main():
         mime_to_extension = {
             'jpeg': 'jpg',
             'png': 'png',
-            # Add other mappings if necessary
+            'gif': 'gif',
+            'bmp': 'bmp',
+            'svg+xml': 'svg',
+            'webp': 'webp'
         }
+
         file_ext = mime_to_extension.get(file_ext, file_ext)
         # Getting the base64 string
         base64_image = encode_image(image_file)
@@ -82,15 +91,19 @@ def main():
         submit_button = st.button(":blue[Pythonize]", key='submit_button')
 
         if submit_button:
-            response_full = generate_response(chat_engine, prompt, "image_to_code")
-            st.divider()
-            # Extract python code from markdown
-            # pattern = r"```python\n(.*?)```"
-            # code_snippet = re.findall(pattern, response_full, re.DOTALL)
-            st.session_state['code_snippet'] = "code_snippet[0]"
-            if response_full:
-                st.markdown("#### Pythonized image:")
-                st.markdown(response_full)
+            try:
+                response_full = generate_response(chat_engine, prompt, "image_to_code")
+                st.divider()
+                # Extract python code from markdown
+                pattern = r"```python\n(.*?)```"
+                code_snippet = re.findall(pattern, response_full, re.DOTALL)
+                if code_snippet:
+                    st.session_state['code_snippet'] = code_snippet[0]
+                if response_full:
+                    st.markdown("#### Pythonized image:")
+                    st.markdown(response_full)
+            except Exception as e:
+                st.error(f"There was an error handling the image!\n\n{e}", icon='🚨')
 
         if 'code_snippet' in st.session_state:
             # Initialize the manual system role and prompt
@@ -103,8 +116,12 @@ def main():
                {st.session_state['code_snippet']}
                """
 
-            if optimize_button := st.button(":blue[Optimize & Explain]"):
-                st.divider()
+            if optimize_button := st.button(
+                    label=":blue[Optimize & Explain]",
+                    help="""
+                    The interpreted code may not be accurate. Press this button to
+                    submit this code for revision and a breakdown of how it works.
+                    """):
                 response = generate_response(
                     chat_engine,
                     prompt,
@@ -121,7 +138,7 @@ def main():
                 st.session_state['vision']['messages'].append(st.session_state['code_snippet'])
                 st.session_state['vision']['messages'].append(response)
 
-    if len(st.session_state['vision']['messages']) > 1:
+    if image_file and len(st.session_state['vision']['messages']) > 1:
         st.sidebar.markdown("#### Original Image")
         st.sidebar.image(image_file)
 
