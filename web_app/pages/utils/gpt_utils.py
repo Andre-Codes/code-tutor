@@ -132,7 +132,7 @@ class ChatEngine:
         if self.role_context != 'general':
             response_formats = self.CONFIG.get('response_formats', {})
             format_style = response_formats.get(self.format_style, {})
-            response_instruct = format_style.get('instruct', 'Respond in markdown formatting')
+            response_instruct = format_style.get('instruct', '')
 
             if self.format_style == 'markdown':
                 md_table_style = format_style.get('table_styles', {}).get(self.MD_TABLE_STYLE, '')
@@ -143,14 +143,17 @@ class ChatEngine:
                     css = format_style.get('css', '')
                     response_instruct += css
             # construct and save the final prompt to be sent with API call
-            self.complete_prompt = f"{response_instruct}; {prompt}"
+            self.complete_prompt = f"{response_instruct}{prompt}"
         else:
             # if no role contexts are available or none are selected
             # the complete prompt defaults to only what is passed
             # to the get_response method
             self.complete_prompt = prompt
 
-    def _text_api_call(self):
+    def _text_api_call(self, **kwargs):
+        print(self.__messages)
+        if 'streaming' in kwargs:
+            self.stream = kwargs['streaming']
         try:
             response = openai.ChatCompletion.create(
                 model=self.model,
@@ -158,6 +161,35 @@ class ChatEngine:
                 temperature=self.temperature,
                 top_p=0.2,
                 stream=self.stream
+            )
+            if response:
+                self.response = response
+        except openai.error.APIConnectionError as e:
+            raise e
+        except openai.error.ServiceUnavailableError as e:
+            raise e
+        except openai.error.APIError as e:
+            raise e
+
+    def _vision_api_call(self, prompt):
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4-vision-preview",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": "What python code is necessary to produce this visual?"},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": prompt,
+                                },
+                            },
+                        ],
+                    }
+                ],
+                max_tokens=700,
             )
             if response:
                 self.response = response
@@ -287,15 +319,19 @@ class ChatEngine:
         if response_type == 'text':
             self._build_prompt()
             self._build_messages(prompt, **kwargs)
-            self._text_api_call()
+            self._text_api_call(**kwargs)
         elif response_type == 'image':
             prompt = self._handle_role_instructions(prompt)
             self._image_api_call(prompt)
+        elif response_type == 'vision':
+            self._vision_api_call(prompt)
         # Return finished response from OpenAI
         if not raw_output and not self.stream:
             if response_type == 'text':
                 return self.response['choices'][0]['message']['content']
             elif response_type == 'image':
                 return self.response['data'][0]['url']
+            elif response_type == 'vision':
+                return self.response['choices'][0]['message']['content']
 
         return self.response
