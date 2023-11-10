@@ -5,17 +5,20 @@ import json
 ai_avatar = "pages/images/ct_logo_head.png"  # /app/code-tutor/web_app/
 
 
-def generate_response(app, prompt, role_context):
+def generate_response(app, prompt, role_context=None, **kwargs):
     if prompt is None:
         raise ValueError("No prompt provided.")
     param_configs = {
         'code_convert': {'prompt': prompt, 'system_role': app.system_role},
-        'quiz': {'prompt': prompt, 'format_style': 'json'}
+        'quiz': {'prompt': prompt, 'format_style': 'json'},
+        'image_to_code': {'prompt': prompt, 'response_type': 'vision', 'raw_output': False}
     }
     with st.spinner('...thinking :thought_balloon:'):
         try:
             # Use the dictionary to get the appropriate parameters
             params = param_configs.get(role_context, {'prompt': prompt})
+            # Update params with any additional kwargs provided
+            params.update(kwargs)
             # Call the get_response method with the unpacked parameters
             response = app.get_response(**params)
             return response
@@ -38,7 +41,7 @@ def create_download(response, role_name):
     )
 
 
-def display_response(response, download, role_name, streaming):
+def display_response(response, streaming, download=True, role_name=None):
     st.divider()
     markdown_placeholder = st.empty()
     collected_responses = []
