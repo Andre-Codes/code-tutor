@@ -1,7 +1,7 @@
 import streamlit as st
 
 # set main page configuration
-ai_avatar = "pages/images/ct_logo.png"
+ai_avatar = "/pages/images/ct_logo.png"
 page_title = "Code Tutor"
 # use shortcodes for icons
 # see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
