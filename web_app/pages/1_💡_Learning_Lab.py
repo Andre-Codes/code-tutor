@@ -232,7 +232,7 @@ def handle_response(chat_engine,
             chat_engine.role_context = 'random'
         else:
             st.info('Please provide a prompt...', icon='😑')
-    print(prompt)
+
     try:
         response = generate_response(chat_engine, prompt, chat_engine.role_context)
 
