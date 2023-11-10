@@ -20,7 +20,7 @@ update_message = """
  OpenAI recently announced major changes to their AI technology.
 One of them, which directly affects Code Tutor, is the addition of
 the **GPT-4 Turbo** model. See the *updates* section on the *welcome* page
-for more information and additional changes.
+for more information.
 """
 st.sidebar.success(update_message, icon="📣")
 
