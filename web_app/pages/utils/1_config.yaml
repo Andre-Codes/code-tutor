@@ -18,8 +18,8 @@ response_formats:
     markdown:
         instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Generate a concise descriptive title for the response. Embed URls to appropriate sources. Format multiple lines of code with: ```python SAMPLE_CODE``` and surround single line code with single backticks. "
         table_styles:
-            bullets: "Also format any table in the form of a bullet outline. The description for each param will be on a new line and indented"
-            pipes: "Also format any table using these instructions: To add a table use three or more hyphens (---) to create each column header and use pipes (|) to separate each column. For compatibility add a pipe on either end of the row"
+            bullets: "Also format any table in the form of a bullet outline. The description for each param will be on a new line and indented. "
+            pipes: "Also format any table using these instructions: To add a table use three or more hyphens (---) to create each column header and use pipes (|) to separate each column. For compatibility add a pipe on either end of the row. "
     code_convert:
         instruct: "Respond using markdown style formatting. Use the # character for headers with at least one space in between the header and the next text. Be sure to use markdown for code blocks using the correct name of the language to ensure proper syntax highlighting."
     html:
