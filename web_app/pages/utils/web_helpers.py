@@ -2,7 +2,7 @@ import streamlit as st
 import json
 
 
-ai_avatar = "/pages/images/ct_logo_head.png"  # /app/code-tutor/web_app/
+ai_avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo_head.png"  # /app/code-tutor/web_app/
 
 
 def generate_response(app, prompt, role_context=None, **kwargs):
