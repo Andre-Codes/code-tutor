@@ -1,4 +1,5 @@
 import openai
+from openai import OpenAI
 import yaml
 
 
@@ -64,6 +65,7 @@ class ChatEngine:
 
             model (str, optional): The GPT model name to use. Defaults to "gpt-3.5-turbo".
         """
+
         if config_path:
             with open(config_path, "r") as f:
                 self.CONFIG = yaml.safe_load(f)
@@ -154,7 +156,8 @@ class ChatEngine:
         if 'streaming' in kwargs:
             self.stream = kwargs['streaming']
         try:
-            response = openai.ChatCompletion.create(
+            client = OpenAI()
+            response = client.chat.completions.create(
                 model=self.model,
                 messages=self.__messages,
                 temperature=self.temperature,
@@ -163,16 +166,17 @@ class ChatEngine:
             )
             if response:
                 self.response = response
-        except openai.error.APIConnectionError as e:
+        except openai.APIConnectionError as e:
             raise e
-        except openai.error.ServiceUnavailableError as e:
+        except openai.RateLimitError as e:
             raise e
-        except openai.error.APIError as e:
+        except openai.APIError as e:
             raise e
 
     def _vision_api_call(self, prompt):
         try:
-            response = openai.ChatCompletion.create(
+            client = OpenAI()
+            response = client.chat.completions.create(
                 model="gpt-4-vision-preview",
                 messages=[
                     {
@@ -192,26 +196,27 @@ class ChatEngine:
             )
             if response:
                 self.response = response
-        except openai.error.APIConnectionError as e:
+        except openai.APIConnectionError as e:
             raise e
-        except openai.error.ServiceUnavailableError as e:
+        except openai.RateLimitError as e:
             raise e
-        except openai.error.APIError as e:
+        except openai.APIError as e:
             raise e
 
     def _image_api_call(self, prompt):
         try:
-            response = openai.Image.create(
+            client = OpenAI()
+            response = client.images.generate(
                 prompt=prompt,
                 n=1,
                 size="1024x1024"
             )
             self.response = response
-        except openai.error.APIConnectionError as e:
+        except openai.APIConnectionError as e:
             raise e
-        except openai.error.ServiceUnavailableError as e:
+        except openai.RateLimitError as e:
             raise e
-        except openai.error.APIError as e:
+        except openai.APIError as e:
             raise e
 
     def _build_messages(self, prompt, **kwargs):
@@ -327,10 +332,10 @@ class ChatEngine:
         # Return finished response from OpenAI
         if not raw_output and not self.stream:
             if response_type == 'text':
-                return self.response['choices'][0]['message']['content']
+                return self.response.choices[0].message.content
             elif response_type == 'image':
-                return self.response['data'][0]['url']
+                return self.response.data[0].url
             elif response_type == 'vision':
-                return self.response['choices'][0]['message']['content']
+                return self.response.choices[0].message.content
 
         return self.response

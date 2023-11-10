@@ -47,10 +47,10 @@ def setup_app_config(base_path_web, base_path_local, config_file, logo_name, ava
     base_path = base_path_web if os.path.exists(base_path_web) else base_path_local
     # Set up file paths uniformly
     # config_file_path = os.path.join(base_path, config_file) pages/utils/1_config.yaml
-    config_file_path = "/mount/src/code-tutor/web_app/pages/utils/1_config.yaml"
+    config_file_path = "/mount/src/code-tutor/web_app/pages/utils/1_config.yaml"  # /mount/src/code-tutor/web_app/
     # logo = os.path.join(base_path, logo_name)
     # avatar = os.path.join(base_path, avatar_name)
-    logo = avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo_head.png"
+    logo = avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo_head.png"  # /mount/src/code-tutor/web_app/
     # Get the API key based on the base path
     api_key = st.secrets["OPENAI_API_KEY"] if base_path == base_path_web else os.environ["OPENAI_API_KEY"]
     # Instantiate the ChatEngine

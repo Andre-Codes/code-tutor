@@ -2,7 +2,7 @@ import streamlit as st
 import json
 
 
-ai_avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo_head.png"  # /app/code-tutor/web_app/
+ai_avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo_head.png"  # /mount/src/code-tutor/web_app/
 
 
 def generate_response(app, prompt, role_context=None, **kwargs):
@@ -48,8 +48,8 @@ def display_response(response, streaming, download=True, role_name=None):
 
     if streaming:
         for chunk in response:
-            if chunk['choices'][0]['finish_reason'] != 'stop':
-                content_chunk = chunk['choices'][0]['delta']['content']
+            if chunk.choices[0].delta.content != 'None':
+                content_chunk = chunk.choices[0].delta.content
                 if content_chunk:
                     collected_responses.append(content_chunk)
                     response_content = ''.join(collected_responses)

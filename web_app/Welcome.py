@@ -1,7 +1,7 @@
 import streamlit as st
 
 # set main page configuration
-ai_avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo.png"
+ai_avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo.png"  # /mount/src/code-tutor/web_app/
 page_title = "Code Tutor"
 # use shortcodes for icons
 # see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
@@ -102,7 +102,34 @@ Our :green[**cross-page history**] functionality means that no matter where you 
 
 *We're always working to make Code Tutor more intuitive and responsive to 
 your needs. Dive in, explore the updates, and let's code smarter, not harder!*
+"""
+)
+st.divider()
 
+col9, col10, col11 = st.columns([2,5,1])
+# with col9:
+#     st.markdown("##### 🆕 ")
+with col10:
+    st.markdown(
+        """
+        ##### 🆕 New Experimental Room: **Pyxelate** 🆕
+        """
+    )
+# with col11:
+#     st.markdown("🆕")
+st.markdown(
+    """
+    This room uses :green[**AI vision**] 👁️ to turn an image into Python code!
+       
+    Try uploading an image of some type of **data visualization** such as a
+    line chart, scatter plot, and even dataframe-like tables. In response you
+    will receive the Python code needed to produce that visual. 🤯
+    """
+)
+
+st.divider()
+st.markdown(
+    """
 ##### Other Changes:
 - The :green[**GPT-4**] model is now the *default* model. This model is
 highly recommended for most code related tasks as it produces more accurate code
