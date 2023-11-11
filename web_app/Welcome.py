@@ -40,7 +40,7 @@ st.markdown(
     """
     \n
     ## What's on the syllabus?
-    ### [Coding Hub](https://codetutor.streamlit.app/Learning_Lab)
+    ### [Coding Hub](https://codetutor.streamlit.app/Coding_Hub)
     This room is your one-stop-shop for all things coding. Once inside,
     you will be able to select from the following options to create your
     :orange[**custom learning environment**].
@@ -63,7 +63,7 @@ st.markdown(
 st.write('##')
 
 st.markdown("""
-    ### [Pyxelate Lab](https://codetutor.streamlit.app/Pyxelate_(beta)) 
+    ### [Pyxelate Lab](https://codetutor.streamlit.app/Pyxelate_Lab_(beta)) 
     🆕 :orange[**New Experimental Room**] 🆕
     
     - This room uses :green[**AI vision**] to turn an 📈 image ➡️ into 🐍 Python code!
