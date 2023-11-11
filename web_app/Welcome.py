@@ -39,7 +39,11 @@ with col1:
 st.markdown(
     """
     \n
-    ### What's on the syllabus?
+    ## What's on the syllabus?
+    ### [Coding Hub](https://codetutor.streamlit.app/Learning_Lab)
+    This room is your one-stop-shop for all things coding. Once inside,
+    you will be able to select from the following options to create your
+    :orange[**custom learning environment**].
     ##### :books: API Analysis
     - In-depth analysis of documentation for libraries, modules, classes, and methods.
     - Simplified explanations and code examples to demonstrate usage.
@@ -53,9 +57,24 @@ st.markdown(
     - Translate natural language (lines of text) to SQL queries.
     ##### :wrench: PEP 8 Formatting
     - Standardize your code to conform with Python PEP 8.
-    \n
 """
 )
+# Insert whitespace
+st.write('##')
+
+st.markdown("""
+    ### [Pyxelate Lab](https://codetutor.streamlit.app/Pyxelate_(beta)) 
+    🆕 :orange[**New Experimental Room**] 🆕
+    
+    - This room uses :green[**AI vision**] to turn an 📈 image ➡️ into 🐍 Python code!
+    - Upload an image or enter a URL for some type of :green[**data visualization**];
+    e.g., line graph📉, bart chart📊, etc., or even dataframe-like tables.
+    - In response you will receive the Python code needed to reproduce that visual. 🤯
+
+""")
+
+# Insert whitespace
+st.write('#')
 
 col3, col4, col5 = st.columns([1,4,1])
 with col4:
@@ -72,7 +91,7 @@ with col7:
 
 st.markdown(
     """
-Hey Learners! We're thrilled to share the latest suite of updates. 
+Hey Learners! 
 Our mission to make your learning journey :orange[**smoother**] 
 and :orange[**smarter**] continues, and these new features are all about enhancing your experience.
 
@@ -106,26 +125,18 @@ your needs. Dive in, explore the updates, and let's code smarter, not harder!*
 )
 st.divider()
 
-col9, col10, col11 = st.columns([2,5,1])
-# with col9:
-#     st.markdown("##### 🆕 ")
-with col10:
-    st.markdown(
-        """
-        ##### 🆕 New Experimental Room: **Pyxelate** 🆕
-        """
-    )
+# col9, col10, col11 = st.columns([2,5,1])
+# # with col9:
+# #     st.markdown("##### 🆕 ")
+# with col10:
+#     st.markdown(
+#         """
+#
+#         """
+#     )
 # with col11:
 #     st.markdown("🆕")
-st.markdown(
-    """
-    This room uses :green[**AI vision**] 👁️ to turn an image into Python code!
-       
-    Try uploading an image of some type of **data visualization** such as a
-    line chart, scatter plot, and even dataframe-like tables. In response you
-    will receive the Python code needed to produce that visual. 🤯
-    """
-)
+
 
 st.divider()
 st.markdown(

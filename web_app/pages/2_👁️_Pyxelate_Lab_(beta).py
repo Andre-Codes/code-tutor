@@ -6,6 +6,7 @@ import pages.utils.gpt_utils as gpt
 from pages.utils.web_helpers import generate_response, display_response
 
 
+@st.cache_data
 def setup_app_config(base_path_web, base_path_local, config_file, logo_name, avatar_name):
     # Determine the base path depending on what exists
     base_path = base_path_web if os.path.exists(base_path_web) else base_path_local
@@ -31,11 +32,12 @@ def encode_image(image_file):
 
 
 def clear_chat():
-    # Delete all the items in Session state
+    # Delete all generated image related items in Session state
     if 'vision' in st.session_state:
         del st.session_state['vision']
     if 'code_snippet' in st.session_state:
         del st.session_state['code_snippet']
+
 
 def main():
     st.title("Visualization to Python")
@@ -49,20 +51,29 @@ def main():
     """, icon='⚠️')
 
     image_file = st.file_uploader(
-        "Upload an image file",
+        label="Upload an image file (PNG, JPG, WEBP, or GIF)",
         key='image_file',
         on_change=clear_chat,
         help=("Images can be of any data visualization such as plots, charts, "
               "graphs, or dataframe-like tables.")
     )
+    image_url = st.text_input(
+        label="Or enter an image URL",
+        key='image_url',
+        on_change=clear_chat,
+        help=("URL to any data visualization such as plots, charts, "
+              "graphs, or dataframe-like tables.")
+    )
     st.divider()
 
-    # Initialize the session state for chat messages
+    # Initialize the session state for images and chat
     if 'vision' not in st.session_state:
         st.session_state.setdefault('vision', {}).setdefault('messages', [])
+    if 'saved_image' not in st.session_state:
+        st.session_state.saved_image = None
 
     # Display chat history, alternating user prompt and response
-    if image_file:
+    if st.session_state.saved_image:
         for i, message in enumerate(st.session_state['vision']['messages']):
             if i % 2:
                 st.chat_message('ai', avatar=ai_avatar).markdown(message)
@@ -73,54 +84,66 @@ def main():
        You're an expert in Python data visualizations. You will optimize,
        debug, and write efficient code for generating visualizations. The visuals
        may be dataframes, charts, graphs, etc. Always include a code snippet 
-       of the complete code in your responses even if no changes were made.
+       of the complete code in your responses even if no changes were made. 
        You only respond to coding and visualization questions.
        """
 
-    if image_file and len(st.session_state['vision']['messages']) < 1:
-        st.markdown("#### Converting the following image to code:")
-        st.image(image_file)
-        file_ext = image_file.type.split('/')[1]
-        # MIME types don't always map directly to file extensions (e.g., 'jpeg' vs. 'jpg')
-        # So, you might need a simple mapping to correct these cases
-        mime_to_extension = {
-            'jpeg': 'jpg',
-            'png': 'png',
-            'gif': 'gif',
-            'bmp': 'bmp',
-            'svg+xml': 'svg',
-            'webp': 'webp'
-        }
+    if len(st.session_state['vision']['messages']) < 1:
+        if image_file:
+            # Save the uploaded image to session state
+            st.session_state.saved_image = image_file
+            # Display the image file
+            st.image(image_file)
+            # Extract file extension
+            file_ext = image_file.type.split('/')[1]
+            # MIME types to file ext. mapping
+            mime_to_extension = {
+                'jpeg': 'jpg',
+                'png': 'png',
+                'gif': 'gif',
+                'bmp': 'bmp',
+                'svg+xml': 'svg',
+                'webp': 'webp'
+            }
+            # Get the MIME type from the type to ext. dict
+            file_ext = mime_to_extension.get(file_ext, file_ext)
+            # Getting the base64 string
+            base64_image = encode_image(image_file)
+            prompt = f"data:image/{file_ext};base64,{base64_image}"
 
-        file_ext = mime_to_extension.get(file_ext, file_ext)
-        # Getting the base64 string
-        base64_image = encode_image(image_file)
-        prompt = f"data:image/{file_ext};base64,{base64_image}"
+        if image_url:
+            # Save the uploaded image to session state
+            st.session_state.saved_image = image_url
+            # Display the image from URL
+            st.image(image_url)
+            prompt = image_url
 
-        submit_button = st.button(":blue[Pythonize]", key='submit_button')
-
-        if submit_button:
-            try:
-                response_full = generate_response(chat_engine, prompt, "image_to_code")
-                st.divider()
-                # Extract python code from markdown
-                pattern = r"```python\n(.*?)```"
-                code_snippet = re.findall(pattern, response_full, re.DOTALL)
-                if code_snippet:
-                    st.session_state['code_snippet'] = code_snippet[0]
-                if response_full:
-                    st.markdown("#### Pythonized image:")
-                    st.markdown(response_full)
-            except Exception as e:
-                st.error(f"There was an error handling the image!\n\n{e}", icon='🚨')
+        if st.session_state.saved_image:
+            if submit_button := st.button(":blue[Pythonize]", key='submit_button'):
+                try:
+                    response_full = generate_response(chat_engine, prompt, role_context="image_to_code")
+                    st.divider()
+                    # Extract python code from markdown
+                    pattern = r"```python\n(.*?)```"
+                    code_snippet = re.findall(pattern, response_full, re.DOTALL)
+                    if code_snippet:
+                        st.session_state['code_snippet'] = code_snippet[0]
+                    if response_full:
+                        st.markdown("#### Pythonized image:")
+                        st.markdown(response_full)
+                except Exception as e:
+                    st.error(f"There was an error handling the image!\n\n{e}", icon='🚨')
 
         if 'code_snippet' in st.session_state:
             # Initialize the manual system role and prompt
             prompt = f"""
-               For the following code, debug and/or optimize if possible. If
+               For the following code, debug and/or optimize if possible.
+               Check if the correct usage for methods and parameters are in place.  
+               If the desired visual can be produced using more advanced 
+               or appropriate plotting methods, update the code accordingly. If
                the code is lacking the necessary data to display a valid plot,
                create the data, or use the built in datasets from plotting
-               libraries. Include a 
+               libraries, i.e. load_dataset() method:
 
                {st.session_state['code_snippet']}
                """
@@ -147,14 +170,14 @@ def main():
                 st.session_state['vision']['messages'].append(st.session_state['code_snippet'])
                 st.session_state['vision']['messages'].append(response)
 
-    if image_file and len(st.session_state['vision']['messages']) > 1:
+    if st.session_state.saved_image and len(st.session_state['vision']['messages']) > 1:
         st.sidebar.markdown("#### Original Image")
-        st.sidebar.image(image_file)
+        st.sidebar.image(st.session_state.saved_image)
 
         # Store the prompt and the response in a session_state list
         # for use in chatting function
         if chat_prompt := st.chat_input(placeholder="Any questions?"):
-            st.chat_message('user').markdown(chat_prompt)
+            st.chat_message('user').text(chat_prompt)
             st.session_state['vision']['messages'].append(chat_prompt)
 
             response_2 = generate_response(

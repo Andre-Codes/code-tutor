@@ -2,9 +2,9 @@ app_ui:
     main:  # settings that control the main page configurations
       page_title: "Code Tutor - Learn Code"
       page_icon: "teacher" # use shortcodes (see: https://streamlit-emoji-shortcodes-streamlit-app-gwckff.streamlit.app/)
-      title: "Learning Lab"
+      title: "Coding Hub"
       title_emoji: "bulb"
-      subheader: "What do you want to learn about today?"
+      subheader: "What should we work on today?"
     prompt:  # settings/controls related to the prompt and prompt area
         prompt_box: True  # inverse is used to control the 'disabled' param
         response_button: True

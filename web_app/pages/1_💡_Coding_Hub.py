@@ -17,7 +17,7 @@ st.set_page_config(
 
 
 # Function to load configurations
-# @st.cache_data
+@st.cache_data
 def load_app_config():
     config_settings = {
         # main app settings:
@@ -41,7 +41,7 @@ def load_app_config():
 
 
 # Function to set up the app configurations
-# @st.cache_data
+@st.cache_data
 def setup_app_config(base_path_web, base_path_local, config_file, logo_name, avatar_name):
     # Determine the base path depending on what exists
     base_path = base_path_web if os.path.exists(base_path_web) else base_path_local
