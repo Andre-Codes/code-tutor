@@ -2,28 +2,29 @@ import streamlit as st
 import base64
 import re
 import os
+from pathlib import Path
 import pages.utils.gpt_utils as gpt
 from pages.utils.web_helpers import generate_response, display_response
 
 
 @st.cache_data
 def setup_app_config(base_path_web, base_path_local, config_file, logo_name, avatar_name):
+    # Convert string paths to Path objects
+    base_path_web = Path(base_path_web)
+    base_path_local = Path(base_path_local)
     # Determine the base path depending on what exists
-    base_path = base_path_web if os.path.exists(base_path_web) else base_path_local
+    base_path = base_path_web if base_path_web.exists() else base_path_local
     # Set up file paths uniformly
-    # config_file_path = os.path.join(base_path, config_file) pages/utils/1_config.yaml
-    config_file_path = "/mount/src/code-tutor/web_app/pages/utils/2_config.yaml"  # /mount/src/code-tutor/web_app/
-    # logo = os.path.join(base_path, logo_name)
-    # avatar = os.path.join(base_path, avatar_name)
-    logo = avatar = "/mount/src/code-tutor/web_app/pages/images/ct_logo_head.png"
+    config_file_path = base_path / config_file
+    logo_path = base_path / logo_name
+    avatar_path = base_path / avatar_name
     # Get the API key based on the base path
     api_key = st.secrets["OPENAI_API_KEY"] if base_path == base_path_web else os.environ["OPENAI_API_KEY"]
-    # Instantiate the ChatEngine
-    chat_engine = gpt.ChatEngine(stream=False, api_key=api_key, config_path=config_file_path)
+    # Instantiate the ChatEngine with the config file path as a string
+    chat_engine = gpt.ChatEngine(stream=False, api_key=api_key, config_path=str(config_file_path))
     # Grab the config data from the engine
     config_data = chat_engine.CONFIG
-
-    return chat_engine, config_data, logo, avatar
+    return chat_engine, config_data, str(logo_path), str(avatar_path)
 
 
 def encode_image(image_file):
@@ -132,7 +133,18 @@ def main():
                         st.markdown("#### Pythonized image:")
                         st.markdown(response_full)
                 except Exception as e:
-                    st.error(f"There was an error handling the image!\n\n{e}", icon='🚨')
+                    error_message = str(e)
+                    error_dict_str = error_message.split(' - ')[1]
+                    error_dict = eval(error_dict_str)
+                    error_message = error_dict['error']['message']
+                    if error_dict['error']['code'] in ('billing_hard_limit_reached', 'insufficient_quota'):
+                        st.error(icon='😪',
+                                 body=f"""**No more requests allowed**. 
+                            \n\n If you are using your own API 🔑 key, increase ⏫ your billing limit.
+                            Otherwise, try again later... (our wallets are tired)
+                        """)
+                    else:
+                        st.error(f"There was an error handling the image!\n\n{error_message}", icon='🚨')
 
         if 'code_snippet' in st.session_state:
             # Initialize the manual system role and prompt
