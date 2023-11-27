@@ -311,7 +311,7 @@ def main():
 if __name__ == '__main__':
     # create the chat engine instance and retrieve the custom configuration data
     chat_engine, config_data, page_logo, ai_avatar = setup_app_config(
-        base_path_web="/app/code-tutor/web_app/pages/",  # streamlit server path
+        base_path_web="/mount/src/code-tutor/web_app/pages/",  # streamlit server path
         base_path_local="pages/",  # local path
         config_file="utils/1_config.yaml",
         logo_name="images/ct_logo_head.png",
