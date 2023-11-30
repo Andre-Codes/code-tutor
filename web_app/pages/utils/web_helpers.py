@@ -66,7 +66,7 @@ def display_response(response, streaming, download=True, role_name=None):
             choices = st.radio(label="Choices", options=q['choices'], label_visibility='hidden', key=i)
             result_placeholder = st.empty()
     else:
-        response_content = response['choices'][0]['message']['content']
+        response_content = response.choices[0].message.content
         markdown_placeholder.markdown(response_content)
         file_data = response_content
 

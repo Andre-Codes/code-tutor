@@ -56,7 +56,7 @@ def setup_app_config(base_path_web, base_path_local, config_file, logo_name, ava
     # Get the API key based on the base path
     api_key = st.secrets["OPENAI_API_KEY"] if base_path == base_path_web else os.environ["OPENAI_API_KEY"]
     # Instantiate the ChatEngine with the config file path as a string
-    chat_engine = gpt.ChatEngine(stream=False, api_key=api_key, config_path=str(config_file_path))
+    chat_engine = gpt.ChatEngine(stream=True, api_key=api_key, config_path=str(config_file_path))
     # Grab the config data from the engine
     config_data = chat_engine.CONFIG
     return chat_engine, config_data, str(logo_path), str(avatar_path)
@@ -283,6 +283,7 @@ def main():
             st.session_state[context]['messages'].append(response)
         except Exception as e:
             error_message = str(e)
+            print(error_message)
             error_dict_str = error_message.split(' - ')[1]
             error_dict = eval(error_dict_str)
             error_message = error_dict['error']['message']
