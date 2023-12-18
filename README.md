@@ -1,91 +1,49 @@
-# CodeTutor - An AI Teacher for Coding
-
-** THIS README IS A WORK IN PROGRESS **
+# Code Tutor - AI Coding Teacher
 
 ## Introduction
 
-Context-based AI assistant for customized lessons on various coding related concepts. Enjoy real-time responses after choosing from a variety of specialized contexts, including API explanation for in-depth library insights, general code assistance with suggestions and real-world code examples, code conversion for multilingual coding (Python to C++, SQL to Pandas, etc.), and PEP 8 standardization to refine and polish your code. Get precise, tailored lessons and solutions to your coding queries with ease.
+Welcome to Code Tutor, your personal AI-powered coding companion! In the ever-evolving world of programming, staying ahead can be a challenge. Code Tutor is here to revolutionize the way you learn and interact with code. Whether you're a budding programmer or a seasoned coder, our platform is designed to cater to your unique learning style and coding needs.
 
-## Table of Contents
+Step into one of the *rooms* below and begin a whole new learning experience...
 
-- [Introduction](#introduction)
-- [Installation and Setup](#installation-and-setup)
-- [Usage](#usage)
-- [Methods Description](#methods-description)
-- [Examples](#examples)
+## Rooms
 
-## Installation and Setup
+### Coding Hub
+The Coding Hub, a pivotal component of our Streamlit application, offers a sophisticated, context-based AI assistant specifically crafted for comprehensive coding education and support. This innovative platform is not just about one-time interactions; it excels in facilitating ongoing conversations and follow-up questions, ensuring a deeply engaging and continuous learning experience. With its advanced AI technology, the Coding Hub allows users to delve into various coding concepts and receive real-time, tailored responses, fostering an environment of active learning and exploration.
 
-#### Jupyter Notebook module
-To use CodeTutor from within a Jupyter Notebook you must include the 
+Key Features
+- Contextual Learning and Assistance: Choose from diverse lesson contexts like **API Explanation**, **Code Assistance**, **Code Conversion**, and **PEP 8 Standardization** to receive focused and relevant educational content.
+- Ongoing Conversations: Engage in extended dialogues with the AI assistant. Follow-up questions are not only encouraged but seamlessly integrated into the learning experience, allowing for a deeper understanding of coding topics.
+- Persistent Lesson Contexts: Each lesson context maintains its history, enabling users to switch between different contexts without losing any previously generated lessons or conversations. This feature ensures a cohesive learning journey, preserving the continuity and progression of each lesson.
+- Real-Time AI-Powered Feedback: Get immediate, AI-driven responses and solutions, making the learning process dynamic and responsive.
+- Interactive User Experience: The interface is designed to be intuitive and user-friendly, making coding education accessible and enjoyable for learners at all levels.
+
+The Coding Hub is designed to be more than just an educational tool; it's a dynamic platform for ongoing coding mentorship and guidance. Whether you're refining your coding technique, exploring new programming languages, or seeking answers to complex coding problems, the Coding Hub offers a personalized and immersive learning experience, keeping all your lessons and interactions organized and accessible.
+
+### Pyxelate Lab
+The Pyxelate Lab is a unique feature of our Streamlit application, specifically designed for data visualization enthusiasts and Python developers. This innovative platform allows users to upload images of data visuals, such as charts, graphs, or other graphical representations. Once an image is uploaded, the Pyxelate Lab harnesses the power of the OpenAI Vision API to analyze the visual and generate the corresponding Python code needed to recreate it.
+
+This functionality is particularly useful for users who come across data visuals in various media and wish to understand how to programmatically replicate them using Python. The Pyxelate Lab not only aids in learning and understanding data visualization techniques but also serves as a tool for quickly converting visual inspirations into executable Python code.
+
+Key Features
+- Image Upload: Users can easily upload images of data visuals directly into the application.
+- OpenAI Vision API Integration: Utilizes the advanced capabilities of the OpenAI Vision API to accurately interpret the uploaded visuals.
+- Python Code Generation: Automatically generates the Python code required to recreate the uploaded data visual, making it easy for users to learn and apply new visualization techniques.
+- Interactive Experience: Offers an engaging and user-friendly interface for seamless interaction and experimentation with different types of data visuals.
+- Learning and Development Tool: Acts as a valuable resource for those looking to enhance their skills in Python programming and data visualization.
+
+## Features
+- **Interactive Coding Lessons**: Users can generate customized coding lessons based on their input.
+- **Advanced AI Integration**: Utilizes state-of-the-art AI models for generating accurate and relevant coding content.
+- **User-Friendly Interface**: Easy-to-navigate design, suitable for all levels of coding expertise.
+- **Customizable Learning Experience**: Offers flexibility in lesson content and structure to cater to individual learning preferences.
+- **Responsive Design**: Optimized for various devices, ensuring a seamless learning experience on desktops, tablets, and smartphones.
 
 ## Usage
+After launching the Code Tutor Streamlit Application, you can:
 
-Initialize the `CodeTutor` class and then call its methods based on your use case. For example:
+- **Generate Lessons**: Enter a topic or question in the prompt box to receive a tailored coding lesson.
+- **Explore AI Models**: Choose from various AI models to see how different algorithms tackle your coding queries.
+- **Interact with the App**: Utilize the interactive interface to modify lessons, ask follow-up questions, and deepen your understanding of coding concepts.
 
-```python
-api_explain = gpt.CodeTutor(role_context='api_explain',
-                            temperature=0, 
-                            prompt_context=True,
-                            comment_level='verbose',
-                            explain_level='comprehensive')
-```
-
-
-
-### Methods Description
-
-#### `__init__(role_context, prompt_context, md_table_style, comment_level, temperature)`
-
-Initializes the GPTService class with various settings.
-
-#### Parameters
-- `role_context` (str, optional): Defines the operational context of the GPT model.
-- `prompt_context` (bool, optional): Indicates if additional context will be provided for the prompt.
-- ... (continue for each method and parameter)
-
-### Examples
-
-## The 'code_help' role context
-```python
-code_help = gpt.CodeTutor(role_context='code_help',
-                            comment_level='normal',
-                            explain_level='comprehensive')
-code_help.prompt = "using pandas compare two dataframes, and create a new one with the differences"
-code_help.get_response(code_help.prompt, format_style='markdown')
-```
-
-### The 'pep8' role context, with assistant messages
-(See this [notebook](https://github.com/Andre-Codes/code-tutor/blob/main/response_examples/chat_assistant_examples/chat_assistant.ipynb) for a full example with response output)
-```python
-# initiaite the class with the chosen role
-fix_code = gpt.CodeTutor(role_context="pep8")
-
-# create the prompt, save it to a unique variable
-prompt_1 = """
-counter=0
-Num = 0.5
-if 0 <= Num:
-    if Num <= 1:
-        for i in [0,2,4,6,8,10,12,14,16,18,20]:
-            counter = counter + 1
-            print(counter + ": " + i**2)
-"""
-# send the prompt and the response will be displayed in the output cell
-# the response is also accessible from the response_content attribute
-fix_code.get_response(prompt=prompt_1, format_style='markdown')
-
-# create a second prompt to follow up the previous response
-prompt2 = """
-can you check again and confirm all the possible changes to 
-the original code were made to conform to PEP8
-"""
-
-# save the first response to a variable
-prompt1_response = fix_code.response_content
-# create a list, alternate prompt and assistant message (response)
-messages = [prompt_1, prompt_response, prompt2]
-# send the messages and get another response
-fix_code.get_response(prompt=messages, format_style='markdown')
-```
 
