@@ -115,8 +115,7 @@ def setup_sidebar(chat_engine, app_config):
         type="password",
         help="Enter your OpenAI API key."
     )
-    if 'gpt_activated' not in st.session_state:
-        st.session_state['gpt_activated'] = False if api_key_input == "" else True
+    st.session_state['gpt_activated'] = False if api_key_input == "" else True
 
     if api_key_input.lower() == 'godmode':
         chat_engine.api_key = st.secrets["OPENAI_API_KEY"]
