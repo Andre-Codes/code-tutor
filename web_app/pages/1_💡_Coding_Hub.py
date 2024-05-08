@@ -75,7 +75,7 @@ def setup_app_controls(app_config):
         response_button = st.button(
             f":blue[Ask Code Tutor!] :sparkles:",
             help="Get an answer",
-            disabled=not app_config['response_button'] and not st.session_state['gpt_activated']  # inverse of enabled status
+            disabled=not app_config['response_button'] or not st.session_state['gpt_activated']  # inverse of enabled status
         )
 
     chat_engine.user_prompt = prompt_box.text_area(
