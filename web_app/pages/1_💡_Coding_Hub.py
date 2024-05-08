@@ -75,7 +75,7 @@ def setup_app_controls(app_config):
         response_button = st.button(
             f":blue[Ask Code Tutor!] :sparkles:",
             help="Get an answer",
-            disabled=not app_config['response_button']  # inverse of enabled status
+            disabled=not app_config['response_button'] and not st.session_state['gpt_activated']  # inverse of enabled status
         )
 
     chat_engine.user_prompt = prompt_box.text_area(
@@ -115,6 +115,8 @@ def setup_sidebar(chat_engine, app_config):
         type="password",
         help="Enter your OpenAI API key."
     )
+    if 'gpt_activated' not in st.session_state:
+        st.session_state['gpt_activated'] = False if api_key_input == "" else True
 
     if api_key_input.lower() == 'godmode':
         chat_engine.api_key = st.secrets["OPENAI_API_KEY"]
@@ -130,7 +132,6 @@ def setup_sidebar(chat_engine, app_config):
 
         # Add Open API key and Advanced Settings widgets to the expander
         with adv_settings:
-            llm_model_enabled = False if api_key_input == "" else True
             llm_model = st.selectbox(
                 "Model",
                 ["GPT-3", "GPT-4", "GPT-4 Turbo"],
@@ -141,9 +142,9 @@ def setup_sidebar(chat_engine, app_config):
                  to detail. 
                  - **GPT-4 Turbo**: fastest, most advanced v4 model.
                  """,
-                disabled=not llm_model_enabled
+                disabled=not gpt_activated
             )
-            if llm_model_enabled:
+            if gpt_activated:
                 chat_engine.model = llm_models_dict[llm_model]
 
             chat_engine.temperature = st.slider(
@@ -153,7 +154,8 @@ def setup_sidebar(chat_engine, app_config):
                 A higher value results in more diverse and unexpected 
                 responses, while lower values result in more conservative
                 and predictable responses.
-                """
+                """,
+                disabled=not gpt_activated
             )
 
     roles = {
