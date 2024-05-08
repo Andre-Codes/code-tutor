@@ -130,7 +130,7 @@ def setup_sidebar(chat_engine, app_config):
 
         # Add Open API key and Advanced Settings widgets to the expander
         with adv_settings:
-            llm_model_enabled = False if api_key_input is None else True
+            llm_model_enabled = False if api_key_input == "" else True
             llm_model = st.selectbox(
                 "Model",
                 ["GPT-3", "GPT-4", "GPT-4 Turbo"],
