@@ -110,17 +110,16 @@ def setup_sidebar(chat_engine, app_config):
         "GPT-4 Turbo": "gpt-4-1106-preview"
     }
 
-    api_key = api_key.text_input(
+    api_key_input = api_key.text_input(
         label="OpenAI API Key :key:",
         type="password",
-        value='',
         help="Enter your OpenAI API key."
     )
 
-    if api_key.lower() == 'god mode':
+    if api_key_input.lower() == 'godmode':
         chat_engine.api_key = st.secrets["OPENAI_API_KEY"]
     else:
-        chat_engine.api_key = api_key
+        chat_engine.api_key = api_key_input
 
     # Advanced settings expander
     if app_config['adv_settings']:
@@ -131,7 +130,7 @@ def setup_sidebar(chat_engine, app_config):
 
         # Add Open API key and Advanced Settings widgets to the expander
         with adv_settings:
-            llm_model_enabled = False if api_key is None else True
+            llm_model_enabled = False if api_key_input is None else True
             llm_model = st.selectbox(
                 "Model",
                 ["GPT-3", "GPT-4", "GPT-4 Turbo"],
