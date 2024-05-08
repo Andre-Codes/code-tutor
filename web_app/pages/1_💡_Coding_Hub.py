@@ -142,9 +142,9 @@ def setup_sidebar(chat_engine, app_config):
                  to detail. 
                  - **GPT-4 Turbo**: fastest, most advanced v4 model.
                  """,
-                disabled=not gpt_activated
+                disabled=not st.session_state['gpt_activated']
             )
-            if gpt_activated:
+            if st.session_state['gpt_activated']:
                 chat_engine.model = llm_models_dict[llm_model]
 
             chat_engine.temperature = st.slider(
@@ -155,7 +155,7 @@ def setup_sidebar(chat_engine, app_config):
                 responses, while lower values result in more conservative
                 and predictable responses.
                 """,
-                disabled=not gpt_activated
+                disabled=not st.session_state['gpt_activated']
             )
 
     roles = {
