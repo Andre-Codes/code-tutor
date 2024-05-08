@@ -2,8 +2,8 @@ import streamlit as st
 import os
 import random
 from pathlib import Path
-from utils.web_helpers import generate_response, display_response
-import utils.gpt_utils as gpt
+from pages.utils.web_helpers import generate_response, display_response
+import pages.utils.gpt_utils as gpt
 
 # set main page configuration
 page_title = "Learning Lab"

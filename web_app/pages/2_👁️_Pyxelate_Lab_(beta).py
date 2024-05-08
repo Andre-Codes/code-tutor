@@ -3,8 +3,8 @@ import base64
 import re
 import os
 from pathlib import Path
-import utils.gpt_utils as gpt
-from utils.web_helpers import generate_response, display_response
+import pages.utils.gpt_utils as gpt
+from pages.utils.web_helpers import generate_response, display_response
 
 
 @st.cache_data

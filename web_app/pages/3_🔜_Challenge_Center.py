@@ -2,8 +2,8 @@ import streamlit as st
 import os
 import json
 import random
-import utils.gpt_utils as gpt
-from utils.web_helpers import generate_response
+import pages.utils.gpt_utils as gpt
+from pages.utils.web_helpers import generate_response
 
 
 # set main page configuration
