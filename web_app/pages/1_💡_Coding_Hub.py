@@ -2,8 +2,8 @@ import streamlit as st
 import os
 import random
 from pathlib import Path
-from pages.utils.web_helpers import generate_response, display_response
-import pages.utils.gpt_utils as gpt
+from utils.web_helpers import generate_response, display_response
+import utils.gpt_utils as gpt
 
 # set main page configuration
 page_title = "Learning Lab"
@@ -55,8 +55,8 @@ def setup_app_config(base_path_web, base_path_local, config_file, logo_name, ava
     avatar_path = base_path / avatar_name
     # Get the API key based on the base path
     api_key = st.secrets["OPENAI_API_KEY"] if base_path == base_path_web else os.environ["OPENAI_API_KEY"]
-    # Instantiate the ChatEngine with the config file path as a string
-    chat_engine = gpt.ChatEngine(stream=True, api_key=api_key, config_path=str(config_file_path))
+    # Start the ChatEngine with the config file path as a string
+    chat_engine = gpt.ChatEngine(stream=True, config_path=str(config_file_path))
     # Grab the config data from the engine
     config_data = chat_engine.CONFIG
     return chat_engine, config_data, str(logo_path), str(avatar_path)
@@ -110,12 +110,17 @@ def setup_sidebar(chat_engine, app_config):
         "GPT-4 Turbo": "gpt-4-1106-preview"
     }
 
-    chat_engine.api_key = api_key.text_input(
+    api_key = api_key.text_input(
         label="OpenAI API Key :key:",
         type="password",
         value='',
-        help="Entering your own key is optional. This app is completely free to use until rate limits are exceeded."
-    ) or chat_engine.api_key
+        help="Enter your OpenAI API key."
+    )
+
+    if api_key.lower() == 'god mode':
+        chat_engine.api_key = st.secrets["OPENAI_API_KEY"]
+    else:
+        chat_engine.api_key = api_key
 
     # Advanced settings expander
     if app_config['adv_settings']:
@@ -126,6 +131,7 @@ def setup_sidebar(chat_engine, app_config):
 
         # Add Open API key and Advanced Settings widgets to the expander
         with adv_settings:
+            llm_model_enabled = False if api_key is None else True
             llm_model = st.selectbox(
                 "Model",
                 ["GPT-3", "GPT-4", "GPT-4 Turbo"],
@@ -135,10 +141,11 @@ def setup_sidebar(chat_engine, app_config):
                 - **GPT-4**: slower response, better accuracy and attention 
                  to detail. 
                  - **GPT-4 Turbo**: fastest, most advanced v4 model.
-                 """
+                 """,
+                disabled=not llm_model_enabled
             )
-
-            chat_engine.model = llm_models_dict[llm_model]
+            if llm_model_enabled:
+                chat_engine.model = llm_models_dict[llm_model]
 
             chat_engine.temperature = st.slider(
                 "Temperature", 0.0, 2.0, 1.0, 0.1,
@@ -291,7 +298,7 @@ def main():
                 st.error(icon='😪',
                          body=f"""**No more requests allowed**. 
                     \n\n If you are using your own API 🔑 key, increase ⏫ your billing limit.
-                    Otherwise, try again later... (our wallets are tired)
+                    Otherwise, try again later...
                 """)
             else:
                 st.error(f"There was an error handling your question!\n\n{error_message}", icon='🚨')
