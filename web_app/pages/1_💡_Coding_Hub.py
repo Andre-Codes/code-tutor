@@ -113,11 +113,10 @@ def setup_sidebar(chat_engine, app_config):
     api_key = api_key.text_input(
         label="OpenAI API Key :key:",
         type="password",
-        value='',
         help="Enter your OpenAI API key."
     )
 
-    if api_key.lower() == 'god mode':
+    if api_key.lower() == 'godmode':
         chat_engine.api_key = st.secrets["OPENAI_API_KEY"]
     else:
         chat_engine.api_key = api_key
